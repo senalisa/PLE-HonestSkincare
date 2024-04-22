@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet } from 'react-native'
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -29,59 +29,133 @@ function HomeStackScreen() {
     );
 }
 
+const CustomTabBarButton = ({children, onPress}) => (
+    <TouchableOpacity
+    style={{
+        top: -15,
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 4,
+                },
+        shadowOpacity: 0.25,
+        backgroundColor: '#63254E',
+        width: 60,
+            height: 60,
+            borderRadius: 100,
+    }}
+    onPress={onPress}
+    >
+        <View>
+            {children}
+        </View>
+    </TouchableOpacity>
+);
+
 // NAVBAR
 const Tabs = () => {
     return (
-        <Tab.Navigator
-            screenOptions={({ route }) => ({
-                tabBarIcon: ({ focused }) => {
-                    let navText;
-                    let iconComponent;
-                    let iconSize = focused ? 25 : 25; 
-
-                    if (route.name === 'Home') {
-                        
-                        iconComponent = focused ? require('./../assets/icons/home-heart.png') : require('./../assets/icons/home-heart.png');
-                    } else if (route.name === 'Ontdek') {
-                        
-                        iconComponent = focused ? require('./../assets/icons/search.png') : require('./../assets/icons/search.png');
-                    } else if (route.name === 'CreatePost') {
-                        iconComponent = focused ? require('./../assets/icons/pen-field.png') : require('./../assets/icons/pen-field.png');
-                    } else if (route.name === 'Leaderboard') {
-                    
-                        iconComponent = focused ? require('./../assets/icons/ranking-star.png') : require('./../assets/icons/ranking-star.png');
-                    } else if (route.name === 'Account') {
-                        
-                        iconComponent = focused ? require('./../assets/icons/user-2.png') : require('./../assets/icons/user-2.png');
-                    }
-
-                    const iconColor = focused ? colors.secondaryColor : "gray";
-                    return <View className="items-center">
-                                <Image source={iconComponent} className="mb-2 w-5 h-5" style={{ tintColor: iconColor, width: iconSize, height: iconSize }} /> 
-                                <Text className={`text-xs ${focused ? 'font-semibold text-secondary' : 'font-medium text-white'}`}>{navText}</Text>
-                            </View>;
+        <Tab.Navigator screenOptions={{
+            tabBarShowLabel: false,
+            headerShown: false,
+            tabBarStyle: {
+                position: 'absolute',
+                backgroundColor: 'white',
+                shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 10,
                 },
-                tabBarStyle: {
-                    paddingVertical: 35,
-                    borderTopWidth: 0,
-                    height: 90,
-                    backgroundColor: 'white',
-                    shadowColor: '#000',
-                    shadowOpacity: 0.2,
-                    shadowOffset: {
-                        width: 0,
-                        height: 2,
-                    },
-                    shadowRadius: 4,
-                },
-                tabBarLabel: '',
-                headerShown: false,
-            })}>
-            <Tab.Screen name="Home" component={HomeStackScreen} />
-            <Tab.Screen name="Ontdek" component={Discover} />
-            <Tab.Screen name="CreatePost" component={CreatePost} />
-            <Tab.Screen name="Leaderboard" component={Leaderboard} />
-            <Tab.Screen name="Account" component={Profile} />
+                shadowOpacity: 0.25,
+            }
+            }}>
+            <Tab.Screen name="Home" component={HomeStackScreen} options={{
+                tabBarIcon: ({focused}) => (
+                    <View style={{alignItems: 'center', justifyContent: 'center', top: 5}}>
+                        <Image
+                        source={require('./../assets/icons/home-heart.png')}
+                        resizeMode="contain"
+                        style={{
+                            width: 25,
+                            height: 25,
+                            tintColor: focused ? '#63254E' : 'grey'
+                        }}
+                        />
+
+                    </View>
+                )
+            }}/>
+
+            <Tab.Screen name="Ontdek" component={Discover} options={{
+                tabBarIcon: ({focused}) => (
+                    <View style={{alignItems: 'center', justifyContent: 'center', top: 5}}>
+                        <Image
+                        source={require('./../assets/icons/search.png')}
+                        resizeMode="contain"
+                        style={{
+                            width: 25,
+                            height: 25,
+                            tintColor: focused ? '#63254E' : 'grey'
+                        }}
+                        />
+
+                    </View>
+                )
+            }}/>
+
+            <Tab.Screen name="CreatePost" component={CreatePost} options={{
+                tabBarIcon: ({focused}) => (
+                    <Image
+                    source={require('./../assets/icons/pen-field.png')}
+                    resizeMode="contain"
+                    style={{
+                        width: 25,
+                        height: 25,
+                        tintColor: 'white'
+                    }}
+                    />
+                ),
+                tabBarButton: (props) => (
+                    <CustomTabBarButton {...props} />
+                )
+            }}/>
+
+            <Tab.Screen name="Leaderboard" component={Leaderboard} options={{
+                tabBarIcon: ({focused}) => (
+                    <View style={{alignItems: 'center', justifyContent: 'center', top: 5}}>
+                        <Image
+                        source={require('./../assets/icons/ranking-star.png')}
+                        resizeMode="contain"
+                        style={{
+                            width: 25,
+                            height: 25,
+                            tintColor: focused ? '#63254E' : 'grey'
+                        }}
+                        />
+
+                    </View>
+                )
+            }}/>
+
+            <Tab.Screen name="Account" component={Profile} options={{
+                tabBarIcon: ({focused}) => (
+                    <View style={{alignItems: 'center', justifyContent: 'center', top: 5}}>
+                        <Image
+                        source={require('./../assets/icons/user-2.png')}
+                        resizeMode="contain"
+                        style={{
+                            width: 25,
+                            height: 25,
+                            tintColor: focused ? '#63254E' : 'grey'
+                        }}
+                        />
+
+                    </View>
+                )
+            }}/>
+
         </Tab.Navigator>
     );
 };
