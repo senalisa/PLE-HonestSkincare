@@ -1,7 +1,8 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createNativeStackNavigator} from '@react-navigation/native-stack';
+import { createStackNavigator, TransitionSpecs, CardStyleInterpolators } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { colors } from './../assets/styles/Styles.jsx';
 import useAuth from '../hooks/useAuth'
@@ -15,8 +16,24 @@ import Discover from '../screens/Discover';
 import CreatePost from '../screens/CreatePost';
 import Leaderboard from '../screens/Leaderboard';
 import Profile from '../screens/Profile';
+import UserSkinType from '../components/account/UserSkinType.jsx';
+import PostDetail from '../screens/PostDetail.jsx';
 
-const Stack = createNativeStackNavigator()
+
+// Animation
+const config = {
+    animation: 'spring',
+    config: {
+      stiffness: 1000,
+      damping: 500,
+      mass: 3,
+      overshootClamping: true,
+      restDisplacementThreshold: 0.01,
+      restSpeedThreshold: 0.01,
+    },
+};
+
+const Stack = createStackNavigator()
 const Tab = createBottomTabNavigator();
 
 const HomeStack = createNativeStackNavigator();
@@ -25,6 +42,7 @@ function HomeStackScreen() {
     return (
         <HomeStack.Navigator>
             <HomeStack.Screen name="HomeScreen" component={Home} options={{ headerShown: false }}/>
+            <HomeStack.Screen name="PostDetail" component={PostDetail} options={{ headerShown:false }} />
         </HomeStack.Navigator>
     );
 }
@@ -169,12 +187,19 @@ const AppNavigation = () => {
                 {user ? (
                 <>
                     <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
+                    <Stack.Screen name="UserSkinType" component={UserSkinType} options={{ headerShown: false }} />
                 </>
                 ) : (
                 <>
                     <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false }} />
-                    <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
-                    <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+                    <Stack.Screen name="Register" component={Register} options={{ headerShown: false, 
+                    cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+                    animation: 'fade'
+                    }} />
+                    <Stack.Screen name="Login" component={Login} options={{ headerShown: false, 
+                    cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+                    animation: 'fade'
+                    }} />
                 </>
                 )}
             </Stack.Navigator>

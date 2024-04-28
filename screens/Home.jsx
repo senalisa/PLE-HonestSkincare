@@ -1,28 +1,56 @@
-import { View, Text, SafeAreaView, TouchableOpacity, Image, ImageBackground, StyleSheet, ScrollView } from 'react-native'
-import React from 'react'
+import { View, Text, SafeAreaView, TouchableOpacity, Image, ImageBackground, ScrollView, RefreshControl } from 'react-native'
+import React, { useState } from 'react'
 import Topics from '../components/Topics'
 import TrendingPostCard from '../components/TrendingPostCard'
+import { TextInput } from 'react-native-gesture-handler'
+import { useNavigation } from '@react-navigation/native'
 
 
 export default function Home() {
+  const navigation = useNavigation()
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
+
   return (
-    <ScrollView>
+    <ScrollView refreshControl={
+      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#63254E"/>
+    }>
     <View className="flex-[1] white">
 
       {/* INTRO */}
-      <ImageBackground source={require('./../assets/images/home-bg.png')} resizeMode="cover" imageStyle= {{opacity:0.5}}>
+      <ImageBackground source={require('./../assets/images/home-bg2.png')} resizeMode="cover" imageStyle= {{opacity:0.2}}>
 
         <View className="mt-10 mb-10">
 
+          {/* INTRO: Logo + Notifications */}
+          <View className="flex-row justify-between">
+            <View className="flex mt-5 ml-4">
+              <Image className="w-16 h-6 ml-2" 
+                              source={require('./../assets/images/logo-plain-nobg.png')} />
+            </View>
+
+            <View>
+              <Image className="w-6 h-6 mr-7 mt-6" 
+                              source={require('./../assets/icons/notification.png')} />
+            </View>
+          </View>
+
           {/* INTRO: Welcome user + text */}
-          <View className="mt-10 px-10 mb-7">
-            <Text className="mb-2" style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 25 }}>Hi Sena</Text>
-            <Text className="" style={{ fontFamily: 'Montserrat_400Regular', fontSize: 16 }}>Find topics you'd like to read</Text>
+          <View className="mx-auto mt-3 mb-8 px-10 flex justify-center">
+            <Text className="mb-1 text-center" style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 25 }}>Hi Sena</Text>
+            <Text className="text-center" style={{ fontFamily: 'Montserrat_400Regular', fontSize: 16 }}>Find topics you'd like to read</Text>
           </View>
 
           <View className="px-10 flex-row justify-between">
             {/* Create topic Button */}
-            <TouchableOpacity 
+            {/* <TouchableOpacity 
               className="py-2 bg-dark-pink rounded-md w-40 items-center shadow">
                 <View className="flex-row">
                   <Image className="w-4 h-4" style={{ tintColor: "white"}}
@@ -34,13 +62,18 @@ export default function Home() {
                   >Create a topic
                   </Text>
                 </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           
             {/* Search Icon */}
             <TouchableOpacity 
-              className="shadow-lg">
-              <Image className="w-5 h-5 mt-2" style={{ tintColor: "black"}}
+              className="shadow-sm bg-white rounded-xl w-full mb-3 flex-row">
+              <Image className="w-5 h-5 my-2 mx-5" style={{ tintColor: "#CBCACA"}}
                                       source={require('./../assets/icons/search.png')} />
+              <TextInput
+              placeholder='Search...'
+              className="text-gray-200 text-md">
+
+              </TextInput>
             </TouchableOpacity>
           </View>
    
@@ -48,7 +81,7 @@ export default function Home() {
 
       </ImageBackground>
 
-      <View className="bg-white rounded-t-3xl outline outline-offset-6 h-full py-5">
+      <View className="bg-white rounded-t-[35px] outline outline-offset-6 h-full py-5 -mt-5">
         {/* Topics for you */}
         <View className="flex-row justify-between  px-8">
           <Text 
@@ -57,7 +90,7 @@ export default function Home() {
             Topics for you
           </Text>
 
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('UserSkinType')}>
             <Text
              style={{ fontFamily: 'Montserrat_500Medium', fontSize: 15 }}
              className="text-dark-pink pt-3 underline underline-offset-4"
@@ -68,19 +101,19 @@ export default function Home() {
         </View>
 
         {/* Topics Map */}
-        <View className="mt-5">
+        <View className="mt-2">
           <Topics />
         </View>
 
-        <View className="flex-row justify-between  px-8">
+        <View className="flex-row justify-between px-8 -mt-4">
           <Text 
           style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }}
-          className="pt-10">
+          className="pt-7">
             Trending posts
           </Text>
         </View>
 
-        <View>
+        <View className="mb-28">
           <TrendingPostCard />
         </View>
         

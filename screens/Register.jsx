@@ -1,6 +1,7 @@
-import { View, Text, SafeAreaView, TouchableOpacity, TextInput, Image} from 'react-native'
+import { View, Text, SafeAreaView, TouchableOpacity, TextInput, Image, ImageBackground} from 'react-native'
+import Animated, { FadeIn, FadeInDown, FadeInUp, FadeOut } from 'react-native-reanimated';
 import React, { useState } from 'react'
-import { ArrowLeftIcon } from 'react-native-heroicons/solid'
+import { ArrowLeftIcon, ArrowUpIcon } from 'react-native-heroicons/solid'
 import { useNavigation } from '@react-navigation/native'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { auth } from '../config/firebase'
@@ -21,28 +22,31 @@ export default function Register() {
 
         // Update profile met displayName
         await updateProfile(user, { displayName: displayName });
-        navigation.navigate('Home');
+        navigation.navigate('UserSkinType');
 
       } catch(err) {
         switch(err.code) {
           case 'auth/email-already-in-use':
-            setError('Dit e-mailadres is al in gebruik.');
+            setError('This e-mail is already in use');
             break;
           case 'auth/invalid-email':
-            setError('Ongeldig e-mailadres.');
+            setError('Invalid e-mail adress');
             break;
           case 'auth/weak-password':
-            setError('Het wachtwoord is te zwak. Vul een wachtwoord in van minimaal 6 tekens.');
+            setError('Please create an password with at least 6 characters');
             break;
           default:
-            setError('Er is een fout opgetreden bij het registreren.');
+            setError('There has been an error, please try again');
         }
       }
     }
   }
      
   return (
-    <View className="flex-1 bg-primary">
+    <View className="flex-1">
+       {/* INTRO */}
+       <ImageBackground source={require('./../assets/images/welcome-bg-up.png')} resizeMode="cover" className="w-full h-full">
+
       <SafeAreaView className="flex">
 
         {/* Backbutton */}
@@ -50,68 +54,141 @@ export default function Register() {
             <TouchableOpacity 
                 onPress={() => navigation.goBack()}
                 className="bg-primary-dark p-2 rounded-tr-2xl rounded-bl-2xl ml-4">
-                <ArrowLeftIcon size="20" color="white"></ArrowLeftIcon>
+                <ArrowUpIcon size="20" color="black"></ArrowUpIcon>
             </TouchableOpacity>
         </View>
 
       </SafeAreaView>
 
       <View className="flex-1 bg-primary px-8 pt-8"> 
-        <Text className="text-white font-bold text-2xl text-center mb-12">
-                Registreren voor NPO Stories
-        </Text>
+        {/* Logo */}
+        <View className="flex items-center mb-10">
+          <Image className="w-32 h-12 ml-2" 
+                          source={require('./../assets/images/logo-plain-nobg.png')} />
+        </View>
 
-        <View className="form space-y-2">
+        <View className="form space-y-2 px-5">
             
             {/* Username */}
-            <Text className="text-white font-semibold text-xl">Gebruikersnaam</Text>
-            <TextInput 
-                className="p-4 bg-gray-200 text-gray-700 rounded-md border border-gray-300 text-l font-medium mb-6"
-                placeholder=''
-                value={displayName}
-                onChangeText={value => setDisplayName(value)}
-            >
-            </TextInput>
+            <Animated.View entering={FadeInDown.delay(200).duration(3000).springify()}>
+              {/* Text */}
+              <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }}
+              className="text-black font-semibold pb-2">Username</Text>
+
+              {/* Input */}
+              <View className="flex-row px-4 py-2 bg-white text-gray-700 rounded-md border border-gray-200 text-l font-medium mb-4">
+                  <Image className="w-6 h-6 mr-3" style={{ tintColor: "black"}}
+                                              source={require('./../assets/icons/profile.png')} />
+                  <TextInput 
+                      className="flex-1"
+                      placeholder=''
+                      value={displayName}
+                      onChangeText={value => setDisplayName(value)}
+                  >
+                  </TextInput>
+                </View>
+
+            </Animated.View>
 
             {/* Email input */}
-            <Text className="text-white font-semibold text-xl">E-mailadres</Text>
-            <TextInput 
-                className="p-4 bg-gray-200 text-gray-700 rounded-md border border-gray-300 text-l font-medium mb-6"
-                placeholder=''
-                value={email}
-                onChangeText={value => setEmail(value)}
-            >
-            </TextInput>
+            <Animated.View entering={FadeInDown.delay(300).duration(3000).springify()}>
+              {/* Text */}
+              <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }}
+              className="text-black font-semibold text-xl">E-mail</Text>
+
+              {/* Input */}
+              <View className="flex-row px-4 py-3 bg-white text-gray-700 rounded-md border border-gray-200 text-l font-medium mb-4">
+                <Image className="w-4 h-4 mr-4" style={{ tintColor: "black"}}
+                                            source={require('./../assets/icons/mail.png')} />
+                <TextInput 
+                    className="flex-1"
+                    placeholder=''
+                    value={email}
+                    onChangeText={value => setEmail(value)}
+                >
+                </TextInput>
+              </View>
+
+            </Animated.View>
 
             {/* Wachtwoord input */}
-            <Text className="text-white font-semibold text-xl">Wachtwoord</Text>
-            <TextInput 
-                className="p-4 bg-gray-200 text-gray-700 rounded-md border border-gray-300 text-l font-medium mb-10"
-                secureTextEntry
-                placeholder=''
-                value={password}
-                onChangeText={value => setPassword(value)}
-            >
-            </TextInput>
+            <Animated.View entering={FadeInDown.delay(400).duration(3000).springify()}>
+              {/* Text */}
+              <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }}
+              className="text-black font-semibold text-xl">Password</Text>
 
-            {error ? <Text className="text-red-500 mb-4 -mt-6">{error}</Text> : null}
+              {/* Input */}
+              <View className="flex-row px-4 py-2.5 bg-white text-gray-700 rounded-md border border-gray-200 text-l font-medium mb-10">
+                <Image className="w-5 h-5 mr-3" style={{ tintColor: "black"}}
+                                            source={require('./../assets/icons/lock.png')} />
+                <TextInput 
+                    className="flex-1"
+                    secureTextEntry
+                    placeholder=''
+                    value={password}
+                    onChangeText={value => setPassword(value)}
+                >
+                </TextInput>
+              </View>
 
-            <TouchableOpacity className="py-3 bg-secondary rounded-md mb-7"
-                              onPress={handlesubmit}
-            >
-                <Text className="text-xl font-bold text-center text-white">Registreren</Text>
-            </TouchableOpacity>
+            </Animated.View>
+  
 
-            {/* Nog geen account */}
-            <View className="flex-row justify-center">
-                <Text className="text-white font-medium">Heb je al een NPO account?</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                    <Text className="font-semibold text-secondary"> Inloggen</Text>
+            {error ? <Text className="text-center text-black-500 mb-6 -mt-6">{error}</Text> : null}
+
+            <Animated.View entering={FadeInDown.delay(500).duration(3000).springify()}>
+                <TouchableOpacity className="py-3 bg-dark-pink rounded-full mb-5 w-60 flex mx-auto"
+                                  onPress={handlesubmit}
+                >
+                    <Text style={{ fontFamily: 'Belleza_400Regular', fontSize: 24 }}
+                    className="text-xl font-bold text-center text-white">Sign up</Text>
                 </TouchableOpacity>
-            </View>
+            </Animated.View>
+
+            <Animated.View entering={FadeInDown.delay(600).duration(3000).springify()}>
+              <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 20 }}
+              className="text-center mb-5">Or</Text>
+              <View className="flex-row justify-center space-x-8 mb-5">
+
+                {/* Google */}
+                <TouchableOpacity className="p-3 bg-gray-100 rounded-2xl">
+                  <Image source={require('./../assets/icons/google.png')}
+                    className="w-10 h-10" />
+                </TouchableOpacity>
+
+                {/* Facebook */}
+                <TouchableOpacity className="p-3 bg-gray-100 rounded-2xl">
+                  <Image source={require('./../assets/icons/facebook.png')}
+                    className="w-10 h-10" />
+                </TouchableOpacity>
+
+                {/* Apple */}
+                <TouchableOpacity className="p-3 bg-gray-100 rounded-2xl">
+                  <Image source={require('./../assets/icons/apple.png')}
+                    className="w-10 h-10" />
+                </TouchableOpacity>
+                
+              </View>
+            </Animated.View>
+
+            <Animated.View entering={FadeInDown.delay(700).duration(3000).springify()}>
+               {/* Nog geen account */}
+               <View className="flex-row justify-center">
+                <TouchableOpacity className="mt-3 flex-wrap text-center"
+                onPress={() => navigation.navigate('Login')}>
+                  <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 16 }} 
+                  className="text-center">Already joined our community?</Text>
+
+                  <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 16 }} 
+                  className="text-center text-dark-pink underline pt-1">Login here</Text>
+                </TouchableOpacity>
+                </View>
+            </Animated.View>
         </View>
 
       </View>
+
+      </ImageBackground>
     </View>
   )
 }

@@ -17,13 +17,23 @@ module.exports = {
 
         // Blue
           "light-blue" : "#F4FBFD",
-          "blue" : "#C9E9F2",
+          "blue" : "#7BB6D7",
 
         //   Pink
-          "pink" : "#EBCDDC",
+          "pink" : "#AE466D",
           "pink-light" : "#EBDBE3",
           "pastel-pink": "#E7B1AF",
-          "pinkie" : "#F5EBEF"
+          "pinkie" : "#F5EBEF",
+
+        //Yellow
+        "yellow" : "#F2EFD7",
+        "dark-yellow" : "#B4A18A",
+      },
+      width: {
+        '18': '4.5rem',
+      },
+      height:{
+        '18': '4.5rem',
       }
       },
   },
