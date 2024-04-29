@@ -2,9 +2,12 @@ import { View, Text, Image, ScrollView,  RefreshControl, } from 'react-native'
 import React from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import Animated, { StretchInX, StretchOutY, FadeIn, FadeInDown } from 'react-native-reanimated';
-
+import { useNavigation } from '@react-navigation/native'
 
 export default function Topics() {
+
+    const navigation = useNavigation()
+
   return (
     // <View className="flex-row"> 
     // <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
@@ -90,7 +93,7 @@ export default function Topics() {
 
         {/* Topic one */}
         <Animated.View entering={FadeInDown.delay(100).duration(3000).springify()}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('CategorySearch')}>
             <View className="bg-white border border-gray-200 ml-7 mr-5 px-4 rounded-xl items-center shadow-sm">
                 {/* Image */}
                 <Image source={require('./../assets/images/skins/skin-oily.png')} 

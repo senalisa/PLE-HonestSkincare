@@ -1,7 +1,7 @@
-import { View, Text, SafeAreaView, TouchableOpacity, Image, ImageBackground, ScrollView, RefreshControl } from 'react-native'
+import { View, Text, SafeAreaView, TouchableOpacity, Image, ImageBackground, ScrollView, RefreshControl, StatusBar } from 'react-native'
 import React, { useState } from 'react'
 import Topics from '../components/Topics'
-import TrendingPostCard from '../components/TrendingPostCard'
+import PostCard from '../components/PostCard'
 import { TextInput } from 'react-native-gesture-handler'
 import { useNavigation } from '@react-navigation/native'
 
@@ -22,6 +22,7 @@ export default function Home() {
     <ScrollView refreshControl={
       <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#63254E"/>
     }>
+      <StatusBar/>
     <View className="flex-[1] white">
 
       {/* INTRO */}
@@ -49,21 +50,7 @@ export default function Home() {
           </View>
 
           <View className="px-10 flex-row justify-between">
-            {/* Create topic Button */}
-            {/* <TouchableOpacity 
-              className="py-2 bg-dark-pink rounded-md w-40 items-center shadow">
-                <View className="flex-row">
-                  <Image className="w-4 h-4" style={{ tintColor: "white"}}
-                                        source={require('./../assets/icons/pen-field.png')} />
-
-                  <Text 
-                  style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 14 }}
-                  className="text-white px-3"
-                  >Create a topic
-                  </Text>
-                </View>
-            </TouchableOpacity> */}
-          
+  
             {/* Search Icon */}
             <TouchableOpacity 
               className="shadow-sm bg-white rounded-xl w-full mb-3 flex-row">
@@ -114,7 +101,7 @@ export default function Home() {
         </View>
 
         <View className="mb-28">
-          <TrendingPostCard />
+          <PostCard />
         </View>
         
       </View>

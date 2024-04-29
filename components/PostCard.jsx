@@ -4,7 +4,7 @@ import React from 'react'
 
 import { useNavigation } from '@react-navigation/native'
 
-export default function TrendingPostCard() {
+export default function PostCard() {
     const navigation = useNavigation()
 
   return (

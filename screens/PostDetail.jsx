@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, Text, SafeAreaView, TouchableOpacity, Image, ImageBackground, ScrollView, RefreshControl } from 'react-native'
+import { View, Text, SafeAreaView, TouchableOpacity, Image, ImageBackground, ScrollView, RefreshControl, StatusBar } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 
 export default function PostDetail() {
@@ -14,6 +14,7 @@ export default function PostDetail() {
 
   return (
     <ScrollView className="bg-[#FAFAFA]">
+        <StatusBar></StatusBar>
          <View className="bg-white px-7 pt-10 rounded-b-3xl shadow-sm">
             <View
             className="flex-row justify-between bg-white pt-6 mb-4">

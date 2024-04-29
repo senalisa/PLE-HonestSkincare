@@ -18,6 +18,7 @@ import Leaderboard from '../screens/Leaderboard';
 import Profile from '../screens/Profile';
 import UserSkinType from '../components/account/UserSkinType.jsx';
 import PostDetail from '../screens/PostDetail.jsx';
+import CategorySearch from '../screens/CategorySearch.jsx';
 
 
 // Animation
@@ -43,6 +44,7 @@ function HomeStackScreen() {
         <HomeStack.Navigator>
             <HomeStack.Screen name="HomeScreen" component={Home} options={{ headerShown: false }}/>
             <HomeStack.Screen name="PostDetail" component={PostDetail} options={{ headerShown:false }} />
+            <HomeStack.Screen name="CategorySearch" component={CategorySearch} options={{ headerShown:false }} />
         </HomeStack.Navigator>
     );
 }
