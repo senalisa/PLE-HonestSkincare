@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 import { View, Text, SafeAreaView, TouchableOpacity, Image, ImageBackground, ScrollView, RefreshControl, StatusBar } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
+import { Linking } from 'react-native';
 
-export default function PostDetail() {
+export default function PostDetail({ route }) {
+    const { post } = route.params;
 
     const navigation = useNavigation()
 
@@ -11,6 +13,17 @@ export default function PostDetail() {
     const toggleReplies = () => {
         setShowReplies(!showReplies); 
     };
+
+    // Functie om de URL van het product te openen in de standaardbrowser
+  const openProductURL = (url) => {
+    if (url && typeof url === 'string') {
+      Linking.openURL(url)
+        .then(() => console.log('URL geopend'))
+        .catch((error) => console.error('Fout bij het openen van URL:', error));
+    } else {
+      console.error('Ongeldige URL:', url);
+    }
+  };
 
   return (
     <ScrollView className="bg-[#FAFAFA]">
@@ -29,7 +42,7 @@ export default function PostDetail() {
                             <Text 
                             style={{ fontFamily: 'Montserrat_500Medium', fontSize: 13 }}
                             className="text-dark-pink text-center">
-                                Advise
+                                {post.postType}
                             </Text>
                 </View>
             </View> 
@@ -40,7 +53,7 @@ export default function PostDetail() {
                 <Text 
                         style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 19 }}
                         className="pt-3 px-1 mb-3 w-80">
-                        Moisturizer X helped me with my oily skin and cleared my acne
+                       {post.title}
                 </Text>
 
                 {/* Save */}
@@ -52,23 +65,43 @@ export default function PostDetail() {
 
             <View className="flex-row mt-2">
                 {/* Tags */}
-                <TouchableOpacity className="bg-light-blue border border-blue rounded-xl px-3 py-0.5 mx-1">
-                            <Text 
+                <View className="flex-row">
+                    {post.skinTypeTags.map((tag, index) => (
+                        <TouchableOpacity 
+                        key={index}
+                        className="bg-light-blue border border-blue rounded-xl px-3 py-0.5 mx-1">
+                        <Text 
                             style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
-                            className="text-center text-blue">Oily skin</Text>
+                            className="text-center text-blue">
+                            {tag}
+                        </Text>
                         </TouchableOpacity>
+                    ))}
 
-                        <TouchableOpacity className="bg-yellow border border-dark-yellow rounded-xl px-3 py-0.5 mr-1">
-                            <Text 
+                    {post.skinConcernTags.map((tag, index) => (
+                        <TouchableOpacity 
+                        key={index}
+                        className="bg-yellow border border-dark-yellow rounded-xl px-3 py-0.5 mx-1">
+                        <Text 
                             style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
-                            className="text-center text-dark-yellow">Acne</Text>
+                            className="text-center text-dark-yellow">
+                            {tag}
+                        </Text>
                         </TouchableOpacity>
+                    ))}
 
-                        <TouchableOpacity className="bg-pinkie border border-pink rounded-xl px-3 py-0.5">
-                            <Text 
+                    {post.skincareProductTags.map((tag, index) => (
+                        <TouchableOpacity 
+                        key={index}
+                        className="bg-pinkie border border-pink rounded-xl px-3 py-0.5 mx-1">
+                        <Text 
                             style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
-                            className="text-center text-pink">Moisturizer</Text>
-                </TouchableOpacity>
+                            className="text-center text-pink">
+                            {tag}
+                        </Text>
+                        </TouchableOpacity>
+                    ))}
+                    </View>
             </View>
             
             <View>
@@ -76,45 +109,46 @@ export default function PostDetail() {
                 <Text 
                         style={{ fontFamily: 'Montserrat_400Regular', fontSize: 16 }}
                         className="pt-5 px-1 mb-3 w-100">
-                        Since a couple of years I’ve had acne on my cheeks and forehead. I tried a lot of things to get rid of it, but it was really hard because i have an oily skin. 
-                        {"\n"} {"\n"}
-                        Till I met the Moisturizer X. At first I experienced a little bit of purging, but after a week or so my skin started to clear up. I’ve already used 3 bottles of this moisturizer. That’s why I really recommend this product. 
+                        {post.description}
                 </Text>
             </View>
+            
+            <View>
+                {post.products.map((product, index) => (
+                    <View key={index} className="bg-white shadow-sm rounded-md flex-row mt-4 py-2 px-5 justify-between">
+                    {/* Product */}
 
-            <View className="bg-white shadow-sm rounded-md flex-row mt-4 py-2 px-5 justify-between">
-                {/* Product */}
+                    <View className="flex-row">
+                        {/* Image */}
+                        <Image className="w-12 h-12 mr-5" source={{ uri: product.productImage }} />
 
-                <View className="flex-row">
-                    {/* Image */}
-                    <Image className="w-12 h-12 mr-5" 
-                                            source={require('./../assets/images/moisturizer.png')} />
-
-                    <View className="flex-wrap mt-2">
+                        <View className="flex-wrap mt-2">
                         {/* Product name */}
-                        <Text  style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15 }}>
-                            Moisturizer X
+                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15 }}>
+                            {product.productName}
                         </Text>
 
                         {/* Brand name */}
-                        <Text  style={{ fontFamily: 'Montserrat_400Regular', fontSize: 15 }}>
-                            Brand Name
+                        <Text style={{ fontFamily: 'Montserrat_400Regular', fontSize: 15 }}>
+                            {product.brandName}
                         </Text>
+                        </View>
                     </View>
-                </View>
 
-                {/* Button */}
-                <TouchableOpacity>
-                    <View className="bg-dark-pink flex-row rounded-full mt-3 px-4 py-1.5">
-                        <Image className="w-2.5 h-2.5" style={{ tintColor: "white"}}
-                                                    source={require('./../assets/icons/link.png')} />
+                    {/* Button */}
+                    <TouchableOpacity onPress={() => openProductURL(product.productURL)}>
+                        <View className="bg-dark-pink flex-row rounded-full mt-3 px-4 py-1.5">
+                        <Image className="w-2.5 h-2.5" style={{ tintColor: "white" }} source={require('./../assets/icons/link.png')} />
 
                         <Text className="text-white ml-1" style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}>
-                            Check it out
+                            Link
                         </Text>
+                        </View>
+                    </TouchableOpacity>
                     </View>
-                </TouchableOpacity>
+                ))}
             </View>
+
 
             <View className="flex-row mt-8 mb-8 justify-between">
                 {/* Author + date */}

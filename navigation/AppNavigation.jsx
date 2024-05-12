@@ -38,6 +38,7 @@ const Stack = createStackNavigator()
 const Tab = createBottomTabNavigator();
 
 const HomeStack = createNativeStackNavigator();
+const CreatePostStack = createNativeStackNavigator();
 
 function HomeStackScreen() {
     return (
@@ -48,6 +49,15 @@ function HomeStackScreen() {
         </HomeStack.Navigator>
     );
 }
+
+// Create a stack navigator for the CreatePost component
+function CreatePostStackScreen() {
+    return (
+      <CreatePostStack.Navigator>
+        <Stack.Screen name="CreatePostStack" component={CreatePost} options={{ headerShown: false }} />
+      </CreatePostStack.Navigator>
+    );
+  }
 
 const CustomTabBarButton = ({children, onPress}) => (
     <TouchableOpacity
@@ -125,8 +135,8 @@ const Tabs = () => {
                 )
             }}/>
 
-            <Tab.Screen name="CreatePost" component={CreatePost} options={{
-                tabBarIcon: ({focused}) => (
+                <Tab.Screen name="CreatePost" component={CreatePostStackScreen} options={{
+                tabBarIcon: ({ focused }) => (
                     <Image
                     source={require('./../assets/icons/pen-field.png')}
                     resizeMode="contain"
@@ -140,7 +150,7 @@ const Tabs = () => {
                 tabBarButton: (props) => (
                     <CustomTabBarButton {...props} />
                 )
-            }}/>
+                }} />
 
             <Tab.Screen name="Leaderboard" component={Leaderboard} options={{
                 tabBarIcon: ({focused}) => (

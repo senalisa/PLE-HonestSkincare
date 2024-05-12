@@ -1,15 +1,38 @@
 import { View, Text, SafeAreaView, TouchableOpacity, Image, ImageBackground, ScrollView, RefreshControl, StatusBar } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Topics from '../components/Topics'
 import PostCard from '../components/PostCard'
 import { TextInput } from 'react-native-gesture-handler'
 import { useNavigation } from '@react-navigation/native'
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from './../config/firebase';
 
 
 export default function Home() {
   const navigation = useNavigation()
 
+  const [posts, setPosts] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const postsCollectionRef = collection(db, 'posts');
+        const querySnapshot = await getDocs(postsCollectionRef);
+        const fetchedPosts = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          fetchedPosts.push({ id: doc.id, ...data });
+        });
+        setPosts(fetchedPosts);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -46,7 +69,7 @@ export default function Home() {
           {/* INTRO: Welcome user + text */}
           <View className="mx-auto mt-3 mb-8 px-10 flex justify-center">
             <Text className="mb-1 text-center" style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 25 }}>Hi Sena</Text>
-            <Text className="text-center" style={{ fontFamily: 'Montserrat_400Regular', fontSize: 16 }}>Find topics you'd like to read</Text>
+            <Text className="text-center" style={{ fontFamily: 'Montserrat_400Regular', fontSize: 16 }}>Let's take care of your skin!</Text>
           </View>
 
           <View className="px-10 flex-row justify-between">
@@ -101,7 +124,9 @@ export default function Home() {
         </View>
 
         <View className="mb-28">
-          <PostCard />
+          {posts.map((post) => (
+            <PostCard key={post.id} post={post} />
+          ))}
         </View>
         
       </View>

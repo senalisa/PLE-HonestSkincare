@@ -92,7 +92,7 @@ export default function CategorySearch() {
       </View>
 
       {/* Postcards */}
-      <View>
+      <View className="mb-32">
         <PostCard />
       </View>
   
