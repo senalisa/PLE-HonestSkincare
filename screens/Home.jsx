@@ -60,7 +60,11 @@ export default function Home() {
                               source={require('./../assets/images/logo-plain-nobg.png')} />
             </View>
 
-            <View>
+            <View className="flex-row">
+              <TouchableOpacity onPress={() => navigation.navigate('UserCard')}>
+                <Image className="w-6 h-6 mr-3 mt-6" 
+                              source={require('./../assets/icons/id-card.png')} />
+              </TouchableOpacity>
               <Image className="w-6 h-6 mr-7 mt-6" 
                               source={require('./../assets/icons/notification.png')} />
             </View>

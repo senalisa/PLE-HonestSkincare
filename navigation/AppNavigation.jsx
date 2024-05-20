@@ -19,6 +19,8 @@ import Profile from '../screens/Profile';
 import UserSkinType from '../components/account/UserSkinType.jsx';
 import PostDetail from '../screens/PostDetail.jsx';
 import CategorySearch from '../screens/CategorySearch.jsx';
+import UserCard from '../components/account/UserCard.jsx';
+import UserCardTwo from '../components/account/UserCardTwo.jsx';
 
 
 // Animation
@@ -200,6 +202,8 @@ const AppNavigation = () => {
                 <>
                     <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
                     <Stack.Screen name="UserSkinType" component={UserSkinType} options={{ headerShown: false }} />
+                    <Stack.Screen name="UserCard" component={UserCard} options={{ headerShown: false }} />
+                    <Stack.Screen name="UserCardTwo" component={UserCardTwo} options={{ headerShown: false }} />
                 </>
                 ) : (
                 <>

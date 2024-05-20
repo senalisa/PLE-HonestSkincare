@@ -2,7 +2,7 @@ import { View, Text, ScrollView, StatusBar, TouchableOpacity, Image } from 'reac
 import React from 'react'
 import Animated, { FlipInEasyX } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native'
-import PostCard from '../components/PostCard';
+import PostCardOld from '../components/PostCardOld';
 
 export default function CategorySearch() {
 
@@ -93,7 +93,7 @@ export default function CategorySearch() {
 
       {/* Postcards */}
       <View className="mb-32">
-        <PostCard />
+        <PostCardOld />
       </View>
   
     </ScrollView>
