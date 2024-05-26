@@ -4,43 +4,79 @@ import Topics from '../components/Topics'
 import PostCard from '../components/PostCard'
 import { TextInput } from 'react-native-gesture-handler'
 import { useNavigation } from '@react-navigation/native'
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from './../config/firebase';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db, auth } from './../config/firebase';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 export default function Home() {
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   const [posts, setPosts] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [userPreferences, setUserPreferences] = useState(null);
+
+  // Function to fetch user preferences
+  const fetchUserPreferences = async () => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const userPreferencesCollectionRef = collection(db, 'userPreferences');
+        const userPreferencesQuery = query(userPreferencesCollectionRef, where('userId', '==', user.uid));
+        const querySnapshot = await getDocs(userPreferencesQuery);
+        if (!querySnapshot.empty) {
+          const userPreferencesData = querySnapshot.docs[0].data();
+          setUserPreferences(userPreferencesData);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching user preferences:', error);
+    }
+  };
+
+  // Function to fetch posts and filter based on user preferences
+  const fetchPosts = async () => {
+    try {
+      const postsCollectionRef = collection(db, 'posts');
+      const querySnapshot = await getDocs(postsCollectionRef);
+      const fetchedPosts = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        fetchedPosts.push({ id: doc.id, ...data });
+      });
+
+      // Filter posts based on user preferences
+      if (userPreferences) {
+        const filteredPosts = fetchedPosts.filter(post => {
+          const hasMatchingSkinType = post.skinTypeTags.includes(userPreferences.skinType);
+          const hasMatchingSkinConcerns = userPreferences.skinConcerns.some(concern => post.skinConcernTags.includes(concern));
+          return hasMatchingSkinType && hasMatchingSkinConcerns;
+        });
+        setPosts(filteredPosts);
+      } else {
+        setPosts(fetchedPosts);
+      }
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const postsCollectionRef = collection(db, 'posts');
-        const querySnapshot = await getDocs(postsCollectionRef);
-        const fetchedPosts = [];
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          fetchedPosts.push({ id: doc.id, ...data });
-        });
-        setPosts(fetchedPosts);
-      } catch (error) {
-        console.error('Error fetching posts:', error);
-      }
-    };
-
+    fetchUserPreferences();
     fetchPosts();
   }, []);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserPreferences();
+      fetchPosts();
+    }, [])
+  );
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
+    fetchPosts().finally(() => setRefreshing(false));
   }, []);
-
   return (
     <ScrollView refreshControl={
       <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#63254E"/>

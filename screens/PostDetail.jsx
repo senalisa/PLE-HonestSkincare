@@ -63,7 +63,7 @@ export default function PostDetail({ route }) {
                 </TouchableOpacity>
             </View>
 
-            <View className="flex-row mt-2">
+            <View className="flex-row mt-2 flex-wrap">
                 {/* Tags */}
                 <View className="flex-row">
                     {post.skinTypeTags.map((tag, index) => (
