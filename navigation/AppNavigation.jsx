@@ -21,6 +21,7 @@ import PostDetail from '../screens/PostDetail.jsx';
 import CategorySearch from '../screens/CategorySearch.jsx';
 import UserCard from '../components/account/UserCard.jsx';
 import UserCardTwo from '../components/account/UserCardTwo.jsx';
+import Article from '../screens/Article.jsx';
 
 
 // Animation
@@ -48,6 +49,7 @@ function HomeStackScreen() {
             <HomeStack.Screen name="HomeScreen" component={Home} options={{ headerShown: false }}/>
             <HomeStack.Screen name="PostDetail" component={PostDetail} options={{ headerShown:false }} />
             <HomeStack.Screen name="CategorySearch" component={CategorySearch} options={{ headerShown:false }} />
+            <HomeStack.Screen name="Article" component={Article} options={{ headerShown:false }} />
         </HomeStack.Navigator>
     );
 }

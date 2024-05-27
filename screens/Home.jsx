@@ -13,6 +13,7 @@ export default function Home() {
   const navigation = useNavigation();
 
   const [posts, setPosts] = useState([]);
+  const [articles, setArticles] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [userPreferences, setUserPreferences] = useState(null);
 
@@ -61,15 +62,35 @@ export default function Home() {
     }
   };
 
+  // Function to fetch posts and filter based on user preferences
+  const fetchArticles = async () => {
+    try {
+      const articlesCollectionRef = collection(db, 'articles');
+      const querySnapshot = await getDocs(articlesCollectionRef);
+      const fetchedArticles = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        fetchedArticles.push({ id: doc.id, ...data });
+      });
+
+      setArticles(fetchedArticles);
+
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
+  };
+
   useEffect(() => {
     fetchUserPreferences();
     fetchPosts();
+    fetchArticles();
   }, []);
 
   useFocusEffect(
     React.useCallback(() => {
       fetchUserPreferences();
       fetchPosts();
+      fetchArticles();
     }, [])
   );
 
@@ -77,6 +98,8 @@ export default function Home() {
     setRefreshing(true);
     fetchPosts().finally(() => setRefreshing(false));
   }, []);
+
+
   return (
     <ScrollView refreshControl={
       <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#63254E"/>
@@ -153,6 +176,15 @@ export default function Home() {
         {/* Topics Map */}
         <View className="mt-2">
           <Topics />
+        </View>
+
+        <View className="">
+            {articles.map((article) => (
+              <TouchableOpacity key={article.id} article={article} onPress={() => navigation.navigate('Article', { articleId: article.id })}
+              className="border border-gray-400 p-4 mx-10"> 
+                <Text>hoiiii</Text>
+              </TouchableOpacity>
+            ))}
         </View>
 
         <View className="flex-row justify-between px-8 -mt-4">
