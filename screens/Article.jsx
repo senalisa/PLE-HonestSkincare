@@ -4,11 +4,12 @@ import { useRoute } from '@react-navigation/native';
 import { doc, getDoc, collection, addDoc, query, orderBy, getDocs, serverTimestamp, updateDoc, arrayUnion, Timestamp } from 'firebase/firestore';
 import { db, auth } from '../config/firebase'; 
 
-const addComment = async (articleId, text, authorId) => {
+const addComment = async (articleId, text, authorId, authorName) => {
   try {
     await addDoc(collection(db, 'articles', articleId, 'comments'), {
       text,
       authorId,
+      authorName,
       timestamp: serverTimestamp(),
     });
   } catch (error) {
@@ -16,19 +17,19 @@ const addComment = async (articleId, text, authorId) => {
   }
 };
 
-const addReply = async (articleId, commentId, text, authorId) => {
-  try {
-    const commentRef = doc(db, 'articles', articleId, 'comments', commentId);
-    const commentSnap = await getDoc(commentRef);
-    const existingReplies = commentSnap.data().replies || [];
-    
-    const timestamp = Timestamp.now(); 
-    const updatedReplies = [...existingReplies, { text, authorId, timestamp }];
-    await updateDoc(commentRef, { replies: updatedReplies });
-  } catch (error) {
-    console.error('Error adding reply: ', error);
-  }
-};
+const addReply = async (articleId, commentId, text, authorId, authorName) => {
+    try {
+      const commentRef = doc(db, 'articles', articleId, 'comments', commentId);
+      const commentSnap = await getDoc(commentRef);
+      const existingReplies = commentSnap.data().replies || [];
+      
+      const timestamp = Timestamp.now(); 
+      const updatedReplies = [...existingReplies, { text, authorId, authorName, timestamp }];
+      await updateDoc(commentRef, { replies: updatedReplies });
+    } catch (error) {
+      console.error('Error adding reply: ', error);
+    }
+  };
 
 const getComments = async (articleId) => {
   try {
@@ -43,6 +44,8 @@ const getComments = async (articleId) => {
 export default function Article() {
   const route = useRoute();
   const { articleId } = route.params; 
+
+  const user = auth.currentUser;
 
   const [article, setArticle] = useState(null);
   const [comments, setComments] = useState([]);
@@ -80,17 +83,58 @@ export default function Article() {
       return;
     }
     
+    const user = auth.currentUser;
+    
+    if (!user || !user.displayName) {
+      console.error('User is not logged in or has no display name.');
+      return;
+    }
+  
+    const authorId = user.uid;
+    const authorName = user.displayName;
+  
     if (replyingTo) {
-      await addReply(articleId, replyingTo, newInput, 'currentUserId'); 
+      await addReply(articleId, replyingTo, newInput, authorId, authorName); 
       setReplyingTo(null);
     } else {
-      await addComment(articleId, newInput, 'currentUserId'); 
+      await addComment(articleId, newInput, authorId, authorName); 
     }
     
     setNewInput('');
     const updatedComments = await getComments(articleId);
     setComments(updatedComments);
   };
+
+  const handleDeleteComment = async (commentId) => {
+    try {
+      await deleteDoc(doc(db, 'articles', articleId, 'comments', commentId));
+      const updatedComments = comments.filter(comment => comment.id !== commentId);
+      setComments(updatedComments);
+    } catch (error) {
+      console.error('Error deleting comment: ', error);
+    }
+  };
+
+  const handleDeleteReply = async (commentId, replyId) => {
+    try {
+      const commentRef = doc(db, 'articles', articleId, 'comments', commentId);
+      const commentSnap = await getDoc(commentRef);
+      const existingReplies = commentSnap.data().replies || [];
+      const updatedReplies = existingReplies.filter(reply => reply.id !== replyId);
+      await updateDoc(commentRef, { replies: updatedReplies });
+      const updatedComments = comments.map(comment => {
+        if (comment.id === commentId) {
+          return { ...comment, replies: updatedReplies };
+        } else {
+          return comment;
+        }
+      });
+      setComments(updatedComments);
+    } catch (error) {
+      console.error('Error deleting reply: ', error);
+    }
+  };
+  
 
   const toggleReply = (commentId) => {
     setReplyingTo(commentId); // Zet de commentId in state wanneer er op "Reply" wordt geklikt
@@ -121,7 +165,14 @@ export default function Article() {
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
           <View className="p-8 border border-gray-100">
+            <Text className="font-bold">Author: {item.authorName}</Text>
             <Text>{item.text}</Text>
+            {item.authorId === user.uid && (
+                <TouchableOpacity onPress={() => handleDeleteComment(item.id)}>
+                <Text className="text-red-500 underline mt-2">Verwijderen</Text>
+                </TouchableOpacity>
+            )}
+
             {/* Toggle-knop voor replies */}
             <TouchableOpacity onPress={() => toggleReply(item.id)}>
               <Text className="text-blue underline mt-2">
@@ -149,7 +200,14 @@ export default function Article() {
           {/* Weergave van replies */}
           {expandedComments[item.id] && item.replies && item.replies.map((reply, index) => (
             <View key={index} className="ml-8 mt-2">
+                <Text className="font-bold">Author: {reply.authorName}</Text>
               <Text>{reply.text}</Text>
+
+              {reply.authorId === user.uid && (
+                <TouchableOpacity onPress={() => handleDeleteReply(item.id, reply.id)}>
+                    <Text className="text-red-500 underline mt-2">Verwijderen</Text>
+                </TouchableOpacity>
+                )}
             </View>
           ))}
           </View>
