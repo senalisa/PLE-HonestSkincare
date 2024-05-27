@@ -1,59 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import { useRoute } from '@react-navigation/native';
-import { db } from '../config/firebase'; // Zorg ervoor dat het pad naar je configuratiebestand correct is
 import { doc, getDoc, collection, addDoc, query, orderBy, getDocs, serverTimestamp, updateDoc, arrayUnion, Timestamp } from 'firebase/firestore';
+import { db, auth } from '../config/firebase'; 
 
-// Functie om een comment toe te voegen
 const addComment = async (articleId, text, authorId) => {
-    try {
-      await addDoc(collection(db, 'articles', articleId, 'comments'), {
-        text,
-        authorId,
-        timestamp: serverTimestamp(),
-      });
-    } catch (error) {
-      console.error('Error adding comment: ', error);
-    }
-  };
+  try {
+    await addDoc(collection(db, 'articles', articleId, 'comments'), {
+      text,
+      authorId,
+      timestamp: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error('Error adding comment: ', error);
+  }
+};
 
-//Functie om replies toe te voegen aan een comment
 const addReply = async (articleId, commentId, text, authorId) => {
-    try {
-      const commentRef = doc(db, 'articles', articleId, 'comments', commentId);
-      const commentSnap = await getDoc(commentRef);
-      const existingReplies = commentSnap.data().replies || [];
-      
-      const timestamp = Timestamp.now(); // Genereer de timestamp hier
-      
-      const updatedReplies = [...existingReplies, { text, authorId, timestamp }];
-      await updateDoc(commentRef, { replies: updatedReplies });
-    } catch (error) {
-      console.error('Error adding reply: ', error);
-    }
-  };
-  
-  
-  
-  // Functie om comments op te halen
-  const getComments = async (articleId) => {
-    try {
-      const commentsQuery = query(collection(db, 'articles', articleId, 'comments'), orderBy('timestamp', 'asc'));
-      const commentsSnapshot = await getDocs(commentsQuery);
-      return commentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } catch (error) {
-      console.error('Error getting comments: ', error);
-    }
-  };
+  try {
+    const commentRef = doc(db, 'articles', articleId, 'comments', commentId);
+    const commentSnap = await getDoc(commentRef);
+    const existingReplies = commentSnap.data().replies || [];
+    
+    const timestamp = Timestamp.now(); 
+    const updatedReplies = [...existingReplies, { text, authorId, timestamp }];
+    await updateDoc(commentRef, { replies: updatedReplies });
+  } catch (error) {
+    console.error('Error adding reply: ', error);
+  }
+};
+
+const getComments = async (articleId) => {
+  try {
+    const commentsQuery = query(collection(db, 'articles', articleId, 'comments'), orderBy('timestamp', 'asc'));
+    const commentsSnapshot = await getDocs(commentsQuery);
+    return commentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error('Error getting comments: ', error);
+  }
+};
 
 export default function Article() {
   const route = useRoute();
-  const { articleId } = route.params; // Zorg ervoor dat je de articleId correct doorgeeft in de navigatie
+  const { articleId } = route.params; 
 
   const [article, setArticle] = useState(null);
   const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState('');
-  const [newReply, setNewReply] = useState({});
+  const [newInput, setNewInput] = useState('');
+  const [replyingTo, setReplyingTo] = useState(null); // Toegevoegd om bij te houden op welke comment er wordt gereplied
   const [expandedComments, setExpandedComments] = useState({});
 
   useEffect(() => {
@@ -81,25 +75,25 @@ export default function Article() {
     fetchComments();
   }, [articleId]);
 
-  const handleAddComment = async () => {
-    if (newComment.trim().length === 0) {
+  const handleAddInput = async () => {
+    if (newInput.trim().length === 0) {
       return;
     }
-    await addComment(articleId, newComment, 'currentUserId'); // Vervang 'currentUserId' met de daadwerkelijke user ID
-    setNewComment('');
+    
+    if (replyingTo) {
+      await addReply(articleId, replyingTo, newInput, 'currentUserId'); 
+      setReplyingTo(null);
+    } else {
+      await addComment(articleId, newInput, 'currentUserId'); 
+    }
+    
+    setNewInput('');
     const updatedComments = await getComments(articleId);
     setComments(updatedComments);
   };
 
-  const handleAddReply = async (commentId) => {
-    const replyText = newReply[commentId];
-    if (replyText.trim().length === 0) {
-      return;
-    }
-    await addReply(articleId, commentId, replyText, 'currentUserId'); // Vervang 'currentUserId' met de daadwerkelijke user ID
-    setNewReply({ ...newReply, [commentId]: '' });
-    const updatedComments = await getComments(articleId);
-    setComments(updatedComments);
+  const toggleReply = (commentId) => {
+    setReplyingTo(commentId); // Zet de commentId in state wanneer er op "Reply" wordt geklikt
   };
 
   const toggleComment = (commentId) => {
@@ -119,16 +113,32 @@ export default function Article() {
 
   return (
     <View className="mt-20 mx-10">
-    <Text className="">Titel:</Text>
-    <Text className="font-bold">{article.articleTitle}</Text>
-  
-    <FlatList
-      data={comments}
-      keyExtractor={item => item.id}
-      renderItem={({ item }) => (
-        <View className="p-8 border border-gray-100">
-          <Text>{item.text}</Text>
-          {/* Toggle-knop voor replies */}
+      <Text className="">Titel:</Text>
+      <Text className="font-bold">{article.articleTitle}</Text>
+
+      <FlatList
+        data={comments}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <View className="p-8 border border-gray-100">
+            <Text>{item.text}</Text>
+            {/* Toggle-knop voor replies */}
+            <TouchableOpacity onPress={() => toggleReply(item.id)}>
+              <Text className="text-blue underline mt-2">
+                {replyingTo === item.id ? 'Cancel Reply' : 'Reply'}
+              </Text>
+            </TouchableOpacity>
+            {/* Weergave van reply-indicator */}
+            {replyingTo === item.id && (
+              <View className="replyIndicator">
+                <Text className="replyIndicatorText">Replying to: {item.author}</Text>
+                <TouchableOpacity onPress={() => setReplyingTo(null)}>
+                  <Text className="closeButton">✕</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* Toggle-knop voor replies */}
           {item.replies && item.replies.length > 0 && (
             <TouchableOpacity onPress={() => toggleComment(item.id)}>
               <Text className="text-blue underline mt-2">
@@ -142,32 +152,22 @@ export default function Article() {
               <Text>{reply.text}</Text>
             </View>
           ))}
-          {/* TextInput voor nieuwe reply */}
-          <TextInput
-            className="border border-gray-300 p-2 mt-2 rounded-lg"
-            placeholder="Add a reply..."
-            value={newReply[item.id] || ''}
-            onChangeText={(text) => setNewReply({ ...newReply, [item.id]: text })}
-          />
-          <TouchableOpacity onPress={() => handleAddReply(item.id)} className="bg-blue-500 text-white py-2 px-4 rounded-lg mt-2">
-            <Text>Post Reply</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-    />
-    
-    {/* TextInput voor nieuwe comment */}
-    <TextInput
-      className="border border-gray-300 p-2 my-3 rounded-lg"
-      placeholder="Add a comment..."
-      value={newComment}
-      onChangeText={setNewComment}
-    />
-    <TouchableOpacity onPress={handleAddComment} className="bg-blue-500 text-white py-2 px-4 rounded-lg">
-      <Text>Add comment</Text>
-    </TouchableOpacity>
-  </View>
-  
-    
+          </View>
+        )}
+      />
+
+      {/* TextInput voor nieuwe input (comment of reply) */}
+            <TextInput
+        className="border border-gray-300 p-2 mt-2 rounded-lg"
+        placeholder={replyingTo ? "Reply to comment..." : "Add a comment..."}
+        value={newInput}
+        onChangeText={setNewInput}
+      />
+      <TouchableOpacity onPress={handleAddInput} className="bg-blue-500 text-white py-2 px-4 rounded-lg mt-2">
+        <Text className="addButtonText">{replyingTo ? "Post Reply" : "Add comment"}</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
+
+
