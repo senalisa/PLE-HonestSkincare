@@ -61,6 +61,7 @@ export default function Home() {
       console.error('Error fetching posts:', error);
     }
   };
+  
 
   useEffect(() => {
     fetchUserPreferences();
@@ -155,7 +156,7 @@ export default function Home() {
 
          {/* Topics Map */}
         <View className="mt-2">
-          <Topics />
+          <Topics userPreferences={userPreferences}/>
         </View>
 
         <View className="flex-row justify-between px-8 -mt-4">

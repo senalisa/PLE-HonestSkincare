@@ -1,104 +1,74 @@
-import { View, Text, Image, ScrollView,  RefreshControl, } from 'react-native'
-import React from 'react'
-import { TouchableOpacity } from 'react-native-gesture-handler'
-import Animated, { StretchInX, StretchOutY, FadeIn, FadeInDown } from 'react-native-reanimated';
-import { useNavigation } from '@react-navigation/native'
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useNavigation } from '@react-navigation/native';
+import { collection, getDocs, where, query, arrayContains } from 'firebase/firestore'; // Importeer de functies om de database te benaderen
+import { db } from '../config/firebase';
 
 export default function Topics() {
+  const navigation = useNavigation();
+  const [topics, setTopics] = useState([]);
+  const [userPreferences, setUserPreferences] = useState(null);
 
-    const navigation = useNavigation()
+  useEffect(() => {
+    const fetchTopics = async () => {
+      try {
+        const topicsCollectionRef = collection(db, 'topics');
+        const querySnapshot = await getDocs(topicsCollectionRef);
+        const fetchedTopics = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          return data;
+        });
+        setTopics(fetchedTopics);
+      } catch (error) {
+        console.error('Error fetching topics:', error);
+      }
+    };
+
+    const fetchUserPreferences = async () => {
+      try {
+        const userPreferencesCollectionRef = collection(db, 'userPreferences');
+        const querySnapshot = await getDocs(userPreferencesCollectionRef);
+        if (!querySnapshot.empty) {
+          const userPreferencesData = querySnapshot.docs[0].data();
+          setUserPreferences(userPreferencesData);
+        }
+      } catch (error) {
+        console.error('Error fetching user preferences:', error);
+      }
+    };
+
+    fetchTopics();
+    fetchUserPreferences();
+  }, []);
+
+  const matchesUserPreferences = (topic) => {
+    if (!userPreferences) return false;
+
+    const matchesSkinType = topic.topic === userPreferences.skinType;
+    const matchesSkinConcerns = userPreferences.skinConcerns.some(concern => concern === topic.topic);
+
+    return matchesSkinType || matchesSkinConcerns;
+  };
 
   return (
-    
-    <View className="flex-row "> 
-    <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} 
-    className="py-5">
-
-        {/* Topic one */}
-        <Animated.View entering={FadeInDown.delay(100).duration(3000).springify()}>
-        <TouchableOpacity onPress={() => navigation.navigate('CategorySearch')}>
-            <View className="bg-white border border-gray-200 ml-7 mr-5 px-4 rounded-xl items-center shadow-sm">
-                {/* Image */}
-                <Image source={require('./../assets/images/skins/skin-oily.png')} 
-                        className="w-14 h-14 rounded-full -mt-4 mb-2"
-                />
-
-                {/* Text */}
+    <View className="flex-row">
+      <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} className="py-5 ml-6">
+        {topics.length > 0 && topics.filter(matchesUserPreferences).map((topic, index) => (
+          <Animated.View key={topic.topic} entering={FadeInDown.duration(1000).springify()}>
+            <TouchableOpacity onPress={() => navigation.navigate('CategorySearch', { topicData: topic })}>
+              <View className="bg-white border border-gray-200 mr-3 px-4 rounded-xl items-center shadow-sm">
+                <Image source={{ uri: topic.topicImage }} className="w-12 h-[60] -mt-4 mb-2" /> 
                 <View className="flex-wrap">
-                <Text
-                    style={{ fontFamily: 'Montserrat_300Light', fontSize: 13 }}
-                    className="w-20 pb-0 text-center">
-                        Explore
-                </Text>
-
-                <Text
-                    style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 16 }}
-                    className="pb-4 text-center">
-                        Oily Skin
-                </Text>
-            </View>
-    
-            </View>
-        </TouchableOpacity>
-        </Animated.View>
-
-         {/* Topic two */}
-         <Animated.View entering={FadeInDown.delay(200).duration(3000).springify()}>
-         <TouchableOpacity>
-            <View className="bg-white border border-gray-200 mr-5 px-4 rounded-xl items-center shadow-sm">
-                {/* Image */}
-                <Image source={require('./../assets/images/skins/skin-oily-acne.png')} 
-                        className="w-14 h-14 rounded-full -mt-4 mb-2"
-                />
-
-                {/* Text */}
-                <View className="flex-wrap">
-                <Text
-                    style={{ fontFamily: 'Montserrat_300Light', fontSize: 13 }}
-                    className="w-20 pb-0 text-center">
-                        Explore
-                </Text>
-
-                <Text
-                    style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 16 }}
-                    className="pb-4 text-center w-20">
-                        Acne 
-                </Text>
-            </View>
-    
-            </View>
-        </TouchableOpacity>
-        </Animated.View>
-
-        {/* Topic two */}
-        <Animated.View entering={FadeInDown.delay(300).duration(3000).springify()}>
-        <TouchableOpacity>
-            <View className="bg-white border border-gray-200 mr-5 px-4 rounded-xl items-center shadow-sm">
-                {/* Image */}
-                <Image source={require('./../assets/images/skins/skin-redness.png')} 
-                        className="w-14 h-14 rounded-full -mt-4 mb-2"
-                />
-
-                {/* Text */}
-                <View className="flex-wrap">
-                <Text
-                    style={{ fontFamily: 'Montserrat_300Light', fontSize: 13 }}
-                    className="w-20 pb-0 text-center">
-                        Explore
-                </Text>
-
-                <Text
-                    style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 16 }}
-                    className="pb-4 text-center w-20">
-                        Redness 
-                </Text>
-            </View>
-    
-            </View>
-        </TouchableOpacity>
-        </Animated.View>
-
-    </ScrollView>
+                  <Text style={{ fontFamily: 'Montserrat_300Light', fontSize: 11 }} className="w-20 pb-0 text-center">Explore</Text>
+                  <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 16 }} className="pb-4 text-center w-[85]">{topic.topicName}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </Animated.View>
+        ))}
+      </ScrollView>
     </View>
-  )
+  );  
 }
+

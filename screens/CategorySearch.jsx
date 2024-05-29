@@ -1,15 +1,63 @@
 import { View, Text, ScrollView, StatusBar, TouchableOpacity, Image } from 'react-native'
-import React from 'react'
+import React, { useState, useEffect } from 'react';
 import Animated, { FlipInEasyX } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native'
 import PostCardOld from '../components/PostCardOld';
+import { useRoute } from '@react-navigation/native';
+import { collection, getDocs, query, where, arrayContains } from 'firebase/firestore';
+import { db } from '../config/firebase';
+import PostCard from '../components/PostCard';
 
 export default function CategorySearch() {
 
   const navigation = useNavigation()
 
+  const route = useRoute();
+  const topicData = route.params.topicData;
+
+  const [relatedPosts, setRelatedPosts] = useState([]);
+  const [sortBy, setSortBy] = useState('newest');
+
+  useEffect(() => {
+    const fetchRelatedPosts = async () => {
+      try {
+        const postsCollectionRef = collection(db, 'posts');
+        const queryBySkinType = query(postsCollectionRef, where('skinTypeTags', 'array-contains', topicData.topic));
+        const queryBySkinConcerns = query(postsCollectionRef, where('skinConcernTags', 'array-contains', topicData.topic));
+
+        const querySnapshotBySkinType = await getDocs(queryBySkinType);
+        const querySnapshotBySkinConcerns = await getDocs(queryBySkinConcerns);
+
+        const postsBySkinType = querySnapshotBySkinType.docs.map(doc => doc.data());
+        const postsBySkinConcerns = querySnapshotBySkinConcerns.docs.map(doc => doc.data());
+
+        const allRelatedPosts = [...postsBySkinType, ...postsBySkinConcerns];
+        setRelatedPosts(allRelatedPosts);
+      } catch (error) {
+        console.error('Error fetching related posts:', error);
+      }
+    };
+
+    fetchRelatedPosts();
+  }, [topicData]);
+
+  useEffect(() => {
+    const sortPosts = () => {
+      if (sortBy === 'newest') {
+        // Sorteer de posts op basis van de meest recent gemaakt
+        setRelatedPosts(prevPosts => prevPosts.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+      } else if (sortBy === 'trending') {
+        // Willekeurige volgorde
+        setRelatedPosts(prevPosts => prevPosts.slice().sort(() => Math.random() - 0.5));
+      }
+    };
+
+    sortPosts();
+  }, [sortBy]);
+
   return (
     <ScrollView className="bg-white">
+
       <StatusBar />
   
       <View className="bg-white pt-10 mb-4 px-7 ">
@@ -35,47 +83,33 @@ export default function CategorySearch() {
       <Animated.View entering={FlipInEasyX.delay(100).duration(2000).springify()}>
       <View className="flex-row bg-white shadow-sm mx-7 rounded-xl mb-8">
         {/* Title + Info */}
-        <View className="w-40 ml-5 py-5 mr-1">
+        <View className="w-40 ml-5 py-5 mr-9">
           <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }} className="mb-2">
-            Oily skin
+            {topicData.topicName}
           </Text>
 
           <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 15 }}>
-            <Text>Oily skin is characterized by an </Text>
-            <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15 }} className="text-dark-pink">overproduction of sebum</Text> 
-            <Text>, resulting in a </Text> 
-            <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15 }} className="text-dark-pink">shiny complexion </Text>
-            <Text>and </Text> 
-            <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15 }} className="text-dark-pink">enlarged pores.</Text>
+            {topicData.topicText}
           </Text>
         </View>
 
         {/* Image */}
         <View>
-          <Image className="w-48 h-40 rounded-r-xl" 
-                          source={require('./../assets/images/category-oily.png')} />
+          <Image className="w-40 h-40 rounded-r-xl" 
+                          source={{ uri: topicData.topicImage }} />
         </View>
       </View>
       </Animated.View>
 
       {/* Trending + Newest buttons + search button */}
       <View className="flex-row justify-between mx-7 mb-2">
-
         <View className="flex-row">
-          <TouchableOpacity className="border border-dark-pink bg-white rounded-xl px-4 py-1">
-          <Text 
-                            style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15 }}
-                            className="text-dark-pink text-center">
-                                Trending
-                            </Text>
+          <TouchableOpacity className={`border ${sortBy === 'trending' ? 'border-dark-pink' : 'border-gray-400'} bg-white rounded-xl px-4 py-1`} onPress={() => setSortBy('trending')}>
+            <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15 }} className={`text-${sortBy === 'trending' ? 'dark-pink' : 'gray-400'} text-center`}>Trending</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="border border-gray-400 bg-white rounded-xl px-4 py-1 ml-3">
-          <Text 
-                            style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15 }}
-                            className="text-gray-400  text-center">
-                                Newest
-                            </Text>
+          <TouchableOpacity className={`border ${sortBy === 'newest' ? 'border-dark-pink' : 'border-gray-400'} bg-white rounded-xl px-4 py-1 ml-3`} onPress={() => setSortBy('newest')}>
+            <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15 }} className={`text-${sortBy === 'newest' ? 'dark-pink' : 'gray-400'} text-center`}>Newest</Text>
           </TouchableOpacity>
         </View>
 
@@ -93,7 +127,9 @@ export default function CategorySearch() {
 
       {/* Postcards */}
       <View className="mb-32">
-        <PostCardOld />
+        {relatedPosts.map((post, index) => (
+          <PostCard key={index} post={post} />
+        ))}
       </View>
   
     </ScrollView>

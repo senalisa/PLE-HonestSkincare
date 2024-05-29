@@ -5,6 +5,7 @@ import { doc, getDoc, collection, addDoc, query, orderBy, getDocs, serverTimesta
 import { db, auth } from '../config/firebase';
 import { Linking } from 'react-native';
 import { Alert } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const addComment = async (postId, text, authorId, authorName) => {
   try {
@@ -170,46 +171,72 @@ export default function PostDetail({ route }) {
     }
   };
 
+  const getTimeAgo = (timestamp) => {
+    const currentDate = new Date();
+    const commentDate = timestamp.toDate(); // Converteer Firestore timestamp naar een JavaScript Date-object
+  
+    const timeDifference = currentDate - commentDate;
+    const secondsDifference = Math.floor(timeDifference / 1000);
+  
+    if (secondsDifference < 60) {
+      return `${secondsDifference} sec ago`;
+    } else if (secondsDifference < 3600) {
+      const minutesDifference = Math.floor(secondsDifference / 60);
+      return `${minutesDifference} min ago`;
+    } else if (secondsDifference < 86400) {
+      const hoursDifference = Math.floor(secondsDifference / 3600);
+      return `${hoursDifference} hours ago`;
+    } else {
+      const daysDifference = Math.floor(secondsDifference / 86400);
+      return `${daysDifference} days ago`;
+    }
+  };
+
   const renderHeader = () => (
     <View>
-        <View className="bg-white px-7 pt-10 rounded-b-3xl shadow-sm">
-        <View
-        className="flex-row justify-between bg-white pt-6 mb-4">
-            {/* Back button */}
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Image className="w-5 h-5" 
-                                source={require('./../assets/icons/left-arrow.png')} />
-            </TouchableOpacity>
+        <View className="bg-white rounded-b-3xl shadow-sm">
 
-            {/* Question or advise tag */}
-            <View className="border border-dark-pink bg-white rounded-xl w-20 p-0.5">
-                        <Text 
-                        style={{ fontFamily: 'Montserrat_500Medium', fontSize: 13 }}
-                        className="text-dark-pink text-center">
-                            {post.postType}
-                        </Text>
-            </View>
+        <ImageBackground source={require('./../assets/images/postcreate-bg.png')} resizeMode="cover" imageStyle= {{opacity:0.2}}>
+        <View
+        className="flex-row justify-between px-5 pt-14 pb-5">
+                {/* Back button */}
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <Image className="w-5 h-5" 
+                                    source={require('./../assets/icons/left-arrow.png')} />
+                </TouchableOpacity>
+
+                {/* Question or advise tag */}
+                <View className="border border-dark-pink rounded-xl w-20 p-0.5">
+                            <Text 
+                            style={{ fontFamily: 'Montserrat_500Medium', fontSize: 13 }}
+                            className="text-dark-pink text-center">
+                                {post.postType}
+                            </Text>
+                </View>
         </View> 
-    
         {/* Post info card */}
-        <View className="flex-row justify-between">
+        <View className="flex-row justify-between bg-white mx-10 rounded-xl p-2 shadow-sm -mb-10 mt-2 text-center">
             {/* Title */}
             <Text 
-                    style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 23 }}
-                    className="pt-3 px-1 mb-3 w-80">
+                    style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 22 }}
+                    className="pt-3 px-1 mb-3 w-80 text-center">
                     {post.title}
             </Text>
 
-            {/* Save */}
+{/*             
             <TouchableOpacity>
                     <Image className="w-5 h-5 mt-3 ml-8" style={{ tintColor: "gray"}}
                                             source={require('./../assets/icons/save.png')} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
         </View>
+        </ImageBackground>
+
+        <View className="px-6 pt-3 mt-10">
+
 
         <View className=" mt-2 flex-wrap">
             {/* Tags */}
-            <View className="flex-row flex-wrap">
+            <View className="flex-row flex-wrap justify-center">
                 {post.skinTypeTags.map((tag, index) => (
                     <TouchableOpacity 
                     key={index}
@@ -252,35 +279,38 @@ export default function PostDetail({ route }) {
             {/* Description */}
             <Text 
                     style={{ fontFamily: 'Montserrat_500Medium', fontSize: 16 }}
-                    className="pt-5 px-1 mb-3 w-100">
+                    className="pt-2 px-2 mb-3 w-100">
                     {post.description}
             </Text>
         </View>
         
         <View>
-        {post.products.map((product, index) => (
+        {post.products.length > 0 && (
+            post.products.map((product, index) => (
             <View key={index} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'white', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, shadowRadius: 1, elevation: 3, borderRadius: 8, marginTop: 12, padding: 12 }}>
-            {/* Product Image */}
-            <Image style={{ width: 40, height: 40, borderRadius: 20, marginRight: 12 }} source={{ uri: product.productImage }} />
-            {/* Product Details */}
-            <View style={{ flex: 1 }}>
+                {/* Product Image */}
+                <Image style={{ width: 40, height: 40, borderRadius: 20, marginRight: 12 }} source={{ uri: product.productImage }} />
+                {/* Product Details */}
+                <View style={{ flex: 1 }}>
                 {/* Product Name */}
                 <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15, marginBottom: 4 }} numberOfLines={2} ellipsizeMode="tail">
-                {product.productName}
+                    {product.productName}
                 </Text>
                 {/* Brand Name */}
                 <Text style={{ fontFamily: 'Montserrat_400Regular', fontSize: 15 }}>{product.brandName}</Text>
-            </View>
-            {/* Link Button */}
-            <TouchableOpacity onPress={() => openProductURL(product.productURL)} style={{ backgroundColor: '#63254E', borderRadius: 20, paddingVertical: 6, paddingHorizontal: 10 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Image style={{ width: 12, height: 12, tintColor: 'white', marginRight: 4 }} source={require('./../assets/icons/link.png')} />
-                <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12, color: 'white' }}>Link</Text>
                 </View>
-            </TouchableOpacity>
+                {/* Link Button */}
+                <TouchableOpacity onPress={() => openProductURL(product.productURL)} style={{ backgroundColor: '#63254E', borderRadius: 20, paddingVertical: 6, paddingHorizontal: 10 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Image style={{ width: 12, height: 12, tintColor: 'white', marginRight: 4 }} source={require('./../assets/icons/link.png')} />
+                    <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12, color: 'white' }}>Link</Text>
+                </View>
+                </TouchableOpacity>
             </View>
-        ))}
+            ))
+        )}
         </View>
+
 
         <View className="flex-row mt-8 mb-8 justify-between">
             {/* Author + date */}
@@ -323,8 +353,9 @@ export default function PostDetail({ route }) {
         </View>
 
         </View>
+        </View>
 
-        <View className="mt-5 mb-5 mx-8 flex-row">
+        <View className="mt-8 mb-4 mx-5 flex-row">
                 <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 19 }}>
                 Comments 
                 </Text>
@@ -344,13 +375,18 @@ export default function PostDetail({ route }) {
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-    <View className="flex-1 bg-white">
+    <View className="flex-1">
+
+    <LinearGradient
+        colors={['#FCFCFC', '#FCFCFC', '#FCFCFC']}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+
       <FlatList
         data={comments}
         keyExtractor={item => item.id}
         ListHeaderComponent={renderHeader}
         renderItem={({ item }) => (
-          <View className="px-8 pr-14 py-3 flex-row w-full">
+          <View className="px-5 pr-14 py-3 flex-row w-full">
 
               <View>
                               <Image className="w-6 h-6" 
@@ -359,66 +395,100 @@ export default function PostDetail({ route }) {
 
             <View className="ml-3">               
 
-            <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
-            className="font-bold mb-1">Author: {item.authorName}</Text>
-           
-            <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 14 }} className="pr-8">{item.text}</Text>
+                <View className="bg-white p-3 rounded-xl shadow-sm">
+                    <View className="flex-row">
 
-            <View className="flex-row justify-between">
+                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
+                        className="font-bold mb-1">{item.authorName} </Text>
+
+                        <Text className="ml-2 mt-0.5 text-gray-400"
+                        style={{ fontFamily: 'Montserrat_500Medium', fontSize: 10 }}
+                        >{getTimeAgo(item.timestamp)}</Text>
+
+                    </View>
+                
+                    <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 14 }} className="pr-8">{item.text}</Text>
+                </View>
+
+            <View className="flex-row">
 
                 <TouchableOpacity onPress={() => {
                 toggleReply(item.id, item.authorName);
                 setReplying(true);
                 }}>
                 <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
-                className="text-gray-400 mt-2">
+                className="text-gray-400 mt-2 mr-5">
                     Reply
                 </Text>
                 </TouchableOpacity>
 
+                {item.replies && item.replies.length > 0 && (
+                <TouchableOpacity onPress={() => toggleComment(item.id)}>
+                    <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
+                    className="text-gray-400 mt-1.5 flex-row mr-5">
+                    <Image className="w-5 h-5 -mt-2 mr-1" style={{ tintColor: "#CBCACA"}}
+                                        source={require('./../assets/icons/minus.png')} />
+                    {expandedComments[item.id] ? `Hide ${item.replies.length} Replies` : `Show ${item.replies.length} Replies`}
+                    </Text>
+                </TouchableOpacity>
+                )}
+
                 {item.authorId === user.uid && (
-                    <TouchableOpacity onPress={() => handleDeleteComment(item.id)}>
-                      <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
-                      className="text-red-500 underline mt-2">Delete</Text>
-                    </TouchableOpacity>
+                    <View className="justify-self-end">
+                        <TouchableOpacity onPress={() => handleDeleteComment(item.id)}>
+                        <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
+                        className="text-red-500 underline mt-2">Delete</Text>
+                        </TouchableOpacity>
+                    </View>
                   )}
 
             </View>
 
-           
-
-            {item.replies && item.replies.length > 0 && (
-              <TouchableOpacity onPress={() => toggleComment(item.id)}>
-                <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
-                className="text-gray-400 mt-2 flex-row">
-                  <Image className="w-5 h-5 -mt-1.5 mr-1" style={{ tintColor: "#CBCACA"}}
-                                    source={require('./../assets/icons/minus.png')} />
-                  {expandedComments[item.id] ? 'Hide Replies' : 'Show Replies'}
-                </Text>
-              </TouchableOpacity>
-            )}
+            {/* Replies on comment */}
             {expandedComments[item.id] && item.replies && item.replies.map((reply, index) => (
-              <View key={index} className="ml-8 mt-5">
+                <View>
+                    <View key={index} className="ml-8 mt-5 flex-row">
 
-                <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
-                className="mb-1">Author: {reply.authorName}</Text>
+                        {/* Image */}
+                        <View>
+                           <Image className="w-6 h-6" 
+                              source={require('./../assets/images/user.png')} />
+                        </View>
 
-                <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 14 }}>{reply.text}</Text>
+                    {/* Author + date + text */}
+                    <View className="bg-white p-3 rounded-xl ml-3 shadow-sm">
+                        <View className="flex-row">
+                            <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
+                            className="font-bold mb-1">{reply.authorName} </Text>
 
-                {reply.authorId === user.uid && (
-                  <TouchableOpacity onPress={() => handleDeleteReply(item.id, reply.timestamp)}>
-                    <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
-                    className="text-red-500 underline mt-2">Delete</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
+                            <Text className="ml-2 mt-0.5 text-gray-400"
+                            style={{ fontFamily: 'Montserrat_500Medium', fontSize: 10 }}
+                            >{getTimeAgo(reply.timestamp)}</Text>
+                        </View>
+                        <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 14 }} className="pr-8">{reply.text}</Text>
+                    </View>
+                    
+                    </View>
+
+                    <View className="flex-end">
+
+                    {/* {reply.authorId === user.uid && (
+                    <TouchableOpacity onPress={() => handleDeleteReply(item.id, reply.timestamp)}>
+                        <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
+                        className="text-red-500 underline mt-2">Delete</Text>
+                    </TouchableOpacity>
+                    )} */}
+
+                    </View>
+                </View>
             ))}
             </View>
           </View>
         )}
       />
+      </LinearGradient>
 
-<View className=" bg-white border-t border-gray-300 shadow-xl">
+<View className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-300 shadow-xl">
 
 <View className="flex-row justify-between mt-3 mx-5">
 
