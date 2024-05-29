@@ -7,13 +7,13 @@ import { useNavigation } from '@react-navigation/native'
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db, auth } from './../config/firebase';
 import { useFocusEffect } from '@react-navigation/native';
+import ArticleCard from '../components/ArticleCard'
 
 
 export default function Home() {
   const navigation = useNavigation();
 
   const [posts, setPosts] = useState([]);
-  const [articles, setArticles] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [userPreferences, setUserPreferences] = useState(null);
 
@@ -62,35 +62,15 @@ export default function Home() {
     }
   };
 
-  // Function to fetch posts and filter based on user preferences
-  const fetchArticles = async () => {
-    try {
-      const articlesCollectionRef = collection(db, 'articles');
-      const querySnapshot = await getDocs(articlesCollectionRef);
-      const fetchedArticles = [];
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        fetchedArticles.push({ id: doc.id, ...data });
-      });
-
-      setArticles(fetchedArticles);
-
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-    }
-  };
-
   useEffect(() => {
     fetchUserPreferences();
     fetchPosts();
-    fetchArticles();
   }, []);
 
   useFocusEffect(
     React.useCallback(() => {
       fetchUserPreferences();
       fetchPosts();
-      fetchArticles();
     }, [])
   );
 
@@ -173,18 +153,9 @@ export default function Home() {
           </TouchableOpacity>
         </View>
 
-        {/* Topics Map */}
+         {/* Topics Map */}
         <View className="mt-2">
           <Topics />
-        </View>
-
-        <View className="">
-            {articles.map((article) => (
-              <TouchableOpacity key={article.id} article={article} onPress={() => navigation.navigate('Article', { articleId: article.id })}
-              className="border border-gray-400 p-4 mx-10"> 
-                <Text>hoiiii</Text>
-              </TouchableOpacity>
-            ))}
         </View>
 
         <View className="flex-row justify-between px-8 -mt-4">

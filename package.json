@@ -23,6 +23,8 @@
     "expo-image-picker": "~15.0.5",
     "expo-status-bar": "~1.12.1",
     "firebase": "^10.11.0",
+    "moment": "^2.30.1",
+    "moment-timezone": "^0.5.45",
     "nativewind": "^2.0.11",
     "react": "18.2.0",
     "react-multistep": "^5.5.9",

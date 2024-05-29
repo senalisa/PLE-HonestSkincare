@@ -47,7 +47,6 @@ function HomeStackScreen() {
     return (
         <HomeStack.Navigator>
             <HomeStack.Screen name="HomeScreen" component={Home} options={{ headerShown: false }}/>
-            <HomeStack.Screen name="PostDetail" component={PostDetail} options={{ headerShown:false }} />
             <HomeStack.Screen name="CategorySearch" component={CategorySearch} options={{ headerShown:false }} />
             {/* <HomeStack.Screen name="Article" component={Article} options={{ headerShown:false }} /> */}
         </HomeStack.Navigator>
@@ -207,6 +206,7 @@ const AppNavigation = () => {
                     <Stack.Screen name="UserCard" component={UserCard} options={{ headerShown: false }} />
                     <Stack.Screen name="UserCardTwo" component={UserCardTwo} options={{ headerShown: false }} />
                     <Stack.Screen name="Article" component={Article} options={{ headerShown: false }} />
+                    <HomeStack.Screen name="PostDetail" component={PostDetail} options={{ headerShown:false }} />
                 </>
                 ) : (
                 <>

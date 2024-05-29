@@ -1,20 +1,165 @@
-import React, { useState } from 'react'
-import { View, Text, SafeAreaView, TouchableOpacity, Image, ImageBackground, ScrollView, RefreshControl, StatusBar } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, FlatList, SafeAreaView, Image, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, RefreshControl, StatusBar } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { doc, getDoc, collection, addDoc, query, orderBy, getDocs, serverTimestamp, updateDoc, arrayUnion, Timestamp, deleteDoc } from 'firebase/firestore';
+import { db, auth } from '../config/firebase';
 import { Linking } from 'react-native';
+import { Alert } from 'react-native';
+
+const addComment = async (postId, text, authorId, authorName) => {
+  try {
+    await addDoc(collection(db, 'posts', postId, 'comments'), {
+      text,
+      authorId,
+      authorName,
+      timestamp: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error('Error adding comment: ', error);
+  }
+};
+
+const addReply = async (postId, commentId, text, authorId, authorName) => {
+    try {
+      const commentRef = doc(db, 'posts', postId, 'comments', commentId);
+      const commentSnap = await getDoc(commentRef);
+      const existingReplies = commentSnap.data().replies || [];
+      
+      const timestamp = Timestamp.now(); 
+      const updatedReplies = [...existingReplies, { text, authorId, authorName, timestamp }];
+      await updateDoc(commentRef, { replies: updatedReplies });
+    } catch (error) {
+      console.error('Error adding reply: ', error);
+    }
+  };
+
+const getComments = async (postId) => {
+  try {
+    const commentsQuery = query(collection(db, 'posts', postId, 'comments'), orderBy('timestamp', 'asc'));
+    const commentsSnapshot = await getDocs(commentsQuery);
+    return commentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error('Error getting comments: ', error);
+  }
+};
 
 export default function PostDetail({ route }) {
-    const { post } = route.params;
+  const { post } = route.params;
+  const navigation = useNavigation();
+  const user = auth.currentUser;
 
-    const navigation = useNavigation()
+  const [comments, setComments] = useState([]);
+  const [newInput, setNewInput] = useState('');
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [expandedComments, setExpandedComments] = useState({});
+  const [replying, setReplying] = useState(false);
+  const [replyingAuthorName, setReplyingAuthorName] = useState(null);
+  const [commentCount, setCommentCount] = useState(0);
 
-    const [showReplies, setShowReplies] = useState(false); 
-
-    const toggleReplies = () => {
-        setShowReplies(!showReplies); 
+  useEffect(() => {
+    const fetchComments = async () => {
+      const comments = await getComments(post.id);
+      setComments(comments);
     };
 
-    // Functie om de URL van het product te openen in de standaardbrowser
+    fetchComments();
+  }, [post.id]);
+
+  useEffect(() => {
+    const fetchCommentCount = async () => {
+      try {
+        const commentsRef = collection(db, 'posts', post.id, 'comments');
+        const commentsSnapshot = await getDocs(commentsRef);
+        setCommentCount(commentsSnapshot.size); // Set het aantal comments voor de post
+      } catch (error) {
+        console.error('Error fetching comment count:', error);
+      }
+    };
+
+    fetchCommentCount();
+  }, [post.id]);
+
+  // Definieer de containsLink functie
+    const containsLink = (text) => {
+        const urlPattern = /(?:https?|ftp):\/\/[\n\S]+|www\.[\S]+/ig;
+        return urlPattern.test(text);
+    };
+
+    const handleAddInput = async () => {
+        if (newInput.trim().length === 0) {
+          return;
+        }
+        
+        // Check of de input een link bevat
+        if (containsLink(newInput)) {
+          // Toon een pop-up om de gebruiker te informeren over het linkbeleid
+          Alert.alert(
+            'Link Policy',
+            'The posting of links is not allowed to ensure the safety and integrity of our community. For more info read the Community Guidelines',
+            [{ text: 'OK' }]
+          );
+          return;
+    }
+  
+    const authorId = user.uid;
+    const authorName = user.displayName;
+  
+    if (replyingTo) {
+      await addReply(post.id, replyingTo, newInput, authorId, authorName);
+      setReplyingTo(null);
+    } else {
+      await addComment(post.id, newInput, authorId, authorName);
+    }
+    
+    setNewInput('');
+    const updatedComments = await getComments(post.id);
+    setComments(updatedComments);
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    try {
+      await deleteDoc(doc(db, 'posts', post.id, 'comments', commentId));
+      const updatedComments = comments.filter(comment => comment.id !== commentId);
+      setComments(updatedComments);
+    } catch (error) {
+      console.error('Error deleting comment: ', error);
+    }
+  };
+
+  const handleDeleteReply = async (commentId, replyId) => {
+    try {
+      const commentRef = doc(db, 'posts', post.id, 'comments', commentId);
+      const commentSnap = await getDoc(commentRef);
+      const existingReplies = commentSnap.data().replies || [];
+      const updatedReplies = existingReplies.filter(reply => reply.timestamp !== replyId);
+      await updateDoc(commentRef, { replies: updatedReplies });
+      const updatedComments = comments.map(comment => {
+        if (comment.id === commentId) {
+          return { ...comment, replies: updatedReplies };
+        } else {
+          return comment;
+        }
+      });
+      setComments(updatedComments);
+    } catch (error) {
+      console.error('Error deleting reply: ', error);
+    }
+  };
+
+  // Pas toggleReply aan om de commentId en auteur naam door te geven
+    const toggleReply = (commentId, authorName) => {
+        setReplyingTo(commentId);
+        setReplyingAuthorName(authorName); // Stel de naam van de auteur in voor weergave
+    };
+
+  const toggleComment = (commentId) => {
+    setExpandedComments({
+      ...expandedComments,
+      [commentId]: !expandedComments[commentId],
+    });
+  };
+
+  // Functie om de URL van het product te openen in de standaardbrowser
   const openProductURL = (url) => {
     if (url && typeof url === 'string') {
       Linking.openURL(url)
@@ -25,356 +170,300 @@ export default function PostDetail({ route }) {
     }
   };
 
-  return (
-    <ScrollView className="bg-[#FAFAFA]">
-        <StatusBar></StatusBar>
-         <View className="bg-white px-7 pt-10 rounded-b-3xl shadow-sm">
-            <View
-            className="flex-row justify-between bg-white pt-6 mb-4">
-                {/* Back button */}
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Image className="w-5 h-5" 
-                                    source={require('./../assets/icons/left-arrow.png')} />
-                </TouchableOpacity>
+  const renderHeader = () => (
+    <View>
+        <View className="bg-white px-7 pt-10 rounded-b-3xl shadow-sm">
+        <View
+        className="flex-row justify-between bg-white pt-6 mb-4">
+            {/* Back button */}
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Image className="w-5 h-5" 
+                                source={require('./../assets/icons/left-arrow.png')} />
+            </TouchableOpacity>
 
-                {/* Question or advise tag */}
-                <View className="border border-dark-pink bg-white rounded-xl w-20 p-0.5">
-                            <Text 
-                            style={{ fontFamily: 'Montserrat_500Medium', fontSize: 13 }}
-                            className="text-dark-pink text-center">
-                                {post.postType}
-                            </Text>
-                </View>
-            </View> 
-        
-            {/* Post info card */}
-            <View className="flex-row justify-between">
-                {/* Title */}
-                <Text 
-                        style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 19 }}
-                        className="pt-3 px-1 mb-3 w-80">
-                       {post.title}
-                </Text>
-
-                {/* Save */}
-                <TouchableOpacity>
-                        <Image className="w-5 h-5 mt-3 ml-8" style={{ tintColor: "gray"}}
-                                                source={require('./../assets/icons/save.png')} />
-                </TouchableOpacity>
-            </View>
-
-            <View className="flex-row mt-2 flex-wrap">
-                {/* Tags */}
-                <View className="flex-row">
-                    {post.skinTypeTags.map((tag, index) => (
-                        <TouchableOpacity 
-                        key={index}
-                        className="bg-light-blue border border-blue rounded-xl px-3 py-0.5 mx-1">
+            {/* Question or advise tag */}
+            <View className="border border-dark-pink bg-white rounded-xl w-20 p-0.5">
                         <Text 
-                            style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
-                            className="text-center text-blue">
-                            {tag}
+                        style={{ fontFamily: 'Montserrat_500Medium', fontSize: 13 }}
+                        className="text-dark-pink text-center">
+                            {post.postType}
                         </Text>
-                        </TouchableOpacity>
-                    ))}
-
-                    {post.skinConcernTags.map((tag, index) => (
-                        <TouchableOpacity 
-                        key={index}
-                        className="bg-yellow border border-dark-yellow rounded-xl px-3 py-0.5 mx-1">
-                        <Text 
-                            style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
-                            className="text-center text-dark-yellow">
-                            {tag}
-                        </Text>
-                        </TouchableOpacity>
-                    ))}
-
-                    {post.skincareProductTags.map((tag, index) => (
-                        <TouchableOpacity 
-                        key={index}
-                        className="bg-pinkie border border-pink rounded-xl px-3 py-0.5 mx-1">
-                        <Text 
-                            style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
-                            className="text-center text-pink">
-                            {tag}
-                        </Text>
-                        </TouchableOpacity>
-                    ))}
-                    </View>
             </View>
-            
-            <View>
-                {/* Description */}
-                <Text 
-                        style={{ fontFamily: 'Montserrat_400Regular', fontSize: 16 }}
-                        className="pt-5 px-1 mb-3 w-100">
-                        {post.description}
-                </Text>
-            </View>
-            
-            <View>
-                {post.products.map((product, index) => (
-                    <View key={index} className="bg-white shadow-sm rounded-md flex-row mt-4 py-2 px-5 justify-between">
-                    {/* Product */}
+        </View> 
+    
+        {/* Post info card */}
+        <View className="flex-row justify-between">
+            {/* Title */}
+            <Text 
+                    style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 23 }}
+                    className="pt-3 px-1 mb-3 w-80">
+                    {post.title}
+            </Text>
 
-                    <View className="flex-row">
-                        {/* Image */}
-                        <Image className="w-12 h-12 mr-5" source={{ uri: product.productImage }} />
+            {/* Save */}
+            <TouchableOpacity>
+                    <Image className="w-5 h-5 mt-3 ml-8" style={{ tintColor: "gray"}}
+                                            source={require('./../assets/icons/save.png')} />
+            </TouchableOpacity>
+        </View>
 
-                        <View className="flex-wrap mt-2">
-                        {/* Product name */}
-                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15 }}>
-                            {product.productName}
-                        </Text>
-
-                        {/* Brand name */}
-                        <Text style={{ fontFamily: 'Montserrat_400Regular', fontSize: 15 }}>
-                            {product.brandName}
-                        </Text>
-                        </View>
-                    </View>
-
-                    {/* Button */}
-                    <TouchableOpacity onPress={() => openProductURL(product.productURL)}>
-                        <View className="bg-dark-pink flex-row rounded-full mt-3 px-4 py-1.5">
-                        <Image className="w-2.5 h-2.5" style={{ tintColor: "white" }} source={require('./../assets/icons/link.png')} />
-
-                        <Text className="text-white ml-1" style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}>
-                            Link
-                        </Text>
-                        </View>
+        <View className=" mt-2 flex-wrap">
+            {/* Tags */}
+            <View className="flex-row flex-wrap">
+                {post.skinTypeTags.map((tag, index) => (
+                    <TouchableOpacity 
+                    key={index}
+                    className="bg-light-blue border border-blue rounded-xl px-3 py-0.5 mx-1 mb-2">
+                    <Text 
+                        style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
+                        className="text-center text-blue">
+                        {tag}
+                    </Text>
                     </TouchableOpacity>
-                    </View>
                 ))}
+
+                {post.skinConcernTags.map((tag, index) => (
+                    <TouchableOpacity 
+                    key={index}
+                    className="bg-yellow border border-dark-yellow rounded-xl px-3 py-0.5 mx-1 mb-2">
+                    <Text 
+                        style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
+                        className="text-center text-dark-yellow">
+                        {tag}
+                    </Text>
+                    </TouchableOpacity>
+                ))}
+
+                {post.skincareProductTags.map((tag, index) => (
+                    <TouchableOpacity 
+                    key={index}
+                    className="bg-pinkie border border-pink rounded-xl px-3 py-0.5 mx-1 mb-2">
+                    <Text 
+                        style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
+                        className="text-center text-pink">
+                        {tag}
+                    </Text>
+                    </TouchableOpacity>
+                ))}
+                </View>
+        </View>
+        
+        <View>
+            {/* Description */}
+            <Text 
+                    style={{ fontFamily: 'Montserrat_500Medium', fontSize: 16 }}
+                    className="pt-5 px-1 mb-3 w-100">
+                    {post.description}
+            </Text>
+        </View>
+        
+        <View>
+        {post.products.map((product, index) => (
+            <View key={index} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'white', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, shadowRadius: 1, elevation: 3, borderRadius: 8, marginTop: 12, padding: 12 }}>
+            {/* Product Image */}
+            <Image style={{ width: 40, height: 40, borderRadius: 20, marginRight: 12 }} source={{ uri: product.productImage }} />
+            {/* Product Details */}
+            <View style={{ flex: 1 }}>
+                {/* Product Name */}
+                <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15, marginBottom: 4 }} numberOfLines={2} ellipsizeMode="tail">
+                {product.productName}
+                </Text>
+                {/* Brand Name */}
+                <Text style={{ fontFamily: 'Montserrat_400Regular', fontSize: 15 }}>{product.brandName}</Text>
+            </View>
+            {/* Link Button */}
+            <TouchableOpacity onPress={() => openProductURL(product.productURL)} style={{ backgroundColor: '#63254E', borderRadius: 20, paddingVertical: 6, paddingHorizontal: 10 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Image style={{ width: 12, height: 12, tintColor: 'white', marginRight: 4 }} source={require('./../assets/icons/link.png')} />
+                <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12, color: 'white' }}>Link</Text>
+                </View>
+            </TouchableOpacity>
+            </View>
+        ))}
+        </View>
+
+        <View className="flex-row mt-8 mb-8 justify-between">
+            {/* Author + date */}
+            <View className="flex-row">
+                <View>
+                    <Image className="w-6 h-6" 
+                                            source={require('./../assets/images/user.png')} />
+                </View>
+
+                <View className="flex-row pt-1.5 mx-2">
+                    <Text
+                    style={{ fontFamily: 'Montserrat_300Light', fontSize: 12 }}>
+                        Jane Ipsum
+                    </Text>
+
+                    <Image className="w-1 h-1 mt-1 ml-3" style={{ tintColor: "#63254E"}}
+                                            source={require('./../assets/images/user.png')} />
+
+                    <Text 
+                    className="ml-3"
+                    style={{ fontFamily: 'Montserrat_300Light', fontSize: 12 }}>
+                        1 day ago
+                    </Text>
+                </View>
             </View>
 
-
-            <View className="flex-row mt-8 mb-8 justify-between">
-                {/* Author + date */}
+            {/* Likes + Comments */}
+            <View className="flex-row mt-1">
+                {/* Likes */}
                 <View className="flex-row">
-                    <View>
-                        <Image className="w-6 h-6" 
-                                                source={require('./../assets/images/user.png')} />
-                    </View>
-
-                    <View className="flex-row pt-1.5 mx-2">
-                        <Text
-                        style={{ fontFamily: 'Montserrat_300Light', fontSize: 12 }}>
-                            Jane Ipsum
-                        </Text>
-
-                        <Image className="w-1 h-1 mt-1 ml-3" style={{ tintColor: "#63254E"}}
-                                                source={require('./../assets/images/user.png')} />
-
-                        <Text 
-                        className="ml-3"
-                        style={{ fontFamily: 'Montserrat_300Light', fontSize: 12 }}>
-                            1 day ago
-                        </Text>
-                    </View>
-                </View>
-
-                {/* Likes + Comments */}
-                <View className="flex-row mt-1">
-                    {/* Likes */}
-                    <View className="flex-row">
-                        <Image className="w-5 h-5 " style={{ tintColor: "gray"}}
-                                            source={require('./../assets/icons/like.png')} />
-                        <Text 
-                        style={{ fontFamily: 'Montserrat_500Medium', fontSize: 15 }}
-                        className="pl-2 mt-0.5">
-                            100
-                        </Text>
-                    </View>
+                    <Image className="w-5 h-5 " style={{ tintColor: "gray"}}
+                                        source={require('./../assets/icons/like.png')} />
+                    <Text 
+                    style={{ fontFamily: 'Montserrat_500Medium', fontSize: 15 }}
+                    className="pl-2 mt-0.5">
+                        100
+                    </Text>
                 </View>
             </View>
+        </View>
 
         </View>
 
-        {/* Comments */}
-        <View className="mx-8 my-8 pb-20">
+        <View className="mt-5 mb-5 mx-8 flex-row">
+                <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 19 }}>
+                Comments 
+                </Text>
+
+                <View className="-mt-1">
+                    <View className="bg-gray-300 px-1.5 rounded-full ml-1">
+                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 13 }}
+                        className="py-0.5 text-white">
+                            {commentCount} 
+                        </Text>
+                    </View>
+                </View>
+        </View>
+    </View>
+  );
+
+
+  return (
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+    <View className="flex-1 bg-white">
+      <FlatList
+        data={comments}
+        keyExtractor={item => item.id}
+        ListHeaderComponent={renderHeader}
+        renderItem={({ item }) => (
+          <View className="px-8 pr-14 py-3 flex-row w-full">
+
+              <View>
+                              <Image className="w-6 h-6" 
+                                                      source={require('./../assets/images/user.png')} />
+              </View>
+
+            <View className="ml-3">               
+
+            <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
+            className="font-bold mb-1">Author: {item.authorName}</Text>
+           
+            <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 14 }} className="pr-8">{item.text}</Text>
+
             <View className="flex-row justify-between">
-                {/* Title */}
-                <View className="flex-row">
-                <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }}
-                      className="mr-1">
-                    2
+
+                <TouchableOpacity onPress={() => {
+                toggleReply(item.id, item.authorName);
+                setReplying(true);
+                }}>
+                <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
+                className="text-gray-400 mt-2">
+                    Reply
                 </Text>
+                </TouchableOpacity>
 
-                <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }}
-                      className="">
-                    Comments
+                {item.authorId === user.uid && (
+                    <TouchableOpacity onPress={() => handleDeleteComment(item.id)}>
+                      <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
+                      className="text-red-500 underline mt-2">Delete</Text>
+                    </TouchableOpacity>
+                  )}
+
+            </View>
+
+           
+
+            {item.replies && item.replies.length > 0 && (
+              <TouchableOpacity onPress={() => toggleComment(item.id)}>
+                <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
+                className="text-gray-400 mt-2 flex-row">
+                  <Image className="w-5 h-5 -mt-1.5 mr-1" style={{ tintColor: "#CBCACA"}}
+                                    source={require('./../assets/icons/minus.png')} />
+                  {expandedComments[item.id] ? 'Hide Replies' : 'Show Replies'}
                 </Text>
-                </View>
-
-                {/* Button */}
-                <TouchableOpacity>
-                    <View className="bg-[#D9D9D9] flex-row rounded-full px-4 py-1.5">
-                        <Image className="w-2.5 h-2.5" style={{ tintColor: "black"}}
-                                                    source={require('./../assets/icons/pencil.png')} />
-
-                        <Text className="text-black ml-1" style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}>
-                            Write a comment
-                        </Text>
-                    </View>
-                </TouchableOpacity>
-            </View>
-            
-            {/* Comment PARENT */}
-            <View className="mt-5 shadow-sm px-0 pt-0">
-                {/* User Name + date */}
-                <View className="flex-row justify-between">
-                        <View className="flex-row">
-                            <View>
-                                <Image className="w-6 h-6" 
-                                                        source={require('./../assets/images/user.png')} />
-                            </View>
-
-                            <View className="flex-row pt-1.5 mx-2">
-                                <Text
-                                style={{ fontFamily: 'Montserrat_300Light', fontSize: 12 }}>
-                                    user12459
-                                </Text>
-
-                                <Image className="w-1 h-1 mt-1 ml-3" style={{ tintColor: "#63254E"}}
-                                                        source={require('./../assets/images/user.png')} />
-
-                                <Text 
-                                className="ml-3"
-                                style={{ fontFamily: 'Montserrat_300Light', fontSize: 12 }}>
-                                    16h
-                                </Text>
-                            </View>
-                        </View>
-
-                        {/* like + reply button */}
-                        <View className="flex-row justify-end mt-1">
-                            {/* Likes */}
-                            <View className="flex-row">
-                                <Image className="w-4 h-4" style={{ tintColor: "gray"}}
-                                                    source={require('./../assets/icons/like.png')} />
-                                <Text 
-                                style={{ fontFamily: 'Montserrat_500Medium', fontSize: 13 }}
-                                className="pl-2 text-gray-600">
-                                    26
-                                </Text>
-                            </View>
-
-                            {/* Reply */}
-                            <View className="flex-row ml-4">
-                                <Image className="w-4 h-4" style={{ tintColor: "gray"}}
-                                                    source={require('./../assets/icons/reply.png')} />
-                                <Text 
-                                style={{ fontFamily: 'Montserrat_500Medium', fontSize: 13 }}
-                                className="pl-0 ml-1 text-gray-600">
-                                    Reply
-                                </Text>
-                            </View>
-                        </View>
-                </View>
-
-                <View>
-                    {/* Comment itself */}
-                    <Text 
-                        style={{ fontFamily: 'Montserrat_400Regular', fontSize: 16 }}
-                        className="pt-3 px-1 mb-3 w-100">
-                            Thank you so much for your advise! I’ve got a question though: 
-                            You’ve said that you experiences some breakouts the first time u started using it. What kind of breakouts was it? Like small pimples or redness?
-                    </Text>
-                </View>
-            </View>
-
-            {/* View replies / Hide replies knop */}
-            {showReplies ? (
-                <TouchableOpacity onPress={toggleReplies}>
-                    <View className="flex-row mt-1 ml-5">
-                        <Image className="w-3 h-3 mr-1" 
-                            source={require('./../assets/icons/up.png')} />
-                        <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 13 }}> 
-                            Hide replies
-                        </Text>
-                    </View>
-                </TouchableOpacity>
-            ) : (
-                <TouchableOpacity onPress={toggleReplies}>
-                    <View className="flex-row mt-1 ml-5">
-                        <Image className="w-3 h-3 mr-1" 
-                            source={require('./../assets/icons/down.png')} />
-                        <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 13 }}> 
-                            View replies
-                        </Text>
-                    </View>
-                </TouchableOpacity>
+              </TouchableOpacity>
             )}
+            {expandedComments[item.id] && item.replies && item.replies.map((reply, index) => (
+              <View key={index} className="ml-8 mt-5">
 
-            {/* Comment reply CHILDREN*/}
-            {showReplies && (
-            <View className="flex justify-end mt-2 shadow-sm px-4 py-3 ml-8">
-                {/* User Name + date */}
-                {/* User Name + date */}
-                <View className="flex-row justify-between">
-                        <View className="flex-row">
-                            <View>
-                                <Image className="w-6 h-6" 
-                                                        source={require('./../assets/images/user.png')} />
-                            </View>
+                <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
+                className="mb-1">Author: {reply.authorName}</Text>
 
-                            <View className="flex-row pt-1.5 mx-2">
-                                <Text
-                                style={{ fontFamily: 'Montserrat_300Light', fontSize: 12 }}>
-                                    user12459
-                                </Text>
+                <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 14 }}>{reply.text}</Text>
 
-                                <Image className="w-1 h-1 mt-1 ml-3" style={{ tintColor: "#63254E"}}
-                                                        source={require('./../assets/images/user.png')} />
-
-                                <Text 
-                                className="ml-3"
-                                style={{ fontFamily: 'Montserrat_300Light', fontSize: 12 }}>
-                                    16h
-                                </Text>
-                            </View>
-                        </View>
-
-                        {/* like + reply button */}
-                        <View className="flex-row justify-end mt-1">
-                            {/* Likes */}
-                            <View className="flex-row">
-                                <Image className="w-4 h-4" style={{ tintColor: "gray"}}
-                                                    source={require('./../assets/icons/like.png')} />
-                                <Text 
-                                style={{ fontFamily: 'Montserrat_500Medium', fontSize: 13 }}
-                                className="pl-2 text-gray-600">
-                                    26
-                                </Text>
-                            </View>
-
-                            {/* Reply */}
-                            <View className="flex-row ml-4">
-                                <Image className="w-4 h-4" style={{ tintColor: "gray"}}
-                                                    source={require('./../assets/icons/reply.png')} />
-                                <Text 
-                                style={{ fontFamily: 'Montserrat_500Medium', fontSize: 13 }}
-                                className="pl-0 ml-1 text-gray-600">
-                                    Reply
-                                </Text>
-                            </View>
-                        </View>
-                </View>
-
-                <View>
-                    {/* Comment itself */}
-                    <Text 
-                        style={{ fontFamily: 'Montserrat_400Regular', fontSize: 16 }}
-                        className="pt-3 px-1 mb-3 w-100">
-                            I've experienced more redness. I didnt saw new pimples or anything.
-                    </Text>
-                </View>
+                {reply.authorId === user.uid && (
+                  <TouchableOpacity onPress={() => handleDeleteReply(item.id, reply.timestamp)}>
+                    <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
+                    className="text-red-500 underline mt-2">Delete</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            ))}
             </View>
-            )}
+          </View>
+        )}
+      />
 
-        </View>
-    </ScrollView>
+<View className=" bg-white border-t border-gray-300 shadow-xl">
+
+<View className="flex-row justify-between mt-3 mx-5">
+
+{replying && (
+  <View className="replyIndicator">
+    <Text style={{ fontFamily: 'Montserrat_500Medium_Italic', fontSize: 13 }}
+    className="replyIndicatorText">Replying to: {replyingAuthorName}</Text>
+  </View>
+)}
+  
+{replying && (
+  <TouchableOpacity onPress={() => {
+    setReplying(false);
+    setReplyingTo(null);
+  }}
+  className="bg-white">
+    <View>
+      <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 13 }}
+      className="text-dark-pink underline">
+        Cancel Reply
+      </Text>
+    </View>
+  </TouchableOpacity>
+)}
+
+</View>
+
+<View className="flex-row bg-white px-4 pt-2 pb-10 justify-between">
+    <View>
+                                <Image className="w-6 h-6 mt-2 mr-4 ml-2" 
+                                                        source={require('./../assets/images/user.png')} />
+                </View>
+  <TextInput
+    className="border border-gray-300 p-2 pl-4 rounded-full flex-1"
+    placeholder={replyingTo ? "Reply to comment..." : "Add a comment..."}
+    value={newInput}
+    onChangeText={setNewInput}
+  />
+  <TouchableOpacity onPress={handleAddInput} className="bg-blue-500 text-white py-2 px-4 rounded-lg mt-2">
+    <Image className="w-6 h-6 -mt-2" style={{ tintColor: "#63254E"}} source={require('../assets/icons/send.png')} />
+  </TouchableOpacity>
+</View>
+</View>
+
+    </View>
+  </KeyboardAvoidingView>
   )
 }

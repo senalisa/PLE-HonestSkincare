@@ -319,13 +319,33 @@ export default function CreatePost() {
     }
   };
 
+  // Definieer de containsLink functie
+const containsLink = (text) => {
+  const urlPattern = /(?:https?|ftp):\/\/[\n\S]+|www\.[\S]+/ig;
+  return urlPattern.test(text);
+};
+
+
   const handleSavePost = async () => {
     try {
-      // Controleer of alle vereiste velden zijn ingevuld
-      if (!userId || !postType || !title || !description) {
-        console.error('Please fill in all required fields');
-        return;
-      }
+     // Controleer of alle vereiste velden zijn ingevuld en of er links zijn
+    if (!userId || !postType || !title || !description ) {
+      Alert.alert(
+        'Could not publish post',
+        'Please fill in all required fields.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    if (containsLink(title) || containsLink(description)) {
+      Alert.alert(
+        'Link Policy',
+        'The posting of links is not allowed to ensure the safety and integrity of our community. For more info read the Community Guidelines',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
 
       // Upload de afbeeldingen en verkrijg de download-URL's
       const imageUrls = await uploadImages(images);
