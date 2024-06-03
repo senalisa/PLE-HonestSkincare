@@ -10,7 +10,7 @@ export default function PostCard({ post }) {
   return (
     <View> 
     {/* Post Two */}
-    <Animated.View entering={FadeInDown.delay(100).duration(3000).springify()}>
+    <Animated.View entering={FadeInDown.delay(0).duration(2000).springify()}>
         <TouchableOpacity onPress={() => navigation.navigate('PostDetail', { post: post })}>
             <View className="relative rounded-xl bg-white shadow mx-7 px-4 py-4 mt-4">
                 <View className="flex-row">
@@ -19,16 +19,16 @@ export default function PostCard({ post }) {
                         {/* Tag */}
                         <View className="bg-dark-pink rounded-xl w-20 p-0.5 ml-1">
                             <Text 
-                                style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
-                                className="text-white text-center">
+                                style={{ fontFamily: 'Montserrat_500Medium' }}
+                                className="text-white text-center text-xs">
                                 {post.postType}
                             </Text>
                         </View>
 
                         {/* Title */}
                         <Text 
-                            style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }}
-                            className="pt-3 px-1 mb-3 w-72">
+                            style={{ fontFamily: 'Montserrat_600SemiBold'}}
+                            className="pt-3 px-1 mb-3 w-72 text-lg">
                             {post.title}
                         </Text>
 
@@ -39,8 +39,8 @@ export default function PostCard({ post }) {
                                     key={index}
                                     className="bg-light-blue border border-blue rounded-xl px-3 py-0.5 mx-1 my-1">
                                     <Text 
-                                        style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
-                                        className="text-center text-blue">
+                                        style={{ fontFamily: 'Montserrat_600SemiBold' }}
+                                        className="text-center text-blue text-[11px]">
                                         {tag}
                                     </Text>
                                 </TouchableOpacity>
@@ -51,8 +51,8 @@ export default function PostCard({ post }) {
                                     key={index}
                                     className="bg-yellow border border-dark-yellow rounded-xl px-3 py-0.5 mx-1 my-1">
                                     <Text 
-                                        style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
-                                        className="text-center text-dark-yellow">
+                                        style={{ fontFamily: 'Montserrat_600SemiBold'}}
+                                        className="text-center text-dark-yellow text-[11px]">
                                         {tag}
                                     </Text>
                                 </TouchableOpacity>
@@ -63,8 +63,8 @@ export default function PostCard({ post }) {
                                     key={index}
                                     className="bg-pinkie border border-pink rounded-xl px-3 py-0.5 mx-1 my-1">
                                     <Text 
-                                        style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
-                                        className="text-center text-pink">
+                                        style={{ fontFamily: 'Montserrat_600SemiBold' }}
+                                        className="text-center text-pink text-[11px]">
                                         {tag}
                                     </Text>
                                 </TouchableOpacity>

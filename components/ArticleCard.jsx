@@ -65,13 +65,13 @@ export default function ArticleCard() {
   
 
   return (
-    <View style={{ flex: 1, height: 280 }}>
+    <View style={{ flex: 1, height: 240 }}>
       <Carousel
         width={170}
         height={230}
         style={{
           width: PAGE_WIDTH,
-          height: 400,
+          height: 300,
           backgroundColor: "#fff",
         }}
         loop
@@ -92,6 +92,7 @@ export default function ArticleCard() {
                 justifyContent: "center",
                 overflow: "hidden",
                 alignItems: "center",
+                borderWidth: 1, borderColor: '#EFEFEF' 
               }}
             >
               <Image source={{ uri: item.articleCover }} style={styles.image} />

@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, StatusBar, TouchableOpacity, Image } from 'react-native'
+import { View, Text, ScrollView, StatusBar, TouchableOpacity, Image, ImageBackground } from 'react-native'
 import React, { useState, useEffect } from 'react';
 import Animated, { FlipInEasyX } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native'
@@ -71,7 +71,7 @@ export default function CategorySearch() {
           {/* Title */}
           <Text  style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }}
           className="text-center flex-1 -ml-4">
-            Topics about Oily skin
+            Topics about {topicData.topicName}
           </Text>
   
           {/* Spacer voor het centreren van de titel */}
@@ -81,24 +81,28 @@ export default function CategorySearch() {
 
       {/* Info-card Skin type/concern */}
       <Animated.View entering={FlipInEasyX.delay(100).duration(2000).springify()}>
-      <View className="flex-row bg-white shadow-sm mx-7 rounded-xl mb-8">
+    
+      <View className="flex-row shadow-md mx-7 rounded-xl mb-8 items-center">
+      <ImageBackground source={require('./../assets/images/topic-bg.png')} imageStyle= {{opacity:0.1}} className="flex-row items-center rounded-xl border-gray-100" style={{ borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: '#E5E5E5'}}>
         {/* Title + Info */}
         <View className="w-40 ml-5 py-5 mr-9">
-          <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }} className="mb-2">
+          <Text style={{ fontFamily: 'Montserrat_600SemiBold' }} className="mb-2 text-lg">
             {topicData.topicName}
           </Text>
 
-          <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 15 }}>
+          <Text style={{ fontFamily: 'Montserrat_500Medium'}} className="text-[13px]">
             {topicData.topicText}
           </Text>
         </View>
 
         {/* Image */}
         <View>
-          <Image className="w-40 h-40 rounded-r-xl" 
+          <Image className="w-[110] h-[135] rounded-r-xl mr-10" 
                           source={{ uri: topicData.topicImage }} />
         </View>
+        </ImageBackground>
       </View>
+     
       </Animated.View>
 
       {/* Trending + Newest buttons + search button */}

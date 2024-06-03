@@ -60,7 +60,7 @@ export default function Register() {
 
       </SafeAreaView>
 
-      <View className="flex-1 bg-primary px-8 pt-8"> 
+      <View className="flex-1 bg-primary px-8 pt-4"> 
         {/* Logo */}
         <View className="flex items-center mb-10">
           <Image className="w-32 h-12 ml-2" 
@@ -72,16 +72,16 @@ export default function Register() {
             {/* Username */}
             <Animated.View entering={FadeInDown.delay(200).duration(3000).springify()}>
               {/* Text */}
-              <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }}
-              className="text-black font-semibold pb-2">Username</Text>
+              <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
+              className="text-black font-semibold pb-2 text-sm">Username</Text>
 
               {/* Input */}
               <View className="flex-row px-4 py-2 bg-white text-gray-700 rounded-md border border-gray-200 text-l font-medium mb-4">
                   <Image className="w-6 h-6 mr-3" style={{ tintColor: "black"}}
                                               source={require('./../assets/icons/profile.png')} />
                   <TextInput 
-                      className="flex-1"
-                      placeholder=''
+                      className="flex-1 text-sm"
+                      placeholder='Username'
                       value={displayName}
                       onChangeText={value => setDisplayName(value)}
                   >
@@ -93,16 +93,16 @@ export default function Register() {
             {/* Email input */}
             <Animated.View entering={FadeInDown.delay(300).duration(3000).springify()}>
               {/* Text */}
-              <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }}
-              className="text-black font-semibold text-xl">E-mail</Text>
+              <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
+              className="text-black font-semibold text-xl pb-2 text-sm">E-mail</Text>
 
               {/* Input */}
               <View className="flex-row px-4 py-3 bg-white text-gray-700 rounded-md border border-gray-200 text-l font-medium mb-4">
                 <Image className="w-4 h-4 mr-4" style={{ tintColor: "black"}}
                                             source={require('./../assets/icons/mail.png')} />
                 <TextInput 
-                    className="flex-1"
-                    placeholder=''
+                    className="flex-1 text-sm"
+                    placeholder='E-mail'
                     value={email}
                     onChangeText={value => setEmail(value)}
                 >
@@ -114,17 +114,17 @@ export default function Register() {
             {/* Wachtwoord input */}
             <Animated.View entering={FadeInDown.delay(400).duration(3000).springify()}>
               {/* Text */}
-              <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }}
-              className="text-black font-semibold text-xl">Password</Text>
+              <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
+              className="text-black font-semibold text-xl text-sm pb-2">Password</Text>
 
               {/* Input */}
               <View className="flex-row px-4 py-2.5 bg-white text-gray-700 rounded-md border border-gray-200 text-l font-medium mb-10">
                 <Image className="w-5 h-5 mr-3" style={{ tintColor: "black"}}
                                             source={require('./../assets/icons/lock.png')} />
                 <TextInput 
-                    className="flex-1"
+                    className="flex-1 text-sm"
                     secureTextEntry
-                    placeholder=''
+                    placeholder='Password'
                     value={password}
                     onChangeText={value => setPassword(value)}
                 >
@@ -140,32 +140,32 @@ export default function Register() {
                 <TouchableOpacity className="py-3 bg-dark-pink rounded-full mb-5 w-60 flex mx-auto"
                                   onPress={handlesubmit}
                 >
-                    <Text style={{ fontFamily: 'Belleza_400Regular', fontSize: 24 }}
-                    className="text-xl font-bold text-center text-white">Sign up</Text>
+                    <Text style={{ fontFamily: 'Belleza_400Regular'}}
+                    className="text-xl font-bold text-center text-white text-xl">Sign up</Text>
                 </TouchableOpacity>
             </Animated.View>
 
             <Animated.View entering={FadeInDown.delay(600).duration(3000).springify()}>
-              <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 20 }}
-              className="text-center mb-5">Or</Text>
-              <View className="flex-row justify-center space-x-8 mb-5">
+              <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
+              className="text-center mb-5 text-md">Or</Text>
+              <View className="flex-row justify-center space-x-8 mb-5 text-base">
 
                 {/* Google */}
                 <TouchableOpacity className="p-3 bg-gray-100 rounded-2xl">
                   <Image source={require('./../assets/icons/google.png')}
-                    className="w-10 h-10" />
+                    className="w-8 h-8" />
                 </TouchableOpacity>
 
                 {/* Facebook */}
                 <TouchableOpacity className="p-3 bg-gray-100 rounded-2xl">
                   <Image source={require('./../assets/icons/facebook.png')}
-                    className="w-10 h-10" />
+                    className="w-8 h-8" />
                 </TouchableOpacity>
 
                 {/* Apple */}
                 <TouchableOpacity className="p-3 bg-gray-100 rounded-2xl">
                   <Image source={require('./../assets/icons/apple.png')}
-                    className="w-10 h-10" />
+                    className="w-8 h-8" />
                 </TouchableOpacity>
                 
               </View>
@@ -176,11 +176,11 @@ export default function Register() {
                <View className="flex-row justify-center">
                 <TouchableOpacity className="mt-3 flex-wrap text-center"
                 onPress={() => navigation.navigate('Login')}>
-                  <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 16 }} 
-                  className="text-center">Already joined our community?</Text>
+                  <Text style={{ fontFamily: 'Montserrat_500Medium'}} 
+                  className="text-center text-sm">Already joined our community?</Text>
 
-                  <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 16 }} 
-                  className="text-center text-dark-pink underline pt-1">Login here</Text>
+                  <Text style={{ fontFamily: 'Montserrat_600SemiBold' }} 
+                  className="text-center text-dark-pink underline pt-1 text-sm">Login here</Text>
                 </TouchableOpacity>
                 </View>
             </Animated.View>

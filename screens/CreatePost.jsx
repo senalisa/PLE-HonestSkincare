@@ -50,7 +50,7 @@ export default function CreatePost() {
         <View key={i} className="flex-row items-center shadow-sm">
           <View
             className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-              i <= step ? 'border-dark-pink bg-dark-pink w-8 h-8' : 'border-white bg-white'
+              i <= step ? 'border-dark-pink bg-dark-pink w-7 h-7' : 'border-white bg-white'
             }`}
           >
             <Text className={`font-bold ${i <= step ? 'text-white' : 'text-gray-200'}`}>
@@ -383,11 +383,11 @@ const containsLink = (text) => {
       <View className="pt-12 pb-10">
      
 
-        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }}
-        className="text-center mt-8 shadow-md">Create a post</Text>
+        <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
+        className="text-center mt-8 shadow-md text-base">Create a post</Text>
 
-        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 22 }}
-        className="text-center mt-1 color-dark-pink shadow-md">{getStepText(step)}</Text>
+        <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
+        className="text-center mt-0 color-dark-pink shadow-md text-xl">{getStepText(step)}</Text>
 
         {/* Progress Bar */}
         <View className="flex-row items-center justify-center my-5 w-20 mx-auto">
@@ -400,26 +400,41 @@ const containsLink = (text) => {
 
        {step === 1 && (
           <View className="flex-1 p-8 bg-white rounded-t-3xl shadow-xl -mt-8 h-screen">
+
+            {/* Next Button */}
+              <View className="flex justify-center items-end -mt-2 -mr-2">
+                <TouchableOpacity 
+                  onPress={handleNext} 
+                  className="py-1 bg-dark-pink rounded-full w-16">
+                  <Text 
+                    style={{ fontFamily: 'Montserrat_600SemiBold'}} 
+                    className="text-sm font-bold text-center text-white">
+                    Next
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
               {/* Type */}
                 <View className="mb-6">
-                  <Text className="text-lg font-bold mb-2">Post Type</Text>
+                  <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
+                  className="text-lg font-bold mb-2">Post Type</Text>
 
                   <View className="flex-row">
                     <TouchableOpacity
-                      className={`py-3 px-7 rounded-full shadow-sm mr-5 ${postType === 'Question' ? 'bg-dark-pink' : 'bg-white'}`}
+                      className={`mt-2 py-2 px-5 rounded-full shadow-sm mr-5 ${postType === 'Question' ? 'bg-dark-pink' : 'bg-white'}`}
                       onPress={() => handlePostTypeSelection('Question')}>
 
-                      <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 14 }}
-                      className={` ${postType === 'Question' ? 'text-white' : 'text-black'}`}>Question</Text>
+                      <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
+                      className={`text-[14px] ${postType === 'Question' ? 'text-white' : 'text-black'}`}>Question</Text>
 
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                      className={`py-3 px-10 rounded-full shadow-sm ${postType === 'Advise' ? 'bg-dark-pink' : 'bg-white'}`}
+                      className={`mt-2 py-2 px-5 rounded-full shadow-sm ${postType === 'Advise' ? 'bg-dark-pink' : 'bg-white'}`}
                       onPress={() => handlePostTypeSelection('Advise')}>
 
-                      <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 14 }}
-                      className={` ${postType === 'Advise' ? 'text-white' : 'text-black'}`}>Advise</Text>
+                      <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
+                      className={`text-[14px] ${postType === 'Advise' ? 'text-white' : 'text-black'}`}>Advise</Text>
                     </TouchableOpacity>
                   </View>
 
@@ -427,9 +442,10 @@ const containsLink = (text) => {
 
               {/* Title */}
                 <View className="mb-6">
-                  <Text className="text-lg font-bold mb-2">Title</Text>
+                <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
+                  className="text-lg font-bold mb-2">Title</Text>
                   <TextInput
-                    className="border border-gray-300 rounded p-3 shadow-md"
+                    className="border border-gray-200 rounded-full p-3.5 shadow-sm bg-white"
                     placeholder="Enter Title"
                     value={title}
                     onChangeText={setTitle}
@@ -438,9 +454,10 @@ const containsLink = (text) => {
 
               {/* Description */}
               <View className="mb-6">
-                <Text className="text-lg font-bold mb-2">Description</Text>
+                <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
+                className="text-lg font-bold mb-2">Description</Text>
                 <TextInput
-                  className="border border-gray-300 rounded p-3 h-48"
+                  className="border border-gray-200 rounded-xl shadow-sm p-3.5 h-48 bg-white"
                   placeholder="Enter Description"
                   multiline
                   value={description}
@@ -448,7 +465,7 @@ const containsLink = (text) => {
                 />
               </View>
 
-              {/* Next Button */}
+              {/* Next Button
               <View className="flex justify-center items-center">
                 <TouchableOpacity 
                   onPress={handleNext} 
@@ -459,16 +476,51 @@ const containsLink = (text) => {
                     Next
                   </Text>
                 </TouchableOpacity>
-              </View>
+              </View> */}
 
           </View>
         )}
 
       {step === 2 && (
             <View className="flex-1 p-8 bg-white rounded-t-3xl shadow-xl -mt-8 h-screen">
+              {/* Next Button */}
+              <View className="flex-row justify-center justify-between -mt-2 -mr-2 mb-7">
+                <TouchableOpacity 
+                  onPress={handlePrevious} 
+                  className="py-1 bg-white border border-gray-400 rounded-full w-16 ">
+                  <Text 
+                    style={{ fontFamily: 'Montserrat_600SemiBold'}} 
+                    className="text-sm font-bold text-center text-gray-400">
+                    Back
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  onPress={handleNext} 
+                  className="py-1 bg-dark-pink rounded-full w-16">
+                  <Text 
+                    style={{ fontFamily: 'Montserrat_600SemiBold'}} 
+                    className="text-sm font-bold text-center text-white">
+                    Next
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              
+
             <View>
               <TouchableOpacity onPress={() => toggleSection('skinType')} className="flex-row justify-between items-center">
-                <Text className="text-lg font-bold mb-5">Skin Type Tags</Text>
+                <View className="flex-row mb-5">
+                    <Image className="w-8 h-10" source={require('../assets/images/oily-skintype.png')} />
+
+                    <View className="ml-3">
+                      <Text style={{ fontFamily: 'Montserrat_400Regular'}}
+                      className="text-sm font-bold -mb-1 ">Choose a tag for the</Text>
+
+                      <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
+                      className="text-lg font-bold ">Skin Type</Text>
+                    </View>
+                </View>
+            
                 <Image className="-mt-4"
                   source={visibleSections.skinType ? require('../assets/icons/up2.png') : require('../assets/icons/down2.png')}
                   style={{ width: 13, height: 13 }} // Pas de grootte van het icoontje aan zoals nodig
@@ -479,67 +531,113 @@ const containsLink = (text) => {
               <View className="border-b border-gray-100 mt-5" />
   
               <TouchableOpacity onPress={() => toggleSection('skinConcern')} className="flex-row justify-between items-center my-5">
-                <Text className="text-lg font-bold">Skin Concern Tags</Text>
+                <View className="flex-row mb-1">
+                    <Image className="w-8 h-10" source={require('../assets/images/acne.png')} />
+
+                    <View className="ml-3">
+                      <Text style={{ fontFamily: 'Montserrat_400Regular'}}
+                      className="text-sm font-bold -mb-1 ">Choose a tag for the</Text>
+
+                      <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
+                      className="text-lg font-bold ">Skin Concern</Text>
+                    </View>
+                </View>
+                
                 <Image
                   source={visibleSections.skinConcern ? require('../assets/icons/up2.png') : require('../assets/icons/down2.png')}
                   style={{ width: 13, height: 13 }} // Pas de grootte van het icoontje aan zoals nodig
                 />
               </TouchableOpacity>
-              {renderTags(['Redness', 'Hyperpigmentation', 'Acne', 'Wrinkles', 'Rosacea', 'Pores', 'Blackheads'], 'skinConcern')}
+              {renderTags(['Redness', 'Hyperpigmentation', 'Acne', 'Wrinkles', 'Rosacea', 'Pores', 'Blackheads', 'Eyebags', 'Whiteheads', 'Dryness'], 'skinConcern')}
 
               <View className="border-b border-gray-100 mt-5" />
   
               <TouchableOpacity onPress={() => toggleSection('skincareProduct')} className="flex-row justify-between items-center my-5">
-                <Text className="text-lg font-bold">Skincare Product Tags</Text>
+                <View className="flex-row mb-1">
+                    <Image className="w-6 h-9" source={require('../assets/images/serum-2.png')} />
+
+                    <View className="ml-3">
+                      <Text style={{ fontFamily: 'Montserrat_400Regular'}}
+                      className="text-sm font-bold -mb-1 ">Choose a tag for the</Text>
+
+                      <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
+                      className="text-lg font-bold ">Skincare Product</Text>
+                    </View>
+                </View>
+
                 <Image
                   source={visibleSections.skincareProduct ? require('../assets/icons/up2.png') : require('../assets/icons/down2.png')}
                   style={{ width: 13, height: 13 }} // Pas de grootte van het icoontje aan zoals nodig
                 />
               </TouchableOpacity>
-              {renderTags(['Cleanser', 'Moisturizer', 'Essence', 'Serum', 'Sunscreen', 'Exfoliant', 'Toner', 'Mask', 'Lip care',], 'skincareProduct')}
+              {renderTags(['Cleanser', 'Moisturizer', 'Serum', 'Sunscreen', 'Toner', 'Eye cream', 'Lip balm',], 'skincareProduct')}
             </View>
   
-            <TouchableOpacity onPress={handleNext} className="mt-8 py-2.5 bg-dark-pink rounded-full mb-5 w-60 flex mx-auto shadow-md">
-              <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 17 }} className="text-xl font-bold text-center text-white">
-                Next
-              </Text>
-            </TouchableOpacity>
-  
-            <TouchableOpacity onPress={handlePrevious} className="mx-auto shadow-md">
-              <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 17 }} className="pt-0 color-gray-500">
-                Go back
-              </Text>
-            </TouchableOpacity>
           </View>
       )}
 
       {step === 3 && (
-           <View className="flex-1 p-8 bg-white rounded-t-3xl shadow-xl -mt-8">
-            <Text className="text-lg font-bold mb-5">Products</Text>
+           <View className="flex-1 p-8 bg-white rounded-t-3xl shadow-xl -mt-8 pb-24">
 
-            {/* Knop om de modal te openen */}
-            <TouchableOpacity onPress={() => setModalVisible(true)} className="mb-5 border border-gray-200 py-2 px-5 rounded-xl flex-row shadow-sm">
-              <Image className="w-3 h-3 mr-3 mt-0.5" 
-                                          source={require('./../assets/icons/plus.png')} />
-              <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 16 }}
-              className=""
-              >Add a product</Text>
-            </TouchableOpacity>
+            {/* Next Button */}
+            <View className="flex-row justify-center justify-between -mt-2 -mr-2 mb-7">
+                <TouchableOpacity 
+                  onPress={handlePrevious} 
+                  className="py-1 bg-white border border-gray-400 rounded-full w-16 ">
+                  <Text 
+                    style={{ fontFamily: 'Montserrat_600SemiBold'}} 
+                    className="text-sm font-bold text-center text-gray-400">
+                    Back
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  onPress={handleSavePost} 
+                  className="py-1 bg-dark-pink rounded-full w-16">
+                  <Text 
+                    style={{ fontFamily: 'Montserrat_600SemiBold'}} 
+                    className="text-sm font-bold text-center text-white">
+                    Save
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <View className="flex-row justify-between mb-3">
+
+                <View className="flex">
+                  <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
+                      className="text-lg font-bold">Products</Text>
+
+                  <Text style={{ fontFamily: 'Montserrat_400Regular'}}
+                      className="text-xs text-gray-400">Optional</Text>
+                </View>
+
+                {/* Knop om de modal te openen */}
+                <TouchableOpacity onPress={() => setModalVisible(true)} className="border border-gray-200 py-2 px-3 rounded-full bg-white flex-row shadow-sm justify-center">
+                  <Image className="w-2 h-2 mr-1 mt-1" 
+                                              source={require('./../assets/icons/plus.png')} />
+                  <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
+                  className="text-xs text-center mt-0.5"
+                  >Add a product</Text>
+                </TouchableOpacity>
+
+              </View>
+
 
             {/* Lijst met geselecteerde producten */}
             <View>
               {products.map((product, index) => (
                 <View key={index} className="align-center my-2">
-                  <View className="flex-row border border-gray-100 rounded-md px-3 py-2 items-center">
+                  <View className="flex-row border border-gray-100 rounded-md px-3 py-2 items-center bg-white shadow-sm">
                    <Image className="w-12 h-12"
                                 source={{ uri: product.productImage }} />
 
                       <View className="flex pl-3">
-                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 16 }}
-                        className="text-black pr-12 mr-12">{product.productName}</Text>
+                        <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
+                        className="text-black pr-12 mr-12 text-base">{product.productName}</Text>
 
-                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 14 }}
-                        className="text-black pt-1 text-dark-pink">{product.brandName}</Text>
+                        <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
+                        className="text-black pt-0.5 text-dark-pink text-sm">{product.brandName}</Text>
                       </View>
                   </View>
 
@@ -609,24 +707,36 @@ const containsLink = (text) => {
 
                 {/* Knop om de modal te sluiten */}
                 <TouchableOpacity onPress={() => setModalVisible(false)}>
-                  <Text>Sluiten</Text>
+                  <Text className="font-bold text-base">Close</Text>
                 </TouchableOpacity>
               </View>
             </Modal>
 
+            <View className="border-b border-gray-100 mt-5" />
+
             {/* Image */}
-            <Text className="text-lg font-bold mb-5 mt-10">Image</Text>
+            <View className="mb-10 mt-8">
 
-            <View className="mb-10">
+            <View className="flex-row justify-between mb-3">
 
-              <TouchableOpacity
-                onPress={pickImages}
-                className="mb-5 border border-gray-200 py-2 px-5 rounded-xl flex-row shadow-sm"
-              >
-                <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 16 }}
-              className=""
-                >Add image(s)</Text>
+              <View className="flex">
+                <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
+                    className="text-lg font-bold">Image(s)</Text>
+
+                <Text style={{ fontFamily: 'Montserrat_400Regular'}}
+                    className="text-xs text-gray-400">Optional</Text>
+              </View>
+
+              {/* Knop om de modal te openen */}
+              <TouchableOpacity onPress={pickImages} className="border border-gray-200 py-2 px-3 rounded-full bg-white flex-row shadow-sm justify-center">
+                <Image className="w-2 h-2 mr-1 mt-1" 
+                                            source={require('./../assets/icons/plus.png')} />
+                <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
+                className="text-xs text-center mt-0.5"
+                >Add Image(s)</Text>
               </TouchableOpacity>
+
+            </View>
 
               <Swiper
                       style={{ height: 300 }}
@@ -634,6 +744,7 @@ const containsLink = (text) => {
                       paginationStyle={{ bottom: -23 }}
                       dotStyle={{ borderRadius: 100, width: 10, height: 10, backgroundColor: 'grey' }}
                       activeDotStyle={{ borderRadius: 100, width: 10, height: 10, backgroundColor: '#63254E' }}
+                      className="mt-5"
                     >
                       {images.map((uri, index) => (
                         <View key={index}>
@@ -644,20 +755,6 @@ const containsLink = (text) => {
                         </View>
                       ))}
               </Swiper>
-            </View>
-
-            <View className="pb-20">
-
-            <TouchableOpacity onPress={handleSavePost} className="mt-8 py-2.5 bg-dark-pink rounded-full mb-3 w-60 flex mx-auto shadow-md">
-              <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 17 }}
-              className="text-xl font-bold text-center text-white">Save</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={handlePrevious} className="mx-auto shadow-md">
-                <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 17 }}
-                className="pt-5 color-gray-500">Go back</Text>
-            </TouchableOpacity>
-
             </View>
 
           </View>

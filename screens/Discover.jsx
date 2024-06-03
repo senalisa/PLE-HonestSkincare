@@ -73,8 +73,10 @@ export default function Discover() {
       <View className="bg-white outline outline-offset-6 h-full py-5 -mt-5 rounded-t-[35px]">
 
       <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 22 }} className="mx-7 mt-2 text-center">Trending Articles</Text>
+      {/* <Image className="w-48 h-10 justify-center mx-auto "
+      source={require('./../assets/images/articles-text.png')} /> */}
 
-      <View className="mb-7">
+      <View className="mb-20">
             <ArticleCard />
         </View>
 

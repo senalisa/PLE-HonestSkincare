@@ -43,7 +43,7 @@ export default function Login() {
 
    </SafeAreaView>
 
-   <View className="flex-1 bg-primary px-8 pt-8"> 
+   <View className="flex-1 bg-primary px-8 pt-4"> 
      {/* Logo */}
      <View className="flex items-center mb-10">
        <Image className="w-32 h-12 ml-2" 
@@ -55,16 +55,16 @@ export default function Login() {
          {/* Email input */}
          <Animated.View entering={FadeInDown.delay(300).duration(3000).springify()}>
            {/* Text */}
-           <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }}
-           className="text-black font-semibold text-xl">E-mail</Text>
+           <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
+              className="text-black font-semibold text-xl pb-2 text-sm">E-mail</Text>
 
            {/* Input */}
            <View className="flex-row px-4 py-3 bg-white text-gray-700 rounded-md border border-gray-200 text-l font-medium mb-4">
              <Image className="w-4 h-4 mr-4" style={{ tintColor: "black"}}
                                          source={require('./../assets/icons/mail.png')} />
              <TextInput 
-                 className="flex-1"
-                 placeholder=''
+                 className="flex-1 text-sm"
+                 placeholder='E-mail'
                  value={email}
                  onChangeText={value => setEmail(value)}
              >
@@ -76,17 +76,18 @@ export default function Login() {
          {/* Wachtwoord input */}
          <Animated.View entering={FadeInDown.delay(400).duration(3000).springify()}>
            {/* Text */}
-           <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }}
-           className="text-black font-semibold text-xl">Password</Text>
+           <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
+              className="text-black font-semibold text-xl text-sm pb-2">Password</Text>
+
 
            {/* Input */}
            <View className="flex-row px-4 py-2.5 bg-white text-gray-700 rounded-md border border-gray-200 text-l font-medium mb-10">
              <Image className="w-5 h-5 mr-3" style={{ tintColor: "black"}}
                                          source={require('./../assets/icons/lock.png')} />
              <TextInput 
-                 className="flex-1"
+                 className="flex-1 text-sm"
                  secureTextEntry
-                 placeholder=''
+                 placeholder='Password'
                  value={password}
                  onChangeText={value => setPassword(value)}
              >
@@ -102,8 +103,8 @@ export default function Login() {
              <TouchableOpacity className="py-3 bg-dark-pink rounded-full mb-5 w-60 flex mx-auto"
                                onPress={handleSubmit}
              >
-                 <Text style={{ fontFamily: 'Belleza_400Regular', fontSize: 24 }}
-                 className="text-xl font-bold text-center text-white">Login</Text>
+                 <Text style={{ fontFamily: 'Belleza_400Regular' }}
+                 className="text-xl font-bold text-center text-white text-xl">Login</Text>
              </TouchableOpacity>
          </Animated.View>
 
@@ -112,23 +113,23 @@ export default function Login() {
            className="text-center mb-5">Or</Text>
            <View className="flex-row justify-center space-x-8 mb-5">
 
-             {/* Google */}
-             <TouchableOpacity className="p-3 bg-gray-100 rounded-2xl">
-               <Image source={require('./../assets/icons/google.png')}
-                 className="w-10 h-10" />
-             </TouchableOpacity>
+            {/* Google */}
+            <TouchableOpacity className="p-3 bg-gray-100 rounded-2xl">
+                  <Image source={require('./../assets/icons/google.png')}
+                    className="w-8 h-8" />
+                </TouchableOpacity>
 
-             {/* Facebook */}
-             <TouchableOpacity className="p-3 bg-gray-100 rounded-2xl">
-               <Image source={require('./../assets/icons/facebook.png')}
-                 className="w-10 h-10" />
-             </TouchableOpacity>
+                {/* Facebook */}
+                <TouchableOpacity className="p-3 bg-gray-100 rounded-2xl">
+                  <Image source={require('./../assets/icons/facebook.png')}
+                    className="w-8 h-8" />
+                </TouchableOpacity>
 
-             {/* Apple */}
-             <TouchableOpacity className="p-3 bg-gray-100 rounded-2xl">
-               <Image source={require('./../assets/icons/apple.png')}
-                 className="w-10 h-10" />
-             </TouchableOpacity>
+                {/* Apple */}
+                <TouchableOpacity className="p-3 bg-gray-100 rounded-2xl">
+                  <Image source={require('./../assets/icons/apple.png')}
+                    className="w-8 h-8" />
+                </TouchableOpacity>
              
            </View>
          </Animated.View>
@@ -138,11 +139,11 @@ export default function Login() {
             <View className="flex-row justify-center">
              <TouchableOpacity className="mt-3 flex-wrap text-center"
              onPress={() => navigation.navigate('Register')}>
-               <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 16 }} 
-               className="text-center">Don't have an account yet?</Text>
+               <Text style={{ fontFamily: 'Montserrat_500Medium'}} 
+               className="text-center text-sm">Don't have an account yet?</Text>
 
-               <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 16 }} 
-               className="text-center text-dark-pink underline pt-1">Sign up here</Text>
+               <Text style={{ fontFamily: 'Montserrat_600SemiBold' }} 
+               className="text-center text-dark-pink underline pt-1 text-sm">Sign up here</Text>
              </TouchableOpacity>
              </View>
          </Animated.View>

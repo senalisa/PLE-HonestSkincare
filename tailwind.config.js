@@ -34,6 +34,9 @@ module.exports = {
       },
       height:{
         '18': '4.5rem',
+      },
+      fontSize: {
+        xxs: ['10px', '14px']
       }
       },
   },

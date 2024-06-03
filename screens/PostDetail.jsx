@@ -7,6 +7,8 @@ import { Linking } from 'react-native';
 import { Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
+import { TrackPostView } from '../userInteraction/TrackPostView';
+
 const addComment = async (postId, text, authorId, authorName) => {
   try {
     await addDoc(collection(db, 'posts', postId, 'comments'), {
@@ -56,7 +58,7 @@ export default function PostDetail({ route }) {
   const [replying, setReplying] = useState(false);
   const [replyingAuthorName, setReplyingAuthorName] = useState(null);
   const [commentCount, setCommentCount] = useState(0);
-
+  
   useEffect(() => {
     const fetchComments = async () => {
       const comments = await getComments(post.id);
@@ -208,42 +210,44 @@ export default function PostDetail({ route }) {
                 {/* Question or advise tag */}
                 <View className="border border-dark-pink rounded-xl w-20 p-0.5">
                             <Text 
-                            style={{ fontFamily: 'Montserrat_500Medium', fontSize: 13 }}
-                            className="text-dark-pink text-center">
+                            style={{ fontFamily: 'Montserrat_500Medium' }}
+                            className="text-dark-pink text-center text-xs">
                                 {post.postType}
                             </Text>
                 </View>
         </View> 
-        {/* Post info card */}
-        <View className="flex-row justify-between bg-white mx-10 rounded-xl p-2 shadow-sm -mb-10 mt-2 text-center">
-            {/* Title */}
-            <Text 
-                    style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 22 }}
-                    className="pt-3 px-1 mb-3 w-80 text-center">
-                    {post.title}
-            </Text>
-
-{/*             
-            <TouchableOpacity>
-                    <Image className="w-5 h-5 mt-3 ml-8" style={{ tintColor: "gray"}}
-                                            source={require('./../assets/icons/save.png')} />
-            </TouchableOpacity> */}
-        </View>
         </ImageBackground>
 
-        <View className="px-6 pt-3 mt-10">
+        <View className="px-6 pt-3">
 
 
         <View className=" mt-2 flex-wrap">
+
+         {/* Post info card */}
+         <View className="flex-row justify-between">
+                {/* Title */}
+                <Text 
+                        style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 19 }}
+                        className="pt-3 px-1 mb-3 w-80">
+                       {post.title}
+                </Text>
+
+                {/* Save */}
+                <TouchableOpacity>
+                        <Image className="w-5 h-5 mt-3 ml-8" style={{ tintColor: "gray"}}
+                                                source={require('./../assets/icons/save.png')} />
+                </TouchableOpacity>
+          </View>
+
             {/* Tags */}
-            <View className="flex-row flex-wrap justify-center">
+            <View className="flex-row flex-wrap">
                 {post.skinTypeTags.map((tag, index) => (
                     <TouchableOpacity 
                     key={index}
                     className="bg-light-blue border border-blue rounded-xl px-3 py-0.5 mx-1 mb-2">
                     <Text 
-                        style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
-                        className="text-center text-blue">
+                        style={{ fontFamily: 'Montserrat_600SemiBold' }}
+                        className="text-center text-blue text-xs">
                         {tag}
                     </Text>
                     </TouchableOpacity>
@@ -254,8 +258,8 @@ export default function PostDetail({ route }) {
                     key={index}
                     className="bg-yellow border border-dark-yellow rounded-xl px-3 py-0.5 mx-1 mb-2">
                     <Text 
-                        style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
-                        className="text-center text-dark-yellow">
+                        style={{ fontFamily: 'Montserrat_600SemiBold'}}
+                        className="text-center text-dark-yellow text-xs">
                         {tag}
                     </Text>
                     </TouchableOpacity>
@@ -266,8 +270,8 @@ export default function PostDetail({ route }) {
                     key={index}
                     className="bg-pinkie border border-pink rounded-xl px-3 py-0.5 mx-1 mb-2">
                     <Text 
-                        style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
-                        className="text-center text-pink">
+                        style={{ fontFamily: 'Montserrat_600SemiBold' }}
+                        className="text-center text-pink text-xs">
                         {tag}
                     </Text>
                     </TouchableOpacity>
@@ -278,8 +282,8 @@ export default function PostDetail({ route }) {
         <View>
             {/* Description */}
             <Text 
-                    style={{ fontFamily: 'Montserrat_500Medium', fontSize: 16 }}
-                    className="pt-2 px-2 mb-3 w-100">
+                    style={{ fontFamily: 'Montserrat_500Medium' }}
+                    className="pt-2 px-2 mb-3 w-100 text-md">
                     {post.description}
             </Text>
         </View>
@@ -343,11 +347,11 @@ export default function PostDetail({ route }) {
                 <View className="flex-row">
                     <Image className="w-5 h-5 " style={{ tintColor: "gray"}}
                                         source={require('./../assets/icons/like.png')} />
-                    <Text 
+                    {/* <Text 
                     style={{ fontFamily: 'Montserrat_500Medium', fontSize: 15 }}
                     className="pl-2 mt-0.5">
                         100
-                    </Text>
+                    </Text> */}
                 </View>
             </View>
         </View>
@@ -355,8 +359,8 @@ export default function PostDetail({ route }) {
         </View>
         </View>
 
-        <View className="mt-8 mb-4 mx-5 flex-row">
-                <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 19 }}>
+        <View className="mt-8 mb-2 mx-5 flex-row">
+                <Text style={{ fontFamily: 'Montserrat_600SemiBold' }} className="text-base">
                 Comments 
                 </Text>
 
@@ -383,8 +387,10 @@ export default function PostDetail({ route }) {
 
       <FlatList
         data={comments}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         ListHeaderComponent={renderHeader}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 200 }}
         renderItem={({ item }) => (
           <View className="px-5 pr-14 py-3 flex-row w-full">
 

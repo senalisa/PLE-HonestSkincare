@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image } from 'react-native'
+import { View, Text, TouchableOpacity, Image, ImageBackground } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { ArrowLeftIcon } from 'react-native-heroicons/solid'
@@ -90,39 +90,49 @@ export default function UserCard() {
         </View>
 
         <Animated.View entering={FlipInEasyX.delay(0).duration(500).springify()}>
-        <View className="m-8 bg-white rounded-xl shadow-xl mx-auto">
+        <View className="m-8 bg-white rounded-xl shadow-xl mx-auto border border-gray-200">
             {/* Card top */}
-            <View className="flex-row bg-dark-pink rounded-t-xl px-5 justify-between">
 
-                {/* Account info */}
-                <View className="flex-row pt-8 pb-12">
-                    {/* Profiel picture */}
-                    <View className="pr-2 pt-1">
-                    <Image className="w-8 h-8" 
-                                                source={require('../../assets/images/user.png')} />
+            <ImageBackground
+                source={require('../../assets/images/home-bg2.png')}
+                resizeMode="cover" imageStyle= {{opacity:0.2, borderTopLeftRadius: 12, borderTopRightRadius: 12}} 
+              >
+
+              <View className="flex-row rounded-t-xl px-5 justify-between">
+
+                    {/* Account info */}
+                    <View className="flex-row pt-8 pb-12">
+                        {/* Profiel picture */}
+                        <View className="pr-5">
+                        <Image className="w-10 h-10" 
+                                                    source={require('../../assets/images/user.png')} />
+                        </View>
+
+                        {/* Account name + title */}
+                        <View className="">
+                            <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }}
+                            className="">Username's</Text>
+                            <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 20 }}
+                            className="">Skin Type Card</Text>
+                        </View>
                     </View>
 
-                    {/* Account name + title */}
-                    <View className="">
-                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 20 }}
-                        className="text-white">Username's</Text>
-                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 20 }}
-                        className="text-white">Skin Type Card</Text>
+                    {/* Logo */}
+                    <View className="pt-5">
+                        <Image className="w-12 h-4 ml-2" 
+                          source={require('../../assets/images/logo-plain-nobg.png')} />
                     </View>
-                </View>
 
-                {/* Logo */}
-                <View className="pt-5">
-                    <Image className="w-12 h-4 ml-2" 
-                       source={require('../../assets/images/logo-white.png')} />
-                </View>
-            </View>
+              
+              </View>
+
+            </ImageBackground>
 
             {/* Card Bottom */}
             <View className="flex-row bg-white mb-7">
 
                 {/* Skin Type */}
-                <View className="bg-white justify-center border-2 border-dark-pink shadow-sm rounded-xl p-3 px-4 mx-5 -mt-6 items-center">
+                <View className="bg-white justify-center border-1 border-gray-200 shadow-sm rounded-xl p-3 px-4 mx-5 -mt-6 items-center">
                     <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 17 }}
                     className="text-lg font-semibold w-24 text-center">{userPreferences.skinType}</Text>
 
@@ -142,8 +152,8 @@ export default function UserCard() {
                     {/* Skin concerns */}
                     <View className="mt-2 flex-row flex-wrap w-48">
                     {userPreferences.skinConcerns.map((concern, index) => (
-                        <View key={index} className="rounded-xl border border-gray-200 px-5 py-1 mr-2 mb-2">
-                        <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 13 }} className="text-center">
+                        <View key={index} className="rounded-xl bg-white border border-dark-yellow px-5 py-1 mr-2 mb-2">
+                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 13 }} className="text-center text-dark-yellow">
                             {concern}
                         </Text>
                         </View>

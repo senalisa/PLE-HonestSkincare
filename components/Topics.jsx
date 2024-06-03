@@ -60,8 +60,8 @@ export default function Topics() {
               <View className="bg-white border border-gray-200 mr-3 px-4 rounded-xl items-center shadow-sm">
                 <Image source={{ uri: topic.topicImage }} className="w-12 h-[60] -mt-4 mb-2" /> 
                 <View className="flex-wrap">
-                  <Text style={{ fontFamily: 'Montserrat_300Light', fontSize: 11 }} className="w-20 pb-0 text-center">Explore</Text>
-                  <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 16 }} className="pb-4 text-center w-[85]">{topic.topicName}</Text>
+                  <Text style={{ fontFamily: 'Montserrat_300Light' }} className="w-20 pb-0 text-center text-[10px]">Explore</Text>
+                  <Text style={{ fontFamily: 'Montserrat_600SemiBold'}} className="pb-4 text-center text-sm w-[85]">{topic.topicName}</Text>
                 </View>
               </View>
             </TouchableOpacity>

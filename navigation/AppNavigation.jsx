@@ -56,7 +56,7 @@ function HomeStackScreen() {
 function CreatePostStackScreen() {
     return (
       <CreatePostStack.Navigator>
-        <Stack.Screen name="CreatePostStack" component={CreatePost} options={{ headerShown: false }} />
+        
       </CreatePostStack.Navigator>
     );
   }
@@ -137,7 +137,7 @@ const Tabs = () => {
                 )
             }}/>
 
-                <Tab.Screen name="CreatePost" component={CreatePostStackScreen} options={{
+                <Tab.Screen name="CreatePost" component={CreatePost} options={{
                 tabBarIcon: ({ focused }) => (
                     <Image
                     source={require('./../assets/icons/pen-field.png')}
@@ -207,6 +207,7 @@ const AppNavigation = () => {
                     <Stack.Screen name="Article" component={Article} options={{ headerShown: false }} />
                     <HomeStack.Screen name="CategorySearch" component={CategorySearch} options={{ headerShown:false }} />
                     <HomeStack.Screen name="PostDetail" component={PostDetail} options={{ headerShown:false }} />
+                    <Stack.Screen name="CreatePostStack" component={CreatePost} options={{ headerShown: false }} />
                 </>
                 ) : (
                 <>

@@ -112,8 +112,8 @@ export default function Home() {
 
           {/* INTRO: Welcome user + text */}
           <View className="mx-auto mt-3 mb-8 px-10 flex justify-center">
-            <Text className="mb-1 text-center" style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 25 }}>Hi Sena</Text>
-            <Text className="text-center" style={{ fontFamily: 'Montserrat_400Regular', fontSize: 16 }}>Let's take care of your skin!</Text>
+            <Text className="mb-1 text-center text-2xl" style={{ fontFamily: 'Montserrat_600SemiBold'}}>Hi Sena</Text>
+            <Text className="text-center text-sm" style={{ fontFamily: 'Montserrat_400Regular'}}>Let's take care of your skin!</Text>
           </View>
 
           <View className="px-10 flex-row justify-between">
@@ -125,7 +125,7 @@ export default function Home() {
                                       source={require('./../assets/icons/search.png')} />
               <TextInput
               placeholder='Search...'
-              className="text-gray-200 text-md">
+              className="text-gray-200 text-xs">
 
               </TextInput>
             </TouchableOpacity>
