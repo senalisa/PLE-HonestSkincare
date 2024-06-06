@@ -58,6 +58,13 @@ export default function PostDetail({ route }) {
   const [replying, setReplying] = useState(false);
   const [replyingAuthorName, setReplyingAuthorName] = useState(null);
   const [commentCount, setCommentCount] = useState(0);
+
+  useEffect(() => {
+    if (user && post.id) {
+      console.log('Tracking post view for user:', user.uid, 'post:', post.id);
+      TrackPostView(user.uid, post.id);
+    }
+  }, [user, post.id]);
   
   useEffect(() => {
     const fetchComments = async () => {

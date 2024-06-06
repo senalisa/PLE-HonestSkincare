@@ -5,6 +5,7 @@ import { ArrowLeftIcon } from 'react-native-heroicons/solid'
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../../config/firebase'; 
 import Animated, { FlipInEasyX } from 'react-native-reanimated';
+import UserCardComponent from './UserCardComponent';
 
 export default function UserCardTwo() {
     const navigation = useNavigation();
@@ -95,82 +96,7 @@ export default function UserCardTwo() {
             </Text>
         </View>
 
-        <Animated.View entering={FlipInEasyX.delay(0).duration(500).springify()}>
-        <View className="m-8 bg-white rounded-xl shadow-xl mx-auto border border-gray-200">
-            {/* Card top */}
-
-            <ImageBackground
-                source={require('../../assets/images/home-bg2.png')}
-                resizeMode="cover" imageStyle= {{opacity:0.2, borderTopLeftRadius: 12, borderTopRightRadius: 12}} 
-              >
-
-              <View className="flex-row rounded-t-xl px-5 justify-between">
-
-                    {/* Account info */}
-                    <View className="flex-row pt-8 pb-12">
-                        {/* Profiel picture */}
-                        <View className="pr-5">
-                        <Image className="w-10 h-10" 
-                                                    source={require('../../assets/images/user.png')} />
-                        </View>
-
-                        {/* Account name + title */}
-                        <View className="">
-                            <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }}
-                            className="">Username's</Text>
-                            <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 20 }}
-                            className="">Skin Type Card</Text>
-                        </View>
-                    </View>
-
-                    {/* Logo */}
-                    <View className="pt-5">
-                        <Image className="w-12 h-4 ml-2" 
-                          source={require('../../assets/images/logo-plain-nobg.png')} />
-                    </View>
-
-              
-              </View>
-
-            </ImageBackground>
-
-            {/* Card Bottom */}
-            <View className="flex-row bg-white mb-7">
-
-                {/* Skin Type */}
-                <View className="bg-white justify-center border-1 border-gray-200 shadow-sm rounded-xl p-3 px-4 mx-5 -mt-6 items-center">
-                    <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 17 }}
-                    className="text-lg font-semibold w-24 text-center">{userPreferences.skinType}</Text>
-
-                    <Image
-                    style={{ width: 80, height: 100 }}
-                    className="mt-2 mb-3"
-                    source={getImageSource(userPreferences.skinType)}
-                    />
-                </View>
-
-                {/* Skin Concerns */}
-                <View>
-                    {/* Title */}
-                    <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 17 }}
-                    className="text-lg font-semibold mt-4">Skin Concerns</Text>
-
-                    {/* Skin concerns */}
-                    <View className="mt-2 flex-row flex-wrap w-48">
-                    {userPreferences.skinConcerns.map((concern, index) => (
-                        <View key={index} className="rounded-xl bg-white border border-dark-yellow px-5 py-1 mr-2 mb-2">
-                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 13 }} className="text-center text-dark-yellow">
-                            {concern}
-                        </Text>
-                        </View>
-                    ))}
-                    </View>
-                </View>
-
-            </View>
-
-        </View>
-        </Animated.View>
+        <UserCardComponent/>
 
         <View className="mx-auto">
             <TouchableOpacity  onPress={() => navigation.navigate('UserSkinType')} className="mt-5 border border-gray-200 rounded-xl py-2 px-2 flex-row">

@@ -22,6 +22,11 @@ import CategorySearch from '../screens/CategorySearch.jsx';
 import UserCard from '../components/account/UserCard.jsx';
 import UserCardTwo from '../components/account/UserCardTwo.jsx';
 import Article from '../screens/Article.jsx';
+import PostCreated from '../components/PostCreated.jsx';
+
+import { TrackPostView } from '../userInteraction/TrackPostView.jsx';
+import CGShort from '../components/community/CGshort.jsx';
+import CGLong from '../components/community/CGlong.jsx';
 
 
 // Animation
@@ -208,6 +213,9 @@ const AppNavigation = () => {
                     <HomeStack.Screen name="CategorySearch" component={CategorySearch} options={{ headerShown:false }} />
                     <HomeStack.Screen name="PostDetail" component={PostDetail} options={{ headerShown:false }} />
                     <Stack.Screen name="CreatePostStack" component={CreatePost} options={{ headerShown: false }} />
+                    <Stack.Screen name="PostCreated" component={PostCreated} options={{ headerShown: false }} />
+                    <Stack.Screen name="CGShort" component={CGShort} options={{ headerShown: false }} />
+                    <Stack.Screen name="CGLong" component={CGLong} options={{ headerShown: false }} />
                 </>
                 ) : (
                 <>

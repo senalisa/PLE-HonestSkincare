@@ -8,8 +8,10 @@ import { uploadBytes, getDownloadURL, ref } from 'firebase/storage';
 import { storage, storageRef } from './../config/firebase';
 import * as ImagePicker from 'expo-image-picker';
 import Swiper from 'react-native-swiper';
+import { useNavigation } from '@react-navigation/native';
 
 export default function CreatePost() {
+  const navigation = useNavigation();
 
   const [postType, setPostType] = useState(null);
   const [title, setTitle] = useState('');
@@ -18,6 +20,7 @@ export default function CreatePost() {
   const [selectedSkinConcernTags, setSelectedSkinConcernTags] = useState([]);
   const [selectedSkincareProductTags, setSelectedSkincareProductTags] = useState([]);
   const [userId, setUserId] = useState(null);
+  const [displayName, setDisplayName] = useState('');
 
   const [products, setProducts] = useState([]); // Array om de geselecteerde producten bij te houden
   const [searchInput, setSearchInput] = useState(''); // Invoerveld om te zoeken naar producten
@@ -87,14 +90,16 @@ export default function CreatePost() {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setUserId(user.uid);
+        setDisplayName(user.displayName); 
       } else {
         setUserId(null);
+        setDisplayName(''); 
       }
     });
-
+  
     return () => unsubscribe();
   }, []);
-
+  
   const handlePostTypeSelection = (type) => {
     setPostType(type);
   };
@@ -124,7 +129,7 @@ export default function CreatePost() {
     return (
       <>
         {visibleSections[type] && ( // Controleer of de sectie zichtbaar is
-          <View className="flex-row flex-wrap">
+          <View className="flex-row flex-wrap w-full">
             {tags.map(tag => (
               <TouchableOpacity
                 key={tag}
@@ -326,9 +331,8 @@ const containsLink = (text) => {
 };
 
 
-  const handleSavePost = async () => {
-    try {
-     // Controleer of alle vereiste velden zijn ingevuld en of er links zijn
+const handleSavePost = async () => {
+  try {
     if (!userId || !postType || !title || !description ) {
       Alert.alert(
         'Could not publish post',
@@ -347,33 +351,51 @@ const containsLink = (text) => {
       return;
     }
 
-      // Upload de afbeeldingen en verkrijg de download-URL's
-      const imageUrls = await uploadImages(images);
+    const imageUrls = await uploadImages(images);
 
-      // Maak een referentie naar een nieuwe post binnen de 'posts' collectie
-      const postsCollectionRef = collection(db, 'posts');
+    const postsCollectionRef = collection(db, 'posts');
 
-      // Voeg een nieuw document toe aan de collectie met een willekeurige document-ID
-      const newPostRef = await addDoc(postsCollectionRef, {
-        userId: userId,
-        postType: postType,
-        title: title,
-        description: description,
-        skinTypeTags: selectedSkinTypeTags,
-        skinConcernTags: selectedSkinConcernTags,
-        skincareProductTags: selectedSkincareProductTags,
-        products: products,
-        imageUrls: imageUrls, // Voeg de URL's van de geüploade afbeeldingen toe aan het document
-        // Voeg eventueel andere velden toe die je wilt opslaan
-      });
+    const newPostRef = await addDoc(postsCollectionRef, {
+      userId: userId,
+      displayName: displayName,  // Voeg deze regel toe om de displayName op te slaan
+      postType: postType,
+      title: title,
+      description: description,
+      skinTypeTags: selectedSkinTypeTags,
+      skinConcernTags: selectedSkinConcernTags,
+      skincareProductTags: selectedSkincareProductTags,
+      products: products,
+      imageUrls: imageUrls,
+    });
 
-      console.log('Post saved successfully!');
-      Alert.alert('Post saved!', 'De post is succesvol opgeslagen.');
-    } catch (error) {
-      console.error('Error saving post:', error);
-      Alert.alert('Error', 'Er is een fout opgetreden bij het opslaan van de post.');
-    }
-  };
+    const newPostData = {
+      userId: userId,
+      displayName: displayName,  // Voeg deze regel toe om de displayName op te slaan
+      postType: postType,
+      title: title,
+      description: description,
+      skinTypeTags: selectedSkinTypeTags,
+      skinConcernTags: selectedSkinConcernTags,
+      skincareProductTags: selectedSkincareProductTags,
+      products: products,
+      imageUrls: imageUrls,
+    };
+
+    setTitle('');
+    setDescription('');
+    setSelectedSkinTypeTags([]);
+    setSelectedSkinConcernTags([]);
+    setSelectedSkincareProductTags([]);
+    setProducts([]);
+    setImages([]);
+
+    navigation.navigate('PostCreated', { post: newPostData });
+  } catch (error) {
+    console.error('Error saving post:', error);
+    Alert.alert('Error', 'Er is een fout opgetreden bij het opslaan van de post.');
+  }
+};
+
 
   return (
     <ScrollView className="h-full bg-white">
@@ -430,11 +452,11 @@ const containsLink = (text) => {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                      className={`mt-2 py-2 px-5 rounded-full shadow-sm ${postType === 'Advise' ? 'bg-dark-pink' : 'bg-white'}`}
-                      onPress={() => handlePostTypeSelection('Advise')}>
+                      className={`mt-2 py-2 px-5 rounded-full shadow-sm ${postType === 'Advice' ? 'bg-dark-pink' : 'bg-white'}`}
+                      onPress={() => handlePostTypeSelection('Advice')}>
 
                       <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
-                      className={`text-[14px] ${postType === 'Advise' ? 'text-white' : 'text-black'}`}>Advise</Text>
+                      className={`text-[14px] ${postType === 'Advice' ? 'text-white' : 'text-black'}`}>Advice</Text>
                     </TouchableOpacity>
                   </View>
 
@@ -482,9 +504,9 @@ const containsLink = (text) => {
         )}
 
       {step === 2 && (
-            <View className="flex-1 p-8 bg-white rounded-t-3xl shadow-xl -mt-8 h-screen">
+            <View className="flex-1 bg-white rounded-t-3xl shadow-xl -mt-8 h-screen">
               {/* Next Button */}
-              <View className="flex-row justify-center justify-between -mt-2 -mr-2 mb-7">
+              <View className="flex-row justify-center justify-between -mt-2 -mr-2 mb-7 px-8 pt-8">
                 <TouchableOpacity 
                   onPress={handlePrevious} 
                   className="py-1 bg-white border border-gray-400 rounded-full w-16 ">
@@ -508,16 +530,16 @@ const containsLink = (text) => {
               
 
             <View>
-              <TouchableOpacity onPress={() => toggleSection('skinType')} className="flex-row justify-between items-center">
+              <TouchableOpacity onPress={() => toggleSection('skinType')} className="flex-row justify-between items-center mx-8">
                 <View className="flex-row mb-5">
                     <Image className="w-8 h-10" source={require('../assets/images/oily-skintype.png')} />
 
-                    <View className="ml-3">
+                    <View className="ml-3 mt-1">
                       <Text style={{ fontFamily: 'Montserrat_400Regular'}}
-                      className="text-sm font-bold -mb-1 ">Choose a tag for the</Text>
+                      className="text-xs font-bold -mb-1 ">Choose a tag for the</Text>
 
                       <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
-                      className="text-lg font-bold ">Skin Type</Text>
+                      className="text-base font-bold ">Skin Type</Text>
                     </View>
                 </View>
             
@@ -526,20 +548,23 @@ const containsLink = (text) => {
                   style={{ width: 13, height: 13 }} // Pas de grootte van het icoontje aan zoals nodig
                 />
               </TouchableOpacity>
-              {renderTags(['Oily', 'Dry', 'Normal', 'Combination'], 'skinType')}
+
+              <View className="px-5">
+                {renderTags(['Oily', 'Dry', 'Normal', 'Combination'], 'skinType')}
+              </View>
 
               <View className="border-b border-gray-100 mt-5" />
   
-              <TouchableOpacity onPress={() => toggleSection('skinConcern')} className="flex-row justify-between items-center my-5">
+              <TouchableOpacity onPress={() => toggleSection('skinConcern')} className="flex-row justify-between items-center my-5 mx-8">
                 <View className="flex-row mb-1">
                     <Image className="w-8 h-10" source={require('../assets/images/acne.png')} />
 
-                    <View className="ml-3">
+                    <View className="ml-3 mt-1">
                       <Text style={{ fontFamily: 'Montserrat_400Regular'}}
-                      className="text-sm font-bold -mb-1 ">Choose a tag for the</Text>
+                      className="text-xs font-bold -mb-1 ">Choose a tag for the</Text>
 
                       <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
-                      className="text-lg font-bold ">Skin Concern</Text>
+                      className="text-base font-bold ">Skin Concern</Text>
                     </View>
                 </View>
                 
@@ -548,20 +573,23 @@ const containsLink = (text) => {
                   style={{ width: 13, height: 13 }} // Pas de grootte van het icoontje aan zoals nodig
                 />
               </TouchableOpacity>
-              {renderTags(['Redness', 'Hyperpigmentation', 'Acne', 'Wrinkles', 'Rosacea', 'Pores', 'Blackheads', 'Eyebags', 'Whiteheads', 'Dryness'], 'skinConcern')}
+
+              <View className="px-5">
+                {renderTags(['Redness', 'Hyperpigmentation', 'Acne', 'Wrinkles', 'Rosacea', 'Pores', 'Blackheads', 'Eyebags', 'Whiteheads', 'Dryness'], 'skinConcern')}
+              </View>
 
               <View className="border-b border-gray-100 mt-5" />
   
-              <TouchableOpacity onPress={() => toggleSection('skincareProduct')} className="flex-row justify-between items-center my-5">
+              <TouchableOpacity onPress={() => toggleSection('skincareProduct')} className="flex-row justify-between items-center my-5 mx-8">
                 <View className="flex-row mb-1">
                     <Image className="w-6 h-9" source={require('../assets/images/serum-2.png')} />
 
-                    <View className="ml-3">
+                    <View className="ml-3 mt-1">
                       <Text style={{ fontFamily: 'Montserrat_400Regular'}}
-                      className="text-sm font-bold -mb-1 ">Choose a tag for the</Text>
+                      className="text-xs font-bold -mb-1 ">Choose a tag for the</Text>
 
                       <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
-                      className="text-lg font-bold ">Skincare Product</Text>
+                      className="text-base font-bold ">Skincare Product</Text>
                     </View>
                 </View>
 
@@ -570,7 +598,11 @@ const containsLink = (text) => {
                   style={{ width: 13, height: 13 }} // Pas de grootte van het icoontje aan zoals nodig
                 />
               </TouchableOpacity>
-              {renderTags(['Cleanser', 'Moisturizer', 'Serum', 'Sunscreen', 'Toner', 'Eye cream', 'Lip balm',], 'skincareProduct')}
+
+              <View className="px-5">
+                {renderTags(['Cleanser', 'Moisturizer', 'Serum', 'Sunscreen', 'Toner', 'Eye cream', 'Lip balm',], 'skincareProduct')}
+              </View>
+
             </View>
   
           </View>
@@ -613,7 +645,7 @@ const containsLink = (text) => {
                 </View>
 
                 {/* Knop om de modal te openen */}
-                <TouchableOpacity onPress={() => setModalVisible(true)} className="border border-gray-200 py-2 px-3 rounded-full bg-white flex-row shadow-sm justify-center">
+                <TouchableOpacity onPress={() => setModalVisible(true)} className="border border-gray-200 py-0 px-5 rounded-full bg-white flex-row shadow-sm justify-center items-center">
                   <Image className="w-2 h-2 mr-1 mt-1" 
                                               source={require('./../assets/icons/plus.png')} />
                   <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
@@ -689,7 +721,7 @@ const containsLink = (text) => {
                   keyExtractor={(item) => item.productName}
                   renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => addProductToList(item)} 
-                    className="px-3 py-3 border border-gray-200 rounded-xl my-2 w-80 flex-row items-center">
+                    className="px-3 py-3 border border-gray-200 rounded-xl my-2 w-[350] flex-row items-center">
 
                       <Image className="rounded-md w-12 h-12"
                                 source={{ uri: item.productImage }} />
@@ -728,7 +760,7 @@ const containsLink = (text) => {
               </View>
 
               {/* Knop om de modal te openen */}
-              <TouchableOpacity onPress={pickImages} className="border border-gray-200 py-2 px-3 rounded-full bg-white flex-row shadow-sm justify-center">
+              <TouchableOpacity onPress={pickImages} className="border border-gray-200 py-2 px-5 rounded-full bg-white flex-row shadow-sm justify-center items-center">
                 <Image className="w-2 h-2 mr-1 mt-1" 
                                             source={require('./../assets/icons/plus.png')} />
                 <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}

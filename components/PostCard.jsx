@@ -11,7 +11,7 @@ export default function PostCard({ post }) {
     <View> 
     {/* Post Two */}
     <Animated.View entering={FadeInDown.delay(0).duration(2000).springify()}>
-        <TouchableOpacity onPress={() => navigation.navigate('PostDetail', { post: post })}>
+        <TouchableOpacity onPress={() => navigation.navigate('PostDetail', { post: post, postId: post.id })}>
             <View className="relative rounded-xl bg-white shadow mx-7 px-4 py-4 mt-4">
                 <View className="flex-row">
                     {/* Post info */}
@@ -28,7 +28,7 @@ export default function PostCard({ post }) {
                         {/* Title */}
                         <Text 
                             style={{ fontFamily: 'Montserrat_600SemiBold'}}
-                            className="pt-3 px-1 mb-3 w-72 text-lg">
+                            className="pt-3 px-1 mb-3 w-80 text-lg">
                             {post.title}
                         </Text>
 
@@ -93,7 +93,7 @@ export default function PostCard({ post }) {
                         <View className="flex-row pt-1.5 mx-2">
                             <Text
                                 style={{ fontFamily: 'Montserrat_300Light', fontSize: 12 }}>
-                                Jane Ipsum
+                                {post.displayName}
                             </Text>
 
                             <Image className="w-1 h-1 mt-1 ml-3" style={{ tintColor: "#63254E"}}

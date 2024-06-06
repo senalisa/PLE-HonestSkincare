@@ -35,7 +35,7 @@ export default function Discover() {
     <View className="flex-[1] white">
 
       {/* INTRO */}
-      <ImageBackground source={require('./../assets/images/discover-bg.png')} resizeMode="cover" imageStyle= {{opacity:0.2}}>
+      <ImageBackground source={require('./../assets/images/discover-bg.png')} resizeMode="cover" imageStyle= {{opacity:0.3}}>
 
         <View className="mt-10 mb-10">
 

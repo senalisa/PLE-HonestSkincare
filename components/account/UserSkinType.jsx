@@ -12,7 +12,7 @@ const SkinConcernOption = ({ concern, isSelected, onPress }) => {
     <TouchableOpacity
       onPress={onPress}
       style={{
-        paddingVertical: 12,
+        paddingVertical: 8,
         paddingHorizontal: 22,
         borderWidth: 1,
         borderColor: isSelected ? '#63254E' : '#ddd',
@@ -21,7 +21,7 @@ const SkinConcernOption = ({ concern, isSelected, onPress }) => {
         backgroundColor: isSelected ? '#63254E' : 'white',
       }}
     >
-      <Text style={{ color: isSelected ? 'white' : 'black', fontFamily: 'Montserrat_500Medium', fontSize: 16  }}>{concern}</Text>
+      <Text style={{ color: isSelected ? 'white' : 'black', fontFamily: 'Montserrat_500Medium' }} className="text-sm">{concern}</Text>
     </TouchableOpacity>
   );
 };
