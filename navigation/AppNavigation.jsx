@@ -47,27 +47,6 @@ const config = {
 const Stack = createStackNavigator()
 const Tab = createBottomTabNavigator();
 
-const HomeStack = createNativeStackNavigator();
-const CreatePostStack = createNativeStackNavigator();
-
-function HomeStackScreen() {
-    return (
-        <HomeStack.Navigator>
-            <HomeStack.Screen name="HomeScreen" component={Home} options={{ headerShown: false }}/>
-            {/* <HomeStack.Screen name="Article" component={Article} options={{ headerShown:false }} /> */}
-        </HomeStack.Navigator>
-    );
-}
-
-// Create a stack navigator for the CreatePost component
-function CreatePostStackScreen() {
-    return (
-      <CreatePostStack.Navigator>
-        
-      </CreatePostStack.Navigator>
-    );
-  }
-
 const CustomTabBarButton = ({children, onPress}) => (
     <TouchableOpacity
     style={{
@@ -110,7 +89,7 @@ const Tabs = () => {
                 shadowOpacity: 0.25,
             }
             }}>
-            <Tab.Screen name="Home" component={HomeStackScreen} options={{
+            <Tab.Screen name="Home" component={Home} options={{
                 tabBarIcon: ({focused}) => (
                     <View style={{alignItems: 'center', justifyContent: 'center', top: 5}}>
                         <Image

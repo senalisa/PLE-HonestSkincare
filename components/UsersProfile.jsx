@@ -54,9 +54,11 @@ export default function UsersProfile({ route }) {
                     </TouchableOpacity>
 
                     {/* Title */}
-                    <Text style={{ fontFamily: 'Montserrat_600SemiBold'}} className="text-center flex-1 -ml-9 text-2xl">
-                    {userPosts.length > 0 && userPosts[0].displayName}
-                    </Text>
+                    <View className="w-72">
+                        <Text style={{ fontFamily: 'Montserrat_600SemiBold'}} className="text-center flex-1 -ml-9 text-2xl">
+                        {userPosts.length > 0 && userPosts[0].displayName}
+                        </Text>
+                    </View>
 
                     {/* Spacer voor het centreren van de titel */}
                     <View className="flex-2" />

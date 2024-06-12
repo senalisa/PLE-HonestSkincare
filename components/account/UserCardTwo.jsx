@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image, ImageBackground } from 'react-native'
+import { View, Text, TouchableOpacity, Image, ImageBackground, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { ArrowLeftIcon } from 'react-native-heroicons/solid'
@@ -53,7 +53,7 @@ export default function UserCardTwo() {
     if (loading) {
         return (
           <View className="flex-1 justify-center items-center">
-            <Text>Loading...</Text>
+             <ActivityIndicator size="large" color="#63254E" />
           </View>
         );
     }
@@ -72,15 +72,8 @@ export default function UserCardTwo() {
       };
 
   return (
-    <View className="flex-1 pt-14 bg-white">
-        {/* Backbutton */}
-        <View className="flex-row justify-start">
-            <TouchableOpacity 
-                onPress={() => navigation.goBack()}
-                className="bg-primary-dark p-2 rounded-tr-2xl rounded-bl-2xl ml-4">
-                <ArrowLeftIcon size="20" color="black"></ArrowLeftIcon>
-            </TouchableOpacity>
-        </View>
+    <ImageBackground source={require('../../assets/images/bg14.png')} imageStyle= {{opacity:0.6, width: '100%', height: '100%' }}>
+   <View className="justify-center items-center px-5 h-screen">
 
         <View className="justify-center items-center pt-6">
             {/* Title */}
@@ -112,5 +105,6 @@ export default function UserCardTwo() {
         </TouchableOpacity>
 
     </View>
+    </ImageBackground>
   )
 }

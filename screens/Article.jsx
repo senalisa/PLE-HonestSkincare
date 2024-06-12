@@ -7,6 +7,7 @@ import { ArrowLeftIcon } from 'react-native-heroicons/solid'
 import { useNavigation } from '@react-navigation/native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Alert } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const addComment = async (articleId, text, authorId, authorName) => {
   try {
@@ -22,18 +23,18 @@ const addComment = async (articleId, text, authorId, authorName) => {
 };
 
 const addReply = async (articleId, commentId, text, authorId, authorName) => {
-    try {
-      const commentRef = doc(db, 'articles', articleId, 'comments', commentId);
-      const commentSnap = await getDoc(commentRef);
-      const existingReplies = commentSnap.data().replies || [];
-      
-      const timestamp = Timestamp.now(); 
-      const updatedReplies = [...existingReplies, { text, authorId, authorName, timestamp }];
-      await updateDoc(commentRef, { replies: updatedReplies });
-    } catch (error) {
-      console.error('Error adding reply: ', error);
-    }
-  };
+  try {
+    const commentRef = doc(db, 'articles', articleId, 'comments', commentId);
+    const commentSnap = await getDoc(commentRef);
+    const existingReplies = commentSnap.data().replies || [];
+
+    const timestamp = Timestamp.now();
+    const updatedReplies = [...existingReplies, { text, authorId, authorName, timestamp }];
+    await updateDoc(commentRef, { replies: updatedReplies });
+  } catch (error) {
+    console.error('Error adding reply: ', error);
+  }
+};
 
 const getComments = async (articleId) => {
   try {
@@ -46,21 +47,19 @@ const getComments = async (articleId) => {
 };
 
 export default function Article() {
-    const navigation = useNavigation();
-
+  const navigation = useNavigation();
   const route = useRoute();
-  const { articleId } = route.params; 
-
+  const { articleId } = route.params;
   const user = auth.currentUser;
 
   const [article, setArticle] = useState(null);
   const [comments, setComments] = useState([]);
   const [newInput, setNewInput] = useState('');
-  const [replyingTo, setReplyingTo] = useState(null); // Toegevoegd om bij te houden op welke comment er wordt gereplied
+  const [replyingTo, setReplyingTo] = useState(null);
   const [expandedComments, setExpandedComments] = useState({});
   const [replying, setReplying] = useState(false);
   const [replyingAuthorName, setReplyingAuthorName] = useState(null);
-
+  const [commentCount, setCommentCount] = useState(0);
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -79,53 +78,62 @@ export default function Article() {
     };
 
     const fetchComments = async () => {
-        const comments = await getComments(articleId);
-        setComments(comments);
-      };
+      const comments = await getComments(articleId);
+      setComments(comments);
+    };
 
     fetchArticle();
     fetchComments();
   }, [articleId]);
 
-   // Definieer de containsLink functie
-   const containsLink = (text) => {
+  useEffect(() => {
+    const fetchCommentCount = async () => {
+      try {
+        const commentsRef = collection(db, 'articles', articleId, 'comments');
+        const commentsSnapshot = await getDocs(commentsRef);
+        setCommentCount(commentsSnapshot.size);
+      } catch (error) {
+        console.error('Error fetching comment count:', error);
+      }
+    };
+
+    fetchCommentCount();
+  }, [comments, articleId]);
+
+  const containsLink = (text) => {
     const urlPattern = /(?:https?|ftp):\/\/[\n\S]+|www\.[\S]+/ig;
     return urlPattern.test(text);
-};
+  };
 
-const handleAddInput = async () => {
-  if (newInput.trim().length === 0) {
-    return;
-  }
-  
-  // Check of de input een link bevat
-  if (containsLink(newInput)) {
-    // Toon een pop-up om de gebruiker te informeren over het linkbeleid
-    Alert.alert(
-      'Link Policy',
-      'The posting of links is not allowed to ensure the safety and integrity of our community. For more info read the Community Guidelines',
-      [{ text: 'OK' }]
-    );
-    return;
-}
-    
-    const user = auth.currentUser;
-    
+  const handleAddInput = async () => {
+    if (newInput.trim().length === 0) {
+      return;
+    }
+
+    if (containsLink(newInput)) {
+      Alert.alert(
+        'Link Policy',
+        'The posting of links is not allowed to ensure the safety and integrity of our community. For more info read the Community Guidelines',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
     if (!user || !user.displayName) {
       console.error('User is not logged in or has no display name.');
       return;
     }
-  
+
     const authorId = user.uid;
     const authorName = user.displayName;
-  
+
     if (replyingTo) {
-      await addReply(articleId, replyingTo, newInput, authorId, authorName); 
+      await addReply(articleId, replyingTo, newInput, authorId, authorName);
       setReplyingTo(null);
     } else {
-      await addComment(articleId, newInput, authorId, authorName); 
+      await addComment(articleId, newInput, authorId, authorName);
     }
-    
+
     setNewInput('');
     const updatedComments = await getComments(articleId);
     setComments(updatedComments);
@@ -160,11 +168,10 @@ const handleAddInput = async () => {
       console.error('Error deleting reply: ', error);
     }
   };
-  
 
   const toggleReply = (commentId, authorName) => {
     setReplyingTo(commentId);
-    setReplyingAuthorName(authorName); // Stel de naam van de auteur in voor weergave
+    setReplyingAuthorName(authorName);
   };
 
   const toggleComment = (commentId) => {
@@ -172,6 +179,39 @@ const handleAddInput = async () => {
       ...expandedComments,
       [commentId]: !expandedComments[commentId],
     });
+  };
+
+  const getTimeAgo = (timestamp) => {
+    const currentDate = new Date();
+    const commentDate = timestamp.toDate();
+
+    const timeDifference = currentDate - commentDate;
+    const secondsDifference = Math.floor(timeDifference / 1000);
+
+    if (secondsDifference < 60) {
+      return `${secondsDifference} sec ago`;
+    } else if (secondsDifference < 3600) {
+      const minutesDifference = Math.floor(secondsDifference / 60);
+      return `${minutesDifference} min ago`;
+    } else if (secondsDifference < 86400) {
+      const hoursDifference = Math.floor(secondsDifference / 3600);
+      return `${hoursDifference} hours ago`;
+    } else {
+      const daysDifference = Math.floor(secondsDifference / 86400);
+      return `${daysDifference} days ago`;
+    }
+  };
+
+  const renderDescription = () => {
+    return article.articleDescription.map((desc, index) => (
+      <Text
+        key={index}
+        className="mt-5"
+        style={{ fontFamily: 'Montserrat_500Medium', fontSize: 16 }}
+      >
+        {desc}
+      </Text>
+    ));
   };
 
   if (!article) {
@@ -189,7 +229,7 @@ const handleAddInput = async () => {
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             className="bg-primary-dark px-2 rounded-tr-2xl rounded-bl-2xl ml-4 pb-40 pt-14 shadow">
-            <ArrowLeftIcon size="20" color="black" />
+            <Image className="w-5 h-5" source={require('./../assets/icons/left-arrow.png')} />
           </TouchableOpacity>
         </View>
       </ImageBackground>
@@ -198,9 +238,9 @@ const handleAddInput = async () => {
         <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 22 }}
         className="font-bold">{article.articleTitle}</Text>
 
-        <Text className="mt-5" style={{ fontFamily: 'Montserrat_500Medium', fontSize: 16 }}>
-        {article.articleDescription}
-        </Text>
+      <View>
+        {renderDescription()}
+      </View>
 
         <Text className="mt-5 text-dark-pink" style={{ fontFamily: 'Montserrat_500Medium_Italic', fontSize: 16 }}>
         Share your thoughts and experiences!
@@ -222,134 +262,190 @@ const handleAddInput = async () => {
                         </Text>
         </View>
 
-        <View className="mt-10 border-b border-gray-100 pb-5">
-                <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }}
-                >Comments</Text>
         </View>
-      </View>
+
+        <View className="mt-6 mb-2 mx-5 flex-row">
+                <Text style={{ fontFamily: 'Montserrat_600SemiBold' }} className="text-lg">
+                Comments 
+                </Text>
+
+                <View className="-mt-1">
+                    <View className="bg-gray-300 px-1.5 rounded-full ml-1">
+                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 13 }}
+                        className="py-0.5 text-white">
+                            {commentCount} 
+                        </Text>
+                    </View>
+                </View>
+        </View>
     </View>
   );
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-      <View className="flex-1 bg-white">
-        <FlatList
-          data={comments}
-          keyExtractor={item => item.id}
-          ListHeaderComponent={renderHeader}
-          renderItem={({ item }) => (
-            <View className="px-8 pr-14 py-3 flex-row">
+    <View className="flex-1">
 
-                <View>
-                                <Image className="w-6 h-6" 
-                                                        source={require('./../assets/images/user.png')} />
+    <LinearGradient
+        colors={['#FCFCFC', '#FCFCFC', '#FCFCFC']}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+
+      <FlatList
+        data={comments}
+        keyExtractor={(item) => item.id}
+        ListHeaderComponent={renderHeader}
+        style={{ flex: 1 }}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 200 }}
+        renderItem={({ item }) => (
+          <View className="px-5 pr-14 py-3 flex-row w-full">
+
+              <View>
+                              <Image className="w-6 h-6" 
+                                                      source={require('./../assets/images/user.png')} />
+              </View>
+
+            <View className="ml-3">               
+
+                <View className="bg-white p-3 rounded-xl shadow-sm">
+                    <View className="flex-row">
+
+                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
+                        className="font-bold mb-1">{item.authorName} </Text>
+
+                        <Text className="ml-2 mt-0.5 text-gray-400"
+                        style={{ fontFamily: 'Montserrat_500Medium', fontSize: 10 }}
+                        >{getTimeAgo(item.timestamp)}</Text>
+
+                    </View>
+                
+                    <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 14 }} className="pr-8">{item.text}</Text>
                 </View>
 
-              <View className="ml-3">               
+            <View className="flex-row">
 
-              <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
-              className="font-bold mb-1">Author: {item.authorName}</Text>
-             
-              <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 14 }} className="pr-8">{item.text}</Text>
+                <TouchableOpacity onPress={() => {
+                toggleReply(item.id, item.authorName);
+                setReplying(true);
+                }}>
+                <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
+                className="text-gray-400 mt-2 mr-5">
+                    Reply
+                </Text>
+                </TouchableOpacity>
 
-              <View className="flex-row justify-between">
-  
-                  <TouchableOpacity onPress={() => {
-                  toggleReply(item.id, item.authorName);
-                  setReplying(true);
-                  }}>
-                  <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
-                  className="text-gray-400 mt-2">
-                      Reply
-                  </Text>
-                  </TouchableOpacity>
+                {item.replies && item.replies.length > 0 && (
+                <TouchableOpacity onPress={() => toggleComment(item.id)}>
+                    <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
+                    className="text-gray-400 mt-1.5 flex-row mr-5">
+                    <Image className="w-5 h-5 -mt-2 mr-1" style={{ tintColor: "#CBCACA"}}
+                                        source={require('./../assets/icons/minus.png')} />
+                    {expandedComments[item.id] ? `Hide ${item.replies.length} Replies` : `Show ${item.replies.length} Replies`}
+                    </Text>
+                </TouchableOpacity>
+                )}
 
-                  {item.authorId === user.uid && (
-                      <TouchableOpacity onPress={() => handleDeleteComment(item.id)}>
+                {item.authorId === user.uid && (
+                    <View className="justify-self-end">
+                        <TouchableOpacity onPress={() => handleDeleteComment(item.id)}>
                         <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
                         className="text-red-500 underline mt-2">Delete</Text>
-                      </TouchableOpacity>
-                    )}
-
-              </View>
-
-             
-
-              {item.replies && item.replies.length > 0 && (
-                <TouchableOpacity onPress={() => toggleComment(item.id)}>
-                  <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
-                  className="text-gray-400 mt-2 flex-row">
-                    <Image className="w-5 h-5 -mt-1.5 mr-1" style={{ tintColor: "#CBCACA"}}
-                                      source={require('./../assets/icons/minus.png')} />
-                    {expandedComments[item.id] ? 'Hide Replies' : 'Show Replies'}
-                  </Text>
-                </TouchableOpacity>
-              )}
-              {expandedComments[item.id] && item.replies && item.replies.map((reply, index) => (
-                <View key={index} className="ml-8 mt-5">
-
-                  <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
-                  className="mb-1">Author: {reply.authorName}</Text>
-
-                  <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 14 }}>{reply.text}</Text>
-
-                  {reply.authorId === user.uid && (
-                    <TouchableOpacity onPress={() => handleDeleteReply(item.id, reply.timestamp)}>
-                      <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
-                      className="text-red-500 underline mt-2">Delete</Text>
-                    </TouchableOpacity>
+                        </TouchableOpacity>
+                    </View>
                   )}
-                </View>
-              ))}
-              </View>
+
             </View>
-          )}
-        />
 
-<View className=" bg-white border-t border-gray-300 shadow-xl">
+            {/* Replies on comment */}
+            {expandedComments[item.id] && item.replies && item.replies.map((reply, index) => (
+                <View>
+                    <View key={index} className="ml-8 mt-5 flex-row">
 
-  <View className="flex-row justify-between mt-3 mx-5">
+                        {/* Image */}
+                        <View>
+                           <Image className="w-6 h-6" 
+                              source={require('./../assets/images/user.png')} />
+                        </View>
 
-  {replying && (
+                    {/* Author + date + text */}
+                    <View className="bg-white p-3 rounded-xl ml-3 shadow-sm">
+                        <View className="flex-row">
+                            <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
+                            className="font-bold mb-1">{reply.authorName} </Text>
+
+                            <Text className="ml-2 mt-0.5 text-gray-400"
+                            style={{ fontFamily: 'Montserrat_500Medium', fontSize: 10 }}
+                            >{getTimeAgo(reply.timestamp)}</Text>
+                        </View>
+                        <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 14 }} className="pr-8">{reply.text}</Text>
+                    </View>
+                    
+                    </View>
+
+                    <View className="flex-end">
+
+                    {/* {reply.authorId === user.uid && (
+                    <TouchableOpacity onPress={() => handleDeleteReply(item.id, reply.timestamp)}>
+                        <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
+                        className="text-red-500 underline mt-2">Delete</Text>
+                    </TouchableOpacity>
+                    )} */}
+
+                    </View>
+                </View>
+            ))}
+            </View>
+          </View>
+        )}
+      />
+      </LinearGradient>
+
+<View className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-300 shadow-xl">
+
+<View className="flex-row justify-between mt-3 mx-5">
+
+{replying && (
   <View className="replyIndicator">
     <Text style={{ fontFamily: 'Montserrat_500Medium_Italic', fontSize: 13 }}
     className="replyIndicatorText">Replying to: {replyingAuthorName}</Text>
   </View>
 )}
   
-    
-  {replying && (
-    <TouchableOpacity onPress={() => {
-      setReplying(false);
-      setReplyingTo(null);
-    }}
-    className="bg-white">
-      <View>
-        <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 13 }}
-        className="text-dark-pink underline">
-          Cancel Reply
-        </Text>
-      </View>
-    </TouchableOpacity>
-  )}
+{replying && (
+  <TouchableOpacity onPress={() => {
+    setReplying(false);
+    setReplyingTo(null);
+  }}
+  className="bg-white">
+    <View>
+      <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 13 }}
+      className="text-dark-pink underline">
+        Cancel Reply
+      </Text>
+    </View>
+  </TouchableOpacity>
+)}
 
 </View>
 
-  <View className="flex-row bg-white p-4 pb-8 justify-between">
-    <TextInput
-      className="border border-gray-300 p-2 rounded-lg w-[350]"
-      placeholder={replyingTo ? "Reply to comment..." : "Add a comment..."}
-      value={newInput}
-      onChangeText={setNewInput}
-    />
-    <TouchableOpacity onPress={handleAddInput} className="bg-blue-500 text-white py-2 px-4 rounded-lg mt-2">
-      <Image className="w-6 h-6 -mt-2" style={{ tintColor: "#63254E"}} source={require('../assets/icons/send.png')} />
-    </TouchableOpacity>
-  </View>
+<View className="flex-row bg-white px-4 pt-2 pb-10 justify-between">
+    <View>
+                                <Image className="w-6 h-6 mt-2 mr-4 ml-2" 
+                                                        source={require('./../assets/images/user.png')} />
+                </View>
+  <TextInput
+    className="border border-gray-300 p-2 pl-4 rounded-full flex-1"
+    placeholder={replyingTo ? "Reply to comment..." : "Add a comment..."}
+    value={newInput}
+    onChangeText={setNewInput}
+  />
+  <TouchableOpacity onPress={handleAddInput} className="bg-blue-500 text-white py-2 px-4 rounded-lg mt-2">
+    <Image className="w-6 h-6 -mt-2" style={{ tintColor: "#63254E"}} source={require('../assets/icons/send.png')} />
+  </TouchableOpacity>
+</View>
 </View>
 
-      </View>
-    </KeyboardAvoidingView>
-  );
+    </View>
+  </KeyboardAvoidingView>
+  )
 };
 

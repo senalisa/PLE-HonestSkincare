@@ -575,7 +575,7 @@ const handleSavePost = async () => {
               </TouchableOpacity>
 
               <View className="px-5">
-                {renderTags(['Redness', 'Hyperpigmentation', 'Acne', 'Wrinkles', 'Rosacea', 'Pores', 'Blackheads', 'Eyebags', 'Whiteheads', 'Dryness'], 'skinConcern')}
+                {renderTags(['Redness', 'Hyperpigmentation', 'Acne', 'Wrinkles', 'Rosacea', 'Pores', 'Blackheads', 'Eyebags', 'Whiteheads', 'Dryness', 'Eczema'], 'skinConcern')}
               </View>
 
               <View className="border-b border-gray-100 mt-5" />

@@ -10,6 +10,7 @@ export default function Profile() {
   const navigation = useNavigation()
 
   const user = auth.currentUser;
+  const displayName = user?.displayName || 'Guest';
 
   const handleLogout = async ()=> {
     await signOut(auth);

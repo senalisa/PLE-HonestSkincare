@@ -189,7 +189,7 @@ export default function PostDetail({ route }) {
   const getTimeAgo = (timestamp) => {
     const currentDate = new Date();
     const commentDate = timestamp.toDate(); // Converteer Firestore timestamp naar een JavaScript Date-object
-  
+   
     const timeDifference = currentDate - commentDate;
     const secondsDifference = Math.floor(timeDifference / 1000);
   
@@ -329,25 +329,27 @@ export default function PostDetail({ route }) {
         </View>
 
         {/* Post IMAGE */}
-        <View>
-          <Swiper
-                  style={{ height: 300 }}
-                  showsButtons={false}
-                  paginationStyle={{ bottom: -25 }}
-                  dotStyle={{ borderRadius: 100, width: 8, height: 8, backgroundColor: 'grey' }}
-                  activeDotStyle={{ borderRadius: 30, width: 8, height: 8, backgroundColor: '#63254E' }}
-                  className="mt-5"
-              >
-                  {post.imageUrls.map((uri, index) => (
-                      <View key={index}>
-                          <Image
-                              source={{ uri }}
-                              style={{ width: '100%', height: '100%', resizeMode: 'cover' }}
-                          />
-                      </View>
-                  ))}
-            </Swiper>
-        </View>
+        {post.imageUrls && post.imageUrls.length > 0 && (
+            <View>
+                <Swiper
+                    style={{ height: 300 }}
+                    showsButtons={false}
+                    paginationStyle={{ bottom: -25 }}
+                    dotStyle={{ borderRadius: 100, width: 8, height: 8, backgroundColor: 'grey' }}
+                    activeDotStyle={{ borderRadius: 30, width: 8, height: 8, backgroundColor: '#63254E' }}
+                    className="mt-5"
+                >
+                    {post.imageUrls.map((uri, index) => (
+                        <View key={index}>
+                            <Image
+                                source={{ uri }}
+                                style={{ width: '100%', height: '100%', resizeMode: 'cover' }}
+                            />
+                        </View>
+                    ))}
+                </Swiper>
+            </View>
+        )}
 
 
         <View className="flex-row mt-8 mb-8 justify-between">

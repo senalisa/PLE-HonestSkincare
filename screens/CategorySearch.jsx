@@ -23,14 +23,17 @@ export default function CategorySearch() {
         const postsCollectionRef = collection(db, 'posts');
         const queryBySkinType = query(postsCollectionRef, where('skinTypeTags', 'array-contains', topicData.topic));
         const queryBySkinConcerns = query(postsCollectionRef, where('skinConcernTags', 'array-contains', topicData.topic));
+        const queryBySkincareProduct = query(postsCollectionRef, where('skincareProductTags', 'array-contains', topicData.topic));
 
         const querySnapshotBySkinType = await getDocs(queryBySkinType);
         const querySnapshotBySkinConcerns = await getDocs(queryBySkinConcerns);
+        const querySnapshotBySkincareProduct = await getDocs(queryBySkincareProduct);
 
         const postsBySkinType = querySnapshotBySkinType.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         const postsBySkinConcerns = querySnapshotBySkinConcerns.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const postsBySkincareProduct = querySnapshotBySkincareProduct.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        const allRelatedPosts = [...postsBySkinType, ...postsBySkinConcerns];
+        const allRelatedPosts = [...postsBySkinType, ...postsBySkinConcerns, ...postsBySkincareProduct];
         setRelatedPosts(allRelatedPosts);
       } catch (error) {
         console.error('Error fetching related posts:', error);
@@ -77,9 +80,11 @@ export default function CategorySearch() {
           </TouchableOpacity>
 
           {/* Title */}
+          <View className="w-72">
           <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }} className="text-center flex-1 -ml-4">
             Topics about {topicData.topicName}
           </Text>
+          </View>
 
           {/* Spacer voor het centreren van de titel */}
           <View className="flex-2" />

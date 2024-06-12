@@ -47,7 +47,7 @@ export default function Welcome() {
           onIndexChanged={(index) => setStep(index)}
           className=""
         >
-          <View className="justify-centermy-10">
+          <View className="justify-center my-5">
             <Image className="w-full h-72 mt-10" source={require('./../assets/images/welcome-pic.png')} />
 
             <Text className="text-center text-2xl  mx-auto mt-6" style={{ fontFamily: 'Montserrat_600SemiBold' }}>
@@ -59,38 +59,38 @@ export default function Welcome() {
             </Text>
           </View>
 
-          <View className="justify-center mx-auto my-10">
+          <View className="justify-center mx-auto my-16">
             <Image className="w-[248] h-64 mt-0 mx-auto" source={require('./../assets/images/skingroup.png')} />
 
             <Text className="text-center text-2xl mx-auto mt-6" style={{ fontFamily: 'Montserrat_600SemiBold' }}>
             Discover skincare {"\n"} tailored to your needs
             </Text>
             
-            <Text className="text-center text-sm w-[350] mx-auto mt-2" style={{ fontFamily: 'Montserrat_400Regular' }}>
+            <Text className="text-center text-sm w-[300] mx-auto mt-2" style={{ fontFamily: 'Montserrat_400Regular' }}>
            Honest Skincare delivers personalized content based on your skin type and concerns, ensuring you get the advice and recommendations that matter most to you.
             </Text>
           </View>
 
-          <View className="justify-center mx-auto my-10">
-            <Image className="w-[248] h-64 mt-0 mx-auto" source={require('./../assets/images/skingroup.png')} />
+          <View className="justify-center mx-auto my-16">
+            <Image className="w-[200] h-[200] mb-5 mt-5 mx-auto" source={require('./../assets/images/social-media.png')} />
 
             <Text className="text-center text-2xl mx-auto mt-6" style={{ fontFamily: 'Montserrat_600SemiBold' }}>
             Be a part of {"\n"} the Community
             </Text>
 
-            <Text className="text-center text-sm w-[350] mx-auto mt-2" style={{ fontFamily: 'Montserrat_400Regular' }}>
+            <Text className="text-center text-sm w-[300] mx-auto mt-2" style={{ fontFamily: 'Montserrat_400Regular' }}>
               Join a vibrant community of skincare enthusiasts. {"\n"} Create posts, share advice, and connect with others who share your skincare journey.
             </Text>
           </View>
 
-          <View className="justify-center mx-auto my-10">
-            <Image className="w-[248] h-64 mt-0 mx-auto" source={require('./../assets/images/skingroup.png')} />
+          <View className="justify-center mx-auto my-16">
+            <Image className="w-[150] h-[150] mt-10 mb-5 mx-auto" source={require('./../assets/images/no-add.png')} />
 
             <Text className="text-center text-2xl mx-auto mt-6" style={{ fontFamily: 'Montserrat_600SemiBold' }}>
             Minimizing  {"\n"} Marketing Influence
             </Text>
 
-            <Text className="text-center text-sm w-[350] mx-auto mt-2" style={{ fontFamily: 'Montserrat_400Regular' }}>
+            <Text className="text-center text-sm w-[300] mx-auto mt-2" style={{ fontFamily: 'Montserrat_400Regular' }}>
               Say goodbye to influencer marketing. Honest Skincare strives to minimize commercial influence, ensuring an authentic and trustworthy experience.
             </Text>
           </View>

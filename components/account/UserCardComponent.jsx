@@ -92,7 +92,7 @@ export default function UserCardComponent() {
                         {/* Account name + title */}
                         <View className="">
                             <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
-                            className="text-base">{auth.currentUser.displayName}'s</Text>
+                            className="text-base">{auth.currentUser?.displayName}'s</Text>
                             <Text style={{ fontFamily: 'Montserrat_500Medium_Italic'}}
                             className="text-base -mt-1">Skin Type Card</Text>
                         </View>
