@@ -27,6 +27,8 @@ import PostCreated from '../components/PostCreated.jsx';
 import { TrackPostView } from '../userInteraction/TrackPostView.jsx';
 import CGShort from '../components/community/CGshort.jsx';
 import CGLong from '../components/community/CGlong.jsx';
+import UserPosts from '../components/account/UserPosts.jsx';
+import UsersProfile from '../components/UsersProfile.jsx';
 
 
 // Animation
@@ -210,12 +212,14 @@ const AppNavigation = () => {
                     <Stack.Screen name="UserCard" component={UserCard} options={{ headerShown: false }} />
                     <Stack.Screen name="UserCardTwo" component={UserCardTwo} options={{ headerShown: false }} />
                     <Stack.Screen name="Article" component={Article} options={{ headerShown: false }} />
-                    <HomeStack.Screen name="CategorySearch" component={CategorySearch} options={{ headerShown:false }} />
-                    <HomeStack.Screen name="PostDetail" component={PostDetail} options={{ headerShown:false }} />
+                    <Stack.Screen name="CategorySearch" component={CategorySearch} options={{ headerShown:false }} />
+                    <Stack.Screen name="PostDetail" component={PostDetail} options={{ headerShown:false }} />
                     <Stack.Screen name="CreatePostStack" component={CreatePost} options={{ headerShown: false }} />
                     <Stack.Screen name="PostCreated" component={PostCreated} options={{ headerShown: false }} />
                     <Stack.Screen name="CGShort" component={CGShort} options={{ headerShown: false }} />
                     <Stack.Screen name="CGLong" component={CGLong} options={{ headerShown: false }} />
+                    <Stack.Screen name="UserPosts" component={UserPosts} options={{ headerShown: false }} />
+                    <Stack.Screen name="UsersProfile" component={UsersProfile} options={{ headerShown: false }} />
                 </>
                 ) : (
                 <>

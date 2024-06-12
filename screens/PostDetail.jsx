@@ -6,6 +6,7 @@ import { db, auth } from '../config/firebase';
 import { Linking } from 'react-native';
 import { Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import Swiper from 'react-native-swiper';
 
 import { TrackPostView } from '../userInteraction/TrackPostView';
 
@@ -58,6 +59,11 @@ export default function PostDetail({ route }) {
   const [replying, setReplying] = useState(false);
   const [replyingAuthorName, setReplyingAuthorName] = useState(null);
   const [commentCount, setCommentCount] = useState(0);
+
+  const handleAuthorPress = () => {
+    const authorId = post.userId; // Haal de gebruikers-ID van de auteur op uit de postgegevens
+    navigation.navigate('UsersProfile', { userId: authorId });
+  };
 
   useEffect(() => {
     if (user && post.id) {
@@ -203,11 +209,11 @@ export default function PostDetail({ route }) {
 
   const renderHeader = () => (
     <View>
-        <View className="bg-white rounded-b-3xl shadow-sm">
+        <View className="shadow-sm">
 
-        <ImageBackground source={require('./../assets/images/postcreate-bg.png')} resizeMode="cover" imageStyle= {{opacity:0.2}}>
+        <ImageBackground source={require('./../assets/images/bg7.png')} resizeMode="cover" imageStyle= {{opacity:0.2}}>
         <View
-        className="flex-row justify-between px-5 pt-14 pb-5">
+        className="flex-row justify-between px-5 pt-14 pb-10">
                 {/* Back button */}
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Image className="w-5 h-5" 
@@ -215,27 +221,26 @@ export default function PostDetail({ route }) {
                 </TouchableOpacity>
 
                 {/* Question or advise tag */}
-                <View className="border border-dark-pink rounded-xl w-20 p-0.5">
+                <View className="border border-dark-pink bg-dark-pink rounded-xl w-20 p-0.5">
                             <Text 
                             style={{ fontFamily: 'Montserrat_500Medium' }}
-                            className="text-dark-pink text-center text-xs">
+                            className="text-white text-center text-xs">
                                 {post.postType}
                             </Text>
                 </View>
         </View> 
         </ImageBackground>
 
-        <View className="px-6 pt-3">
+        <View className="px-6 pt-3 bg-white rounded-3xl -mt-5">
 
-
-        <View className=" mt-2 flex-wrap">
+        <View className="mt-2 flex-wrap">
 
          {/* Post info card */}
          <View className="flex-row justify-between">
                 {/* Title */}
                 <Text 
-                        style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 19 }}
-                        className="pt-3 px-1 mb-3 w-80">
+                        style={{ fontFamily: 'Montserrat_600SemiBold' }}
+                        className="pt-3 px-1 mb-3 w-80 text-xl">
                        {post.title}
                 </Text>
 
@@ -290,11 +295,12 @@ export default function PostDetail({ route }) {
             {/* Description */}
             <Text 
                     style={{ fontFamily: 'Montserrat_500Medium' }}
-                    className="pt-2 px-2 mb-3 w-100 text-md">
+                    className="pt-2 px-2 mb-3 w-100 text-base">
                     {post.description}
             </Text>
         </View>
         
+        {/* Post PRODUCT */}
         <View>
         {post.products.length > 0 && (
             post.products.map((product, index) => (
@@ -322,6 +328,27 @@ export default function PostDetail({ route }) {
         )}
         </View>
 
+        {/* Post IMAGE */}
+        <View>
+          <Swiper
+                  style={{ height: 300 }}
+                  showsButtons={false}
+                  paginationStyle={{ bottom: -25 }}
+                  dotStyle={{ borderRadius: 100, width: 8, height: 8, backgroundColor: 'grey' }}
+                  activeDotStyle={{ borderRadius: 30, width: 8, height: 8, backgroundColor: '#63254E' }}
+                  className="mt-5"
+              >
+                  {post.imageUrls.map((uri, index) => (
+                      <View key={index}>
+                          <Image
+                              source={{ uri }}
+                              style={{ width: '100%', height: '100%', resizeMode: 'cover' }}
+                          />
+                      </View>
+                  ))}
+            </Swiper>
+        </View>
+
 
         <View className="flex-row mt-8 mb-8 justify-between">
             {/* Author + date */}
@@ -332,10 +359,12 @@ export default function PostDetail({ route }) {
                 </View>
 
                 <View className="flex-row pt-1.5 mx-2">
-                    <Text
-                    style={{ fontFamily: 'Montserrat_300Light', fontSize: 12 }}>
-                        Jane Ipsum
+                  <TouchableOpacity onPress={handleAuthorPress}>
+                    <Text style={{ fontFamily: 'Montserrat_300Light', fontSize: 12 }}
+                    className="underline">
+                      {post.displayName}
                     </Text>
+                  </TouchableOpacity>
 
                     <Image className="w-1 h-1 mt-1 ml-3" style={{ tintColor: "#63254E"}}
                                             source={require('./../assets/images/user.png')} />
@@ -366,8 +395,8 @@ export default function PostDetail({ route }) {
         </View>
         </View>
 
-        <View className="mt-8 mb-2 mx-5 flex-row">
-                <Text style={{ fontFamily: 'Montserrat_600SemiBold' }} className="text-base">
+        <View className="mt-6 mb-2 mx-5 flex-row">
+                <Text style={{ fontFamily: 'Montserrat_600SemiBold' }} className="text-lg">
                 Comments 
                 </Text>
 

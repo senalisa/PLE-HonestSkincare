@@ -5,9 +5,19 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db, auth } from './../config/firebase';
 import TopicAll from '../components/TopicAll';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import Search from '../components/Search';
 
 export default function Discover() {
   const [articles, setArticles] = useState([]);
+  const [searchVisible, setSearchVisible] = useState(false); // State voor zichtbaarheid van de zoekmodal
+
+  const openSearchModal = () => {
+    setSearchVisible(true); // Functie om de zoekmodal te openen
+  };
+
+  const closeSearchModal = () => {
+    setSearchVisible(false); // Functie om de zoekmodal te sluiten
+  };
 
    // Function to fetch posts and filter based on user preferences
    const fetchArticles = async () => {
@@ -37,33 +47,42 @@ export default function Discover() {
       {/* INTRO */}
       <ImageBackground source={require('./../assets/images/discover-bg.png')} resizeMode="cover" imageStyle= {{opacity:0.3}}>
 
-        <View className="mt-10 mb-10">
+        <View className="mt-20 mb-10">
 
           {/* INTRO: Logo + Notifications */}
-          <View className="flex-row justify-end">
-            <View className="flex mt-5 mr-4">
-              <Image className="w-16 h-6 ml-2" 
-                              source={require('./../assets/images/logo-plain-nobg.png')} />
-            </View>
-          </View>
+          
 
           {/* INTRO: Welcome user + text */}
-          <View className="-mt-3 mb-0 px-10 flex">
-            <Text className="mb-1" style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 25 }}>Discover</Text>
-            <Text className="" style={{ fontFamily: 'Montserrat_400Regular', fontSize: 16 }}>Read articles and scroll trough topics</Text>
+          <View className="-mt-3 mb-0 px-8 flex-row justify-between">
+            <View>
+              <Text className="mb-1" style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 25 }}>Discover</Text>
+              <Text className="" style={{ fontFamily: 'Montserrat_400Regular', fontSize: 16 }}>Read articles and scroll trough topics</Text>
+            </View>
+            
+              <View className="flex mt-1 ml-4">
+                <Image className="w-16 h-6 ml-2" 
+                                source={require('./../assets/images/logo-plain-nobg.png')} />
+              </View>
           </View>
 
           {/* Search Bar */}
           <View className="px-10 flex-row justify-between mt-6">
+            {/* Search Icon */}
             <TouchableOpacity 
-              className="shadow-sm bg-white rounded-xl w-full mb-3 flex-row">
-              <Image className="w-5 h-5 my-2 mx-5" style={{ tintColor: "#CBCACA"}}
-                  source={require('./../assets/icons/search.png')} />
-              <TextInput
-                placeholder='Search...'
-                className="text-gray-200 text-md w-72">
-              </TextInput>
-            </TouchableOpacity>
+                style={{ paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between' }}
+                onPress={openSearchModal}
+              >
+                <View className="shadow-md bg-white rounded-xl w-full mb-5 flex-row items-center">
+                  <Image style={{ width: 20, height: 20, margin: 10, tintColor: '#CBCACA' }} className="ml-5 mr-3" source={require('./../assets/icons/search.png')} />
+                  <Text style={{ fontFamily: 'Montserrat_500Medium_Italic' }}
+                  className="text-gray-300">
+                    Search...
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              {/* Search Modal */}
+              <Search visible={searchVisible} onClose={closeSearchModal}/>
           </View>
    
         </View>

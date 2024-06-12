@@ -1,4 +1,4 @@
-import { View, Text, Image } from 'react-native'
+import { View, Text, Image, ScrollView } from 'react-native'
 import React from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { useNavigation } from '@react-navigation/native'
@@ -7,7 +7,7 @@ export default function CGShort() {
   const navigation = useNavigation()
 
   return (
-    <View className="flex-1 bg-white pt-16">
+    <ScrollView className="flex-1 bg-white pt-16">
 
       {/* Back button */}
       <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -86,13 +86,13 @@ export default function CGShort() {
         </Text>
       </View>
 
-      <TouchableOpacity className="rounded-full bg-dark-pink px-20 py-3 flex-row mx-auto mt-10"
-                            onPress={() => navigation.navigate('Register')}>
+      <TouchableOpacity className="rounded-full bg-dark-pink px-20 py-3 flex-row mx-auto mt-10 mb-32"
+                            onPress={() => navigation.navigate('UserSkinType')}>
              <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
                     className="text-white text-xl"
              >I agree</Text>
       </TouchableOpacity>
 
-    </View>
+    </ScrollView>
   )
 }

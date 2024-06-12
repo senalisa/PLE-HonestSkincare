@@ -51,7 +51,7 @@ export default function TopicAll() {
             <Image source={{ uri: topic.topicImage }} className="w-12 h-[60] -mt-4 mb-2" />
             <View className="flex-wrap">
               <Text style={{ fontFamily: 'Montserrat_300Light' }} className="w-20 pb-0 text-center text-[10px]">Explore</Text>
-              <Text style={{ fontFamily: 'Montserrat_600SemiBold' }} className="pb-4 text-center w-[85] text-xs">{topic.topicName}</Text>
+              <Text style={{ fontFamily: 'Montserrat_600SemiBold' }} className="pb-4 text-center w-[85] text-md">{topic.topicName}</Text>
             </View>
           </View>
         </TouchableOpacity>
@@ -67,7 +67,7 @@ export default function TopicAll() {
             <Image source={{ uri: topic.topicImage }} className="w-12 h-[45] -mt-6 mb-2" />
             <View className="flex-wrap">
               <Text style={{ fontFamily: 'Montserrat_300Light'}} className="w-20 pb-0 mt-2 text-center text-[10px]">Explore</Text>
-              <Text style={{ fontFamily: 'Montserrat_600SemiBold'}} className="pb-1 text-center w-[85] text-xs">{topic.topicName}</Text>
+              <Text style={{ fontFamily: 'Montserrat_600SemiBold'}} className="pb-1 text-center w-[85] text-md">{topic.topicName}</Text>
             </View>
           </View>
         </TouchableOpacity>

@@ -2,10 +2,19 @@ import { View, Text, TouchableOpacity, ScrollView, StatusBar, ImageBackground, I
 import React from 'react'
 import { useNavigation } from '@react-navigation/native'
 import UserCardComponent from '../components/account/UserCardComponent'
+import { signOut } from 'firebase/auth'
+import { auth } from '../config/firebase'
 
 export default function Profile() {
 
   const navigation = useNavigation()
+
+  const user = auth.currentUser;
+
+  const handleLogout = async ()=> {
+    await signOut(auth);
+    navigation.navigate('Welcome')
+  }
 
   return (
     <ScrollView>
@@ -18,8 +27,17 @@ export default function Profile() {
         <View className="mt-20 mb-24">
 
           {/* INTRO: Welcome user + text */}
-          <View className="-mt-3 mb-0 px-10 flex">
+          <View className="-mt-3 mb-0 px-10 flex-row justify-between">
             <Text className="mb-1" style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 25 }}>Account</Text>
+            
+            <TouchableOpacity onPress={handleLogout}>
+            <View className="flex-row mt-1.5">
+              <Image className="w-4 h-4 mr-1"  style={{ tintColor: '#63254E' }}
+                                  source={require('./../assets/icons/exit.png')} />
+              <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
+              className="text-dark-pink">Sign out</Text>
+            </View>
+            </TouchableOpacity>
           </View>
 
           <View>
@@ -36,9 +54,33 @@ export default function Profile() {
           <UserCardComponent />
         </View>
 
+        {/* Button */}
+        <TouchableOpacity className="bg-white border border-gray-100 mx-8 py-4 px-5 shadow-sm rounded-xl flex-row justify-between"
+        onPress={()=> navigation.navigate('UserPosts')}>
+            
+            <View className="flex-row">
+              <Image className="w-5 h-5 mr-4" 
+                                  source={require('./../assets/icons/post.png')} />
+
+              <Text style={{ fontFamily: 'Montserrat_500Medium' }}
+              className="mt-0.5">
+                My posts
+              </Text>
+            </View>
+
+            <TouchableOpacity className="bg-dark-pink py-1 w-24 rounded-full ml-12">
+                            <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
+                            className="text-white text-xs text-center">Boost!</Text>
+            </TouchableOpacity>
+
+            <Image className="w-5 h-5" 
+                                  source={require('./../assets/icons/next.png')} />
+
+        </TouchableOpacity>
+
         <View>
           {/* Button */}
-          <TouchableOpacity className="bg-white border border-gray-100 mx-8 py-4 px-5 shadow-sm rounded-xl flex-row justify-between">
+          <TouchableOpacity className="bg-white border border-gray-100 mx-8 py-4 px-5 shadow-sm rounded-xl flex-row justify-between mt-5">
             
             <View className="flex-row">
               <Image className="w-5 h-5 mr-4" 
@@ -56,8 +98,9 @@ export default function Profile() {
           </TouchableOpacity>
 
           {/* Button */}
-          <TouchableOpacity className="bg-white border border-gray-100 mx-8 py-4 px-5 shadow-sm rounded-xl flex-row justify-between mt-5">
-            
+          <TouchableOpacity className="bg-white border border-gray-100 mx-8 py-4 px-5 shadow-sm rounded-xl flex-row justify-between mt-5"
+          onPress={()=> navigation.navigate('UserSkinType')}>
+
             <View className="flex-row">
               <Image className="w-5 h-6 mr-4 -mt-1" 
                                   source={require('./../assets/icons/face.png')} />
@@ -74,7 +117,8 @@ export default function Profile() {
           </TouchableOpacity>
 
           {/* Button */}
-          <TouchableOpacity className="bg-white border border-gray-100 mx-8 py-4 px-5 shadow-sm rounded-xl flex-row justify-between mt-5">
+          <TouchableOpacity className="bg-white border border-gray-100 mx-8 py-4 px-5 shadow-sm rounded-xl flex-row justify-between mt-5"
+          onPress={()=> navigation.navigate('CGLong')}>
             
             <View className="flex-row">
               <Image className="w-5 h-5 mr-4" 
@@ -90,10 +134,12 @@ export default function Profile() {
                                   source={require('./../assets/icons/next.png')} />
 
           </TouchableOpacity>
+
+          
         </View>
 
-        <View className="flex justify-center items-center mt-14">
-          <Image className="w-16 h-6 mb-2" 
+        <View className="flex justify-center items-center mt-10">
+          <Image className="w-16 h-6 mb-1" 
                                 source={require('./../assets/images/logo-plain-nobg.png')} />
 
           <Text style={{ fontFamily: 'Montserrat_500Medium' }}

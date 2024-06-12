@@ -11,14 +11,14 @@ export default function CGLong() {
     <View className="flex-1 bg-white pt-16 pb-16">
 
       {/* Back button */}
-      <TouchableOpacity onPress={() => navigation.goBack()}>
+      <TouchableOpacity onPress={() => navigation.goBack()} className="px-5 py-2">
                     <Image className="absolute top-0 left-7 w-5 h-5" 
                                     source={require('../../assets/icons/left-arrow.png')} />
        </TouchableOpacity>
 
-      <View>
+      <View className="flex items-center">
         <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
-        className="text-xl text-center">
+        className="text-xl text-center -mt-4 w-60">
           Community Guidelines
         </Text>
       </View>

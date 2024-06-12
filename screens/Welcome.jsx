@@ -108,7 +108,7 @@ export default function Welcome() {
           <TouchableOpacity className="rounded-full bg-dark-pink px-20 py-3 flex-row"
                             onPress={() => navigation.navigate('Register')}>
              <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
-                    className="text-white text-xl"
+                    className="text-white text-lg"
              >Get Started</Text>
           </TouchableOpacity>
         </View>

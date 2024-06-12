@@ -154,7 +154,8 @@ export default function UserSkinType() {
                 <TouchableOpacity 
                     onPress={() => navigation.goBack()}
                     className="bg-primary-dark p-2 rounded-tr-2xl rounded-bl-2xl ml-4">
-                    <ArrowLeftIcon size="20" color="black"></ArrowLeftIcon>
+                   <Image className="absolute top-0 left-4 w-5 h-5" 
+                                    source={require('../../assets/icons/left-arrow.png')} />
                 </TouchableOpacity>
             </View>
 

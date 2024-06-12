@@ -102,9 +102,10 @@ export default function Login() {
          <Animated.View entering={FadeInDown.delay(500).duration(3000).springify()}>
              <TouchableOpacity className="py-3 bg-dark-pink rounded-full mb-5 w-60 flex mx-auto"
                                onPress={handleSubmit}
-             >
-                 <Text style={{ fontFamily: 'Belleza_400Regular' }}
-                 className="text-xl font-bold text-center text-white text-xl">Login</Text>
+             > 
+             <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
+             className="text-white text-lg text-center"
+              >Login</Text>
              </TouchableOpacity>
          </Animated.View>
 

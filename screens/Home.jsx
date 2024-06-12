@@ -89,21 +89,14 @@ export default function Home() {
     }, [])
   );
 
-  // const onRefresh = React.useCallback(() => {
-  //   setRefreshing(true);
-  //   fetchPosts().finally(() => setRefreshing(false));
-  // }, []);
-
   return (
     <ScrollView 
-    // refreshControl={
-    //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#63254E"/> }
       >
       <StatusBar/>
       <View className="flex-[1] white">
 
         {/* INTRO */}
-        <ImageBackground source={require('./../assets/images/home-bg2.png')} resizeMode="cover" imageStyle= {{opacity:0.2}}>
+        <ImageBackground source={require('./../assets/images/home-bg2.png')} resizeMode="cover" imageStyle= {{opacity:0.3}}>
 
           <View className="mt-10 mb-10">
 
@@ -137,8 +130,8 @@ export default function Home() {
                 style={{ paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between' }}
                 onPress={openSearchModal}
               >
-                <View style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5, backgroundColor: 'white', borderRadius: 10, width: '100%', marginBottom: 10, flexDirection: 'row', alignItems: 'center' }}>
-                  <Image style={{ width: 20, height: 20, margin: 10, tintColor: '#CBCACA' }} source={require('./../assets/icons/search.png')} />
+                <View className="shadow-md bg-white rounded-xl w-full mb-5 flex-row items-center">
+                  <Image style={{ width: 20, height: 20, margin: 10, tintColor: '#CBCACA' }} className="ml-5 mr-3" source={require('./../assets/icons/search.png')} />
                   <Text style={{ fontFamily: 'Montserrat_500Medium_Italic' }}
                   className="text-gray-300">
                     Search...
