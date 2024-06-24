@@ -8,8 +8,6 @@ import { Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Swiper from 'react-native-swiper';
 
-import { TrackPostView } from '../userInteraction/TrackPostView';
-
 const addComment = async (postId, text, authorId, authorName) => {
   try {
     await addDoc(collection(db, 'posts', postId, 'comments'), {
@@ -48,6 +46,8 @@ const getComments = async (postId) => {
 };
 
 export default function PostDetail({ route }) {
+  console.disableYellowBox = true;
+  
   const { post } = route.params;
   const navigation = useNavigation();
   const user = auth.currentUser;
@@ -65,12 +65,6 @@ export default function PostDetail({ route }) {
     navigation.navigate('UsersProfile', { userId: authorId });
   };
 
-  useEffect(() => {
-    if (user && post.id) {
-      console.log('Tracking post view for user:', user.uid, 'post:', post.id);
-      TrackPostView(user.uid, post.id);
-    }
-  }, [user, post.id]);
   
   useEffect(() => {
     const fetchComments = async () => {

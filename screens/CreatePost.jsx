@@ -22,30 +22,32 @@ export default function CreatePost() {
   const [userId, setUserId] = useState(null);
   const [displayName, setDisplayName] = useState('');
 
-  const [products, setProducts] = useState([]); // Array om de geselecteerde producten bij te houden
-  const [searchInput, setSearchInput] = useState(''); // Invoerveld om te zoeken naar producten
-  const [searchResults, setSearchResults] = useState([]); // Array om zoekresultaten weer te geven
-  const [modalVisible, setModalVisible] = useState(false); // State om de zichtbaarheid van de modal aan te passen
+  const [products, setProducts] = useState([]); 
+  const [searchInput, setSearchInput] = useState(''); 
+  const [searchResults, setSearchResults] = useState([]); 
+  const [modalVisible, setModalVisible] = useState(false); 
 
+  //MULTI-STEP-PROGRESS
   const [step, setStep] = useState(1);
+  const totalSteps = 3;
+  const progress = (step / totalSteps) * 100;
   const [formData, setFormData] = useState({
     step1Data: '',
     step2Data: '',
     step3Data: '',
   });
 
+  //Button to go to the next step
   const handleNext = () => {
     setStep((prevStep) => Math.min(prevStep + 1, totalSteps));
   };
 
+  //Button to go back to the previous step
   const handlePrevious = () => {
     setStep((prevStep) => Math.max(prevStep - 1, 1));
   };
 
-  const totalSteps = 3;
-
-  const progress = (step / totalSteps) * 100;
-
+  //Progress step indicator
   const renderStepIndicator = (currentStep) => {
     const indicators = [];
     for (let i = 1; i <= totalSteps; i++) {
@@ -73,12 +75,35 @@ export default function CreatePost() {
     return indicators;
   };
 
+    // Dynamic titles of the steps
+    const getStepText = (step) => {
+      switch (step) {
+        case 1:
+          return "What is your post about?";
+        case 2:
+          return "Select tags about your post";
+        case 3:
+          return "Add a product or image";
+        default:
+          return "What is your post about?";
+      }
+    };
+
+  //TAGS
   const [visibleSections, setVisibleSections] = useState({
     skinType: true,
     skinConcern: false,
     skincareProduct: false,
   });
 
+  // Styles of the tags
+  const tagStyles = {
+    skinType: 'bg-light-blue border-2 border-blue',
+    skinConcern: 'bg-yellow border-2 border-dark-yellow',
+    skincareProduct: 'bg-pinkie border-2 border-pink',
+  };
+
+  //Toggle section of tags
   const toggleSection = (section) => {
     setVisibleSections((prev) => ({
       ...prev,
@@ -86,24 +111,7 @@ export default function CreatePost() {
     }));
   };  
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUserId(user.uid);
-        setDisplayName(user.displayName); 
-      } else {
-        setUserId(null);
-        setDisplayName(''); 
-      }
-    });
-  
-    return () => unsubscribe();
-  }, []);
-  
-  const handlePostTypeSelection = (type) => {
-    setPostType(type);
-  };
-
+  //Toggle function of the tags
   const toggleTag = (tag, type) => {
     switch (type) {
       case 'skinType':
@@ -125,6 +133,8 @@ export default function CreatePost() {
         break;
     }
   };
+
+  //Render the tags
   const renderTags = (tags, type) => {
     return (
       <>
@@ -158,6 +168,13 @@ export default function CreatePost() {
     );
   };
 
+  //POST TYPE
+   const handlePostTypeSelection = (type) => {
+    setPostType(type);
+  };
+
+  //PRODUCTS
+  //Fetch all products from database
   const fetchAllProducts = async () => {
     try {
       // Maak een query om alle items uit de database te halen
@@ -182,10 +199,10 @@ export default function CreatePost() {
     }
   };
   
-  // Roep de functie aan om alle producten op te halen
+  // Call the function to get all products
   fetchAllProducts();
   
-
+  //Search products
   const searchProducts = async (searchTerm) => {
     try {
       // Maak een query om alle producten te halen
@@ -209,7 +226,7 @@ export default function CreatePost() {
     }
   };
   
-  // Functie om een product toe te voegen aan de lijst met geselecteerde producten
+  // Function to add a product to the list of selected products
   const addProductToList = (product) => {
     setModalVisible(false);
     setProducts(prevProducts => {
@@ -218,14 +235,14 @@ export default function CreatePost() {
     });
   };
 
-  // Functie om een product uit de lijst met geselecteerde producten te verwijderen
+  // Function to delete a product out of the list with selected products
   const removeProductFromList = (index) => {
     const updatedProducts = [...products];
     updatedProducts.splice(index, 1); // Verwijder het product op de opgegeven index
     setProducts(updatedProducts); // Werk de lijst met geselecteerde producten bij
   };
 
-  // Functie om de URL van het product te openen in de standaardbrowser
+  // Function to open the URL of a product in the browser
   const openProductURL = (url) => {
     if (url && typeof url === 'string') {
       Linking.openURL(url)
@@ -236,32 +253,10 @@ export default function CreatePost() {
     }
   };
 
-  const buttonTextStyle = {
-    color: '#393939',
-    marginTop: '-30px'
-  };
-
-  const tagStyles = {
-    skinType: 'bg-light-blue border-2 border-blue',
-    skinConcern: 'bg-yellow border-2 border-dark-yellow',
-    skincareProduct: 'bg-pinkie border-2 border-pink',
-  };
-
-  const getStepText = (step) => {
-    switch (step) {
-      case 1:
-        return "What is your post about?";
-      case 2:
-        return "Select tags about your post";
-      case 3:
-        return "Add a product or image";
-      default:
-        return "What is your post about?";
-    }
-  };
-
+  //IMAGES
   const [images, setImages] = useState([]);
 
+  //Function to pick the images from the phone
   const pickImages = async () => {
     console.log('Opening image picker...');
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -286,27 +281,21 @@ export default function CreatePost() {
     }
   };
 
+  //Function to upload the chosen image to Firebase storage
   const uploadImages = async (images) => {
     try {
-      // Controleer of er afbeeldingen zijn geselecteerd
       if (images.length === 0) {
         console.log('Geen afbeeldingen geselecteerd.');
         return [];
       }
   
-      // Upload elke afbeelding en verzamel de download-URL's
       const downloadURLs = await Promise.all(images.map(async (imageUri) => {
         try {
-          // Haal de bestandsnaam op uit de URI
           const filename = imageUri.substring(imageUri.lastIndexOf('/') + 1);
-          // Maak een verwijzing naar het specifieke bestand
           const fileRef = ref(storageRef, `images/${filename}`);
-          // Haal de blob op van de afbeelding
           const response = await fetch(imageUri);
           const blob = await response.blob();
-          // Upload het bestand naar Firebase Storage
           const snapshot = await uploadBytes(fileRef, blob);
-          // Verkrijg de download-URL van het geüploade bestand
           const downloadURL = await getDownloadURL(snapshot.ref);
           return downloadURL;
         } catch (error) {
@@ -315,22 +304,35 @@ export default function CreatePost() {
         }
       }));
   
-      // Geef de array met download-URL's terug
       return downloadURLs;
     } catch (error) {
-      // Als er een fout optreedt, log de fout en gooi een foutmelding
       console.error('Fout bij het uploaden van afbeeldingen:', error);
       throw error;
     }
   };
 
-  // Definieer de containsLink functie
+// Check if the post contains links
 const containsLink = (text) => {
   const urlPattern = /(?:https?|ftp):\/\/[\n\S]+|www\.[\S]+/ig;
   return urlPattern.test(text);
 };
 
+//AUTH
+useEffect(() => {
+  const unsubscribe = auth.onAuthStateChanged((user) => {
+    if (user) {
+      setUserId(user.uid);
+      setDisplayName(user.displayName); 
+    } else {
+      setUserId(null);
+      setDisplayName(''); 
+    }
+  });
 
+  return () => unsubscribe();
+}, []);
+
+//SAVE THE POST
 const handleSavePost = async () => {
   try {
     if (!userId || !postType || !title || !description ) {
@@ -357,7 +359,7 @@ const handleSavePost = async () => {
 
     const newPostRef = await addDoc(postsCollectionRef, {
       userId: userId,
-      displayName: displayName,  // Voeg deze regel toe om de displayName op te slaan
+      displayName: displayName,  
       postType: postType,
       title: title,
       description: description,
@@ -370,7 +372,7 @@ const handleSavePost = async () => {
 
     const newPostData = {
       userId: userId,
-      displayName: displayName,  // Voeg deze regel toe om de displayName op te slaan
+      displayName: displayName,  
       postType: postType,
       title: title,
       description: description,
@@ -401,13 +403,17 @@ const handleSavePost = async () => {
     <ScrollView className="h-full bg-white">
     <View className="flex-1 h-min-screen">
 
+      {/* Background Image */}
       <ImageBackground source={require('./../assets/images/bg3.png')} resizeMode="cover" imageStyle= {{opacity:0.3}}>
-      <View className="pt-12 pb-10">
-     
 
+      {/* Fixed top bar */}
+      <View className="pt-12 pb-10">
+  
+        {/* Title */}
         <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
         className="text-center mt-8 shadow-md text-base">Create a post</Text>
 
+        {/* Title of the step */}
         <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
         className="text-center mt-0 color-dark-pink shadow-md text-xl">{getStepText(step)}</Text>
 
@@ -416,10 +422,11 @@ const handleSavePost = async () => {
           {renderStepIndicator(step)}
         </View>
 
-       
       </View>
+
       </ImageBackground>
 
+      {/* Step 1 */}
        {step === 1 && (
           <View className="flex-1 p-8 bg-white rounded-t-3xl shadow-xl -mt-8 h-screen">
 
@@ -436,7 +443,7 @@ const handleSavePost = async () => {
                 </TouchableOpacity>
               </View>
 
-              {/* Type */}
+              {/* Post Type */}
                 <View className="mb-6">
                   <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
                   className="text-lg font-bold mb-2">Post Type</Text>
@@ -462,7 +469,7 @@ const handleSavePost = async () => {
 
                 </View>
 
-              {/* Title */}
+              {/* Post Title */}
                 <View className="mb-6">
                 <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
                   className="text-lg font-bold mb-2">Title</Text>
@@ -474,7 +481,7 @@ const handleSavePost = async () => {
                   />
                 </View>
 
-              {/* Description */}
+              {/* Post Description */}
               <View className="mb-6">
                 <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
                 className="text-lg font-bold mb-2">Description</Text>
@@ -486,26 +493,13 @@ const handleSavePost = async () => {
                   onChangeText={setDescription}
                 />
               </View>
-
-              {/* Next Button
-              <View className="flex justify-center items-center">
-                <TouchableOpacity 
-                  onPress={handleNext} 
-                  className="py-2.5 bg-dark-pink rounded-full mt-10 w-60 shadow-md">
-                  <Text 
-                    style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 17 }} 
-                    className="text-xl font-bold text-center text-white">
-                    Next
-                  </Text>
-                </TouchableOpacity>
-              </View> */}
-
           </View>
         )}
 
+      {/* Step 2 */}
       {step === 2 && (
             <View className="flex-1 bg-white rounded-t-3xl shadow-xl -mt-8 h-screen">
-              {/* Next Button */}
+              {/* Back Button */}
               <View className="flex-row justify-center justify-between -mt-2 -mr-2 mb-7 px-8 pt-8">
                 <TouchableOpacity 
                   onPress={handlePrevious} 
@@ -517,6 +511,7 @@ const handleSavePost = async () => {
                   </Text>
                 </TouchableOpacity>
 
+                {/* Next button */}
                 <TouchableOpacity 
                   onPress={handleNext} 
                   className="py-1 bg-dark-pink rounded-full w-16">
@@ -528,8 +523,9 @@ const handleSavePost = async () => {
                 </TouchableOpacity>
               </View>
               
-
+            {/* Tags */}
             <View>
+              {/* Tags for skin type */}
               <TouchableOpacity onPress={() => toggleSection('skinType')} className="flex-row justify-between items-center mx-8">
                 <View className="flex-row mb-5">
                     <Image className="w-8 h-10" source={require('../assets/images/oily-skintype.png')} />
@@ -545,7 +541,7 @@ const handleSavePost = async () => {
             
                 <Image className="-mt-4"
                   source={visibleSections.skinType ? require('../assets/icons/up2.png') : require('../assets/icons/down2.png')}
-                  style={{ width: 13, height: 13 }} // Pas de grootte van het icoontje aan zoals nodig
+                  style={{ width: 13, height: 13 }} 
                 />
               </TouchableOpacity>
 
@@ -553,8 +549,10 @@ const handleSavePost = async () => {
                 {renderTags(['Oily', 'Dry', 'Normal', 'Combination'], 'skinType')}
               </View>
 
+              {/* Line */}
               <View className="border-b border-gray-100 mt-5" />
   
+              {/* Tags for skin concern */}
               <TouchableOpacity onPress={() => toggleSection('skinConcern')} className="flex-row justify-between items-center my-5 mx-8">
                 <View className="flex-row mb-1">
                     <Image className="w-8 h-10" source={require('../assets/images/acne.png')} />
@@ -570,7 +568,7 @@ const handleSavePost = async () => {
                 
                 <Image
                   source={visibleSections.skinConcern ? require('../assets/icons/up2.png') : require('../assets/icons/down2.png')}
-                  style={{ width: 13, height: 13 }} // Pas de grootte van het icoontje aan zoals nodig
+                  style={{ width: 13, height: 13 }} 
                 />
               </TouchableOpacity>
 
@@ -578,8 +576,10 @@ const handleSavePost = async () => {
                 {renderTags(['Redness', 'Hyperpigmentation', 'Acne', 'Wrinkles', 'Rosacea', 'Pores', 'Blackheads', 'Eyebags', 'Whiteheads', 'Dryness', 'Eczema'], 'skinConcern')}
               </View>
 
+              {/* Line */}
               <View className="border-b border-gray-100 mt-5" />
   
+              {/* Tags for skincare product */}
               <TouchableOpacity onPress={() => toggleSection('skincareProduct')} className="flex-row justify-between items-center my-5 mx-8">
                 <View className="flex-row mb-1">
                     <Image className="w-6 h-9" source={require('../assets/images/serum-2.png')} />
@@ -595,7 +595,7 @@ const handleSavePost = async () => {
 
                 <Image
                   source={visibleSections.skincareProduct ? require('../assets/icons/up2.png') : require('../assets/icons/down2.png')}
-                  style={{ width: 13, height: 13 }} // Pas de grootte van het icoontje aan zoals nodig
+                  style={{ width: 13, height: 13 }} 
                 />
               </TouchableOpacity>
 
@@ -608,11 +608,12 @@ const handleSavePost = async () => {
           </View>
       )}
 
+      {/* Step 3 */}
       {step === 3 && (
            <View className="flex-1 p-8 bg-white rounded-t-3xl shadow-xl -mt-8 pb-24">
 
-            {/* Next Button */}
             <View className="flex-row justify-center justify-between -mt-2 -mr-2 mb-7">
+                {/* Back Button */}
                 <TouchableOpacity 
                   onPress={handlePrevious} 
                   className="py-1 bg-white border border-gray-400 rounded-full w-16 ">
@@ -623,6 +624,7 @@ const handleSavePost = async () => {
                   </Text>
                 </TouchableOpacity>
 
+                {/* Next Button */}
                 <TouchableOpacity 
                   onPress={handleSavePost} 
                   className="py-1 bg-dark-pink rounded-full w-16">
@@ -634,6 +636,7 @@ const handleSavePost = async () => {
                 </TouchableOpacity>
               </View>
 
+              {/* Products */}
               <View className="flex-row justify-between mb-3">
 
                 <View className="flex">
@@ -644,7 +647,7 @@ const handleSavePost = async () => {
                       className="text-xs text-gray-400">Optional</Text>
                 </View>
 
-                {/* Knop om de modal te openen */}
+                {/* Button to open the Modal of products */}
                 <TouchableOpacity onPress={() => setModalVisible(true)} className="border border-gray-200 py-0 px-5 rounded-full bg-white flex-row shadow-sm justify-center items-center">
                   <Image className="w-2 h-2 mr-1 mt-1" 
                                               source={require('./../assets/icons/plus.png')} />
@@ -656,7 +659,7 @@ const handleSavePost = async () => {
               </View>
 
 
-            {/* Lijst met geselecteerde producten */}
+            {/* List of selected products */}
             <View>
               {products.map((product, index) => (
                 <View key={index} className="align-center my-2">
@@ -688,7 +691,7 @@ const handleSavePost = async () => {
               ))}
             </View>
 
-            {/* Modal voor het toevoegen van producten */}
+            {/* Modal to search add products */}
             <Modal
               animationType="slide"
               visible={modalVisible}
@@ -699,7 +702,7 @@ const handleSavePost = async () => {
                 <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 22 }}
                 className="mb-5">Add a product</Text>
 
-                {/* Invoerveld voor het zoeken naar producten */}
+                {/* Textinput with search */}
                 <View className="flex-row mx-14 px-4 py-2.5 bg-white text-gray-700 rounded-xl border border-gray-200 text-l font-medium mb-1 shadow-sm">
                   <Image className="w-5 h-5 mr-3" style={{ tintColor: "#CBCACA"}}
                                           source={require('./../assets/icons/search.png')} />
@@ -715,7 +718,7 @@ const handleSavePost = async () => {
                   />
                 </View>
 
-                {/* Lijst met zoekresultaten */}
+                {/* List of search results */}
                 <FlatList
                   data={searchResults}
                   keyExtractor={(item) => item.productName}
@@ -737,7 +740,7 @@ const handleSavePost = async () => {
                   )}
                 />
 
-                {/* Knop om de modal te sluiten */}
+                {/* Button to close modal */}
                 <TouchableOpacity onPress={() => setModalVisible(false)}>
                   <Text className="font-bold text-base">Close</Text>
                 </TouchableOpacity>
@@ -746,7 +749,7 @@ const handleSavePost = async () => {
 
             <View className="border-b border-gray-100 mt-5" />
 
-            {/* Image */}
+            {/* Images */}
             <View className="mb-10 mt-8">
 
             <View className="flex-row justify-between mb-3">
@@ -759,7 +762,7 @@ const handleSavePost = async () => {
                     className="text-xs text-gray-400">Optional</Text>
               </View>
 
-              {/* Knop om de modal te openen */}
+              {/* Button to open phone gallery and add one or multiple images */}
               <TouchableOpacity onPress={pickImages} className="border border-gray-200 py-2 px-5 rounded-full bg-white flex-row shadow-sm justify-center items-center">
                 <Image className="w-2 h-2 mr-1 mt-1" 
                                             source={require('./../assets/icons/plus.png')} />
@@ -770,6 +773,7 @@ const handleSavePost = async () => {
 
             </View>
 
+              {/* Swiper for the selected Images */}
               <Swiper
                       style={{ height: 300 }}
                       showsButtons={false}

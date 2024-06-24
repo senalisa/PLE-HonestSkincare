@@ -5,6 +5,8 @@ import Animated, { FadeIn, FadeInDown, FadeInUp, FadeOut } from 'react-native-re
 import Swiper from 'react-native-swiper';
 
 export default function Welcome() {
+  console.disableYellowBox = true;
+  
   const navigation = useNavigation()
 
   const [step, setStep] = useState(0);

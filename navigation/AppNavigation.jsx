@@ -24,7 +24,6 @@ import UserCardTwo from '../components/account/UserCardTwo.jsx';
 import Article from '../screens/Article.jsx';
 import PostCreated from '../components/PostCreated.jsx';
 
-import { TrackPostView } from '../userInteraction/TrackPostView.jsx';
 import CGShort from '../components/community/CGshort.jsx';
 import CGLong from '../components/community/CGlong.jsx';
 import UserPosts from '../components/account/UserPosts.jsx';

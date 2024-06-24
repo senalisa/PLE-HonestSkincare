@@ -7,8 +7,26 @@ export default function Leaderboard() {
   const [skinTypeModalVisible, setSkinTypeModalVisible] = useState(false);
   const [skinConcernModalVisible, setSkinConcernModalVisible] = useState(false);
 
-  const skinTypes = ['Oily', 'Dry', 'Combination', 'Normal'];
-  const skinConcerns = ['Acne', 'Redness', 'Wrinkles', 'Dryness', 'Eye bags', 'Pores', 'Blackheads', 'Whiteheads', 'Rosacea'];
+  const skinTypes = [
+    { name: 'Oily', icon: require('./../assets/images/skins/oily-skintype.png') },
+    { name: 'Dry', icon: require('./../assets/images/skins/dry-skintype.png') },
+    { name: 'Combination', icon: require('./../assets/images/skins/combi-skintype.png') },
+    { name: 'Normal', icon: require('./../assets/images/skins/normal-skintype.png') },
+  ];
+
+  const skinConcerns = [
+    { name: 'Dryness', icon: require('./../assets/images/skins/dryness.png') },
+    { name: 'Acne', icon: require('./../assets/images/skins/acne.png') },
+    { name: 'Redness', icon: require('./../assets/images/skins/redness.png') },
+    { name: 'Hyperpigmentation', icon: require('./../assets/images/skins/acne.png') },
+    { name: 'Whiteheads', icon: require('./../assets/images/skins/whiteheads.png') },
+    { name: 'Wrinkles', icon: require('./../assets/images/skins/wrinkles.png') },
+    { name: 'Rosacea', icon: require('./../assets/images/skins/rosesea.png') },
+    { name: 'Pores', icon: require('./../assets/images/skins/pores.png') },
+    { name: 'Blackheads', icon: require('./../assets/images/skins/blackheads.png') },
+    { name: 'Eyebags', icon: require('./../assets/images/skins/eyebags.png') },
+    { name: 'Eczema', icon: require('./../assets/images/skins/eczema.png') }
+  ];
 
   return (
     <ScrollView>
@@ -196,91 +214,82 @@ export default function Leaderboard() {
         </View>
       </View>
 
-      {/* Modal voor Skin Type */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={skinTypeModalVisible}
-        onRequestClose={() => setSkinTypeModalVisible(false)}
-      >
-        <View className="flex-1 justify-center items-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-          <View className="bg-white p-5 rounded-lg w-80 py-10">
-            
-            <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
-            className="text-center mb-5 text-base">
-              Choose a Skin Type
-            </Text>
-
-            <View className="flex-row flex-wrap w-full items-center justify-center">
-            {skinTypes.map((concern) => (
-              <TouchableOpacity
-                key={concern}
-                className="bg-light-blue border-2 border-blue px-5 py-1.5 rounded-full mr-2 mb-2"
-                onPress={() => {
-                  setSelectedSkinConcern(concern);
-                  setSkinConcernModalVisible(false);
-                }}
-              >
-                <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 13 }}
-                className="text-center text-md text-blue">{concern}</Text>
-              </TouchableOpacity>
-            ))}
-            </View>
-
-            <TouchableOpacity
-              className="bg-dark-pink py-2 mx-12 rounded-full mt-8"
-              onPress={() => setSkinTypeModalVisible(false)}
+     {/* Modal voor Skin Type */}
+     <Modal
+            animationType="fade"
+            transparent={true}
+            visible={skinTypeModalVisible}
+            onRequestClose={() => setSkinTypeModalVisible(false)}
             >
-              <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15 }}
-                    className="text-white text-center">Cancel</Text>
-            </TouchableOpacity>
-
-          </View>
-        </View>
-      </Modal>
-
-      {/* Modal voor Skin Concern */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={skinConcernModalVisible}
-        onRequestClose={() => setSkinConcernModalVisible(false)}
-      >
-        <View className="flex-1 justify-center items-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-          <View className="bg-white p-5 rounded-lg w-80 py-10">
-            
-            <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
-            className="text-center mb-5 text-base">
-              Choose a Skin Concern
-            </Text>
-
-            <View className="flex-row flex-wrap w-full items-center justify-center">
-            {skinConcerns.map((concern) => (
-              <TouchableOpacity
-                key={concern}
-                className="bg-yellow border-2 border-dark-yellow px-5 py-1.5 rounded-full mr-2 mb-2"
-                onPress={() => {
-                  setSelectedSkinConcern(concern);
-                  setSkinConcernModalVisible(false);
-                }}
-              >
-                <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 13 }}
-                className="text-center text-md text-dark-yellow">{concern}</Text>
-              </TouchableOpacity>
-            ))}
+            <View className="flex-1 justify-center items-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                <View className="bg-white p-5 rounded-lg w-80 py-10">
+                <Text style={{ fontFamily: 'Montserrat_600SemiBold' }} className="text-center mb-5 text-xl">
+                    Choose a Skin Type
+                </Text>
+                <View className="flex-row flex-wrap w-full items-center justify-center">
+                    {skinTypes.map((type) => (
+                    <TouchableOpacity
+                        key={type.name}
+                        className="bg-white border border-gray-200 px-5 py-1.5 rounded-full mr-2 mb-4 flex-row items-center"
+                        onPress={() => {
+                        setSelectedSkinType(type.name);
+                        setSkinTypeModalVisible(false);
+                        }}
+                    >
+                        <Image source={type.icon} style={{ width: 20, height: 24, marginRight: 8 }} />
+                        <Text style={{ fontFamily: 'Montserrat_600SemiBold' }} className="text-center text-base text-black">
+                        {type.name}
+                        </Text>
+                    </TouchableOpacity>
+                    ))}
+                </View>
+                <TouchableOpacity className="bg-dark-pink py-2 mx-12 rounded-full mt-8" onPress={() => setSkinTypeModalVisible(false)}>
+                    <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15 }} className="text-white text-center">
+                    Cancel
+                    </Text>
+                </TouchableOpacity>
+                </View>
             </View>
+            </Modal>
 
-            <TouchableOpacity
-              className="bg-dark-pink py-2 mx-12 rounded-full mt-8"
-              onPress={() => setSkinConcernModalVisible(false)}
+
+            {/* Modal voor Skin Concern */}
+            <Modal
+            animationType="fade"
+            transparent={true}
+            visible={skinConcernModalVisible}
+            onRequestClose={() => setSkinConcernModalVisible(false)}
             >
-              <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15 }}
-                    className="text-white text-center">Cancel</Text>
-            </TouchableOpacity>
-
-          </View>
-        </View>
-      </Modal>
+            <View className="flex-1 justify-center items-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                <View className="bg-white p-5 rounded-lg w-80 py-10">
+                <Text style={{ fontFamily: 'Montserrat_600SemiBold' }} className="text-center mb-5 text-xl">
+                    Choose a Skin Concern
+                </Text>
+                <View className="flex-row flex-wrap w-full items-center justify-center">
+                    {skinConcerns.map((concern) => (
+                    <TouchableOpacity
+                        key={concern.name}
+                        className="bg-white border border-gray-200 px-5 py-1.5 rounded-full mr-2 mb-4 flex-row items-center"
+                        onPress={() => {
+                        setSelectedSkinConcern(concern.name);
+                        setSkinConcernModalVisible(false);
+                        }}
+                    >
+                        <Image source={concern.icon} style={{ width: 20, height: 24, marginRight: 8 }} />
+                        <Text style={{ fontFamily: 'Montserrat_600SemiBold' }} className="text-center text-base text-black">
+                        {concern.name}
+                        </Text>
+                    </TouchableOpacity>
+                    ))}
+                </View>
+                <TouchableOpacity className="bg-dark-pink py-2 mx-12 rounded-full mt-8" onPress={() => setSkinConcernModalVisible(false)}>
+                    <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15 }} className="text-white text-center">
+                    Cancel
+                    </Text>
+                </TouchableOpacity>
+                </View>
+            </View>
+            </Modal>
     </ScrollView>
   );
 }
