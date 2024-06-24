@@ -1,7 +1,7 @@
 
 # Honest Skincare
 
-Honest Skincare is a mobile application addressing the trending issue of hidden marketing on social media within the skincare industry. At Honest Skincare, we aim to create a transparent and reliable skincare community platform where users help each other, free from influencer and marketing biases.
+Honest Skincare is a mobile application addressing the trending issue of hidden marketing on social media within the skincare industry. At Honest Skincare, we aim to create a transparent and reliable skincare community platform where users help each other, free from influencer and marketing biases. [Watch here the showcase video.](https://www.youtube.com/watch?v=uVvQfOf0L1Y) 
 
 ![HonestSkincare-Hero](https://github.com/senalisa/PLE-HonestSkincare/assets/82781389/a91d0524-7384-444d-a414-f3add96fdf77)
 
