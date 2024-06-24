@@ -54,5 +54,23 @@ To open the project in Expo, run:
 > Refer to the documentation of each package used for specific integration instructions and configurations.
 
 
+## Contributing
+
+Contributions are welcomed and greatly appreciated! They help improve the project and foster a collaborative community. If you have suggestions to enhance this project, here’s how you can contribute:
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+
+## Contact
+
+Sena Babacan  - 1016131@hr.nl
+
+Project Link: [https://github.com/senalisa/PLE-HonestSkincare](https://github.com/senalisa/PLE-HonestSkincare)
+
+
 
 
