@@ -1,20 +1,27 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import NavigationStack from './navigation/AppNavigation'
+import {  useFonts, Montserrat_300Light, Montserrat_400Regular, Montserrat_500Medium, Montserrat_600SemiBold, Montserrat_700Bold, Montserrat_500Medium_Italic
+} from '@expo-google-fonts/montserrat';
+import { Belleza_400Regular } from '@expo-google-fonts/belleza'
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+    let [fontsLoaded] = useFonts({
+        Montserrat_300Light,
+        Montserrat_400Regular,
+        Montserrat_500Medium,
+        Montserrat_600SemiBold,
+        Montserrat_700Bold,
+        Montserrat_500Medium_Italic,
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+        Belleza_400Regular,
+
+      });
+    
+      if (!fontsLoaded) {
+        return null;
+      }
+
+    return (
+            <NavigationStack />
+    );
+}

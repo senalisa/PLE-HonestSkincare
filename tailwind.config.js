@@ -1,25 +1,44 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  // NOTE: Update this to include the paths to all of your component files.
   content: [
-    "./App/**/*.{js,jsx,ts,tsx}",
-    "./components/**/*.{js,jsx,ts,tsx}",
-    "./views/*.{js,jsx,ts,tsx}",
-    "./navigation/*.{js,jsx,ts,tsx}",
+      "./App.{js,jsx,ts,tsx}",
+      "./components/**/*.{js,jsx,ts,tsx}",
+      "./screens/*.{js,jsx,ts,tsx}",
+      "./navigation/*.{js,jsx,ts,tsx}",
+      // "./<custom directory>/**/*.{js,jsx,ts,tsx}",
   ],
-  presets: [require("nativewind/preset")],
   theme: {
-    extend: {},
-    colors: {
-      "primary" : "#63254E",
-      "light-blue" : "#F1FAFC",
-      "light-blue-border" : "#BDE6EF",
-      "light-pink": "#F5E5EC",
-      "light-pink-border" : "#EAD6DF",
-      "light-green" : "#F2EFD7",
-      "light-green-border" : "#DFDBBB",
-    }
+      extend: {
+      colors: {
+          "dark-pink" : "#63254E",
+          "light-beige" : "#F5EDE5",
+          "dark-beige" : "#C8BBA8",
+          "pastel-green" : "#E2E0C1",
+
+        // Blue
+          "light-blue" : "#F4FBFD",
+          "blue" : "#7BB6D7",
+
+        //   Pink
+          "pink" : "#AE466D",
+          "pink-light" : "#EBDBE3",
+          "pastel-pink": "#E7B1AF",
+          "pinkie" : "#F5EBEF",
+
+        //Yellow
+        "yellow" : "#F2EFD7",
+        "dark-yellow" : "#B4A18A",
+      },
+      width: {
+        '18': '4.5rem',
+      },
+      height:{
+        '18': '4.5rem',
+      },
+      fontSize: {
+        xxs: ['10px', '14px']
+      }
+      },
   },
   plugins: [],
 }
-
