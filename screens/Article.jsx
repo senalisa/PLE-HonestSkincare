@@ -9,6 +9,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
+//Function to add a comment
 const addComment = async (articleId, text, authorId, authorName) => {
   try {
     await addDoc(collection(db, 'articles', articleId, 'comments'), {
@@ -22,6 +23,7 @@ const addComment = async (articleId, text, authorId, authorName) => {
   }
 };
 
+//Function to add a reply to a comment
 const addReply = async (articleId, commentId, text, authorId, authorName) => {
   try {
     const commentRef = doc(db, 'articles', articleId, 'comments', commentId);
@@ -36,6 +38,7 @@ const addReply = async (articleId, commentId, text, authorId, authorName) => {
   }
 };
 
+//Function to get the comments of the article
 const getComments = async (articleId) => {
   try {
     const commentsQuery = query(collection(db, 'articles', articleId, 'comments'), orderBy('timestamp', 'asc'));
@@ -61,6 +64,7 @@ export default function Article() {
   const [replyingAuthorName, setReplyingAuthorName] = useState(null);
   const [commentCount, setCommentCount] = useState(0);
 
+  //Fetch the article
   useEffect(() => {
     const fetchArticle = async () => {
       try {
@@ -86,6 +90,7 @@ export default function Article() {
     fetchComments();
   }, [articleId]);
 
+  //Fetch the comment count
   useEffect(() => {
     const fetchCommentCount = async () => {
       try {
@@ -100,11 +105,13 @@ export default function Article() {
     fetchCommentCount();
   }, [comments, articleId]);
 
+  //Check if the user's comment contains a link
   const containsLink = (text) => {
     const urlPattern = /(?:https?|ftp):\/\/[\n\S]+|www\.[\S]+/ig;
     return urlPattern.test(text);
   };
 
+  // Add the reply
   const handleAddInput = async () => {
     if (newInput.trim().length === 0) {
       return;
@@ -139,6 +146,7 @@ export default function Article() {
     setComments(updatedComments);
   };
 
+  // Delete a comment
   const handleDeleteComment = async (commentId) => {
     try {
       await deleteDoc(doc(db, 'articles', articleId, 'comments', commentId));
@@ -149,31 +157,13 @@ export default function Article() {
     }
   };
 
-  const handleDeleteReply = async (commentId, replyId) => {
-    try {
-      const commentRef = doc(db, 'articles', articleId, 'comments', commentId);
-      const commentSnap = await getDoc(commentRef);
-      const existingReplies = commentSnap.data().replies || [];
-      const updatedReplies = existingReplies.filter(reply => reply.id !== replyId);
-      await updateDoc(commentRef, { replies: updatedReplies });
-      const updatedComments = comments.map(comment => {
-        if (comment.id === commentId) {
-          return { ...comment, replies: updatedReplies };
-        } else {
-          return comment;
-        }
-      });
-      setComments(updatedComments);
-    } catch (error) {
-      console.error('Error deleting reply: ', error);
-    }
-  };
-
+  // Function to toggle a reply
   const toggleReply = (commentId, authorName) => {
     setReplyingTo(commentId);
     setReplyingAuthorName(authorName);
   };
 
+  // Function to toggle comments
   const toggleComment = (commentId) => {
     setExpandedComments({
       ...expandedComments,
@@ -181,6 +171,7 @@ export default function Article() {
     });
   };
 
+  // Function to get the time ago of a comment 
   const getTimeAgo = (timestamp) => {
     const currentDate = new Date();
     const commentDate = timestamp.toDate();
@@ -202,6 +193,7 @@ export default function Article() {
     }
   };
 
+  // RRender the description of an article
   const renderDescription = () => {
     return article.articleDescription.map((desc, index) => (
       <Text
@@ -214,6 +206,7 @@ export default function Article() {
     ));
   };
 
+  // Load indicator
   if (!article) {
     return (
       <View>
@@ -222,8 +215,10 @@ export default function Article() {
     );
   }
 
+  // Head of an article
   const renderHeader = () => (
     <View>
+      {/* Background image */}
       <ImageBackground source={{ uri: article.articleImage }} resizeMode="cover">
         <View className="flex-row justify-start">
           <TouchableOpacity
@@ -234,18 +229,22 @@ export default function Article() {
         </View>
       </ImageBackground>
 
+      {/* Title */}
       <View className="-mt-14 bg-white rounded-t-xl pt-8 pb-5 px-6">
         <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 22 }}
         className="font-bold">{article.articleTitle}</Text>
 
+      {/* Description */}
       <View>
         {renderDescription()}
       </View>
 
+        {/* Finish line */}
         <Text className="mt-5 text-dark-pink" style={{ fontFamily: 'Montserrat_500Medium_Italic', fontSize: 16 }}>
         Share your thoughts and experiences!
         </Text>
 
+        {/* Author */}
         <View className="flex-row pt-8">
                         <Text
                         style={{ fontFamily: 'Montserrat_300Light', fontSize: 12 }}>
@@ -264,6 +263,7 @@ export default function Article() {
 
         </View>
 
+        {/* Comments text */}
         <View className="mt-6 mb-2 mx-5 flex-row">
                 <Text style={{ fontFamily: 'Montserrat_600SemiBold' }} className="text-lg">
                 Comments 
@@ -282,6 +282,7 @@ export default function Article() {
   );
 
   return (
+    // Comments
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
     <View className="flex-1">
 
@@ -382,14 +383,6 @@ export default function Article() {
                     </View>
 
                     <View className="flex-end">
-
-                    {/* {reply.authorId === user.uid && (
-                    <TouchableOpacity onPress={() => handleDeleteReply(item.id, reply.timestamp)}>
-                        <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
-                        className="text-red-500 underline mt-2">Delete</Text>
-                    </TouchableOpacity>
-                    )} */}
-
                     </View>
                 </View>
             ))}
@@ -401,6 +394,7 @@ export default function Article() {
 
 <View className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-300 shadow-xl">
 
+{/* Bottom text input bar to write a comment or reply */}
 <View className="flex-row justify-between mt-3 mx-5">
 
 {replying && (

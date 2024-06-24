@@ -13,6 +13,7 @@ export default function UserPosts() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
   
+    //Fetch the logged in user's posts
     useEffect(() => {
         const fetchPosts = async () => {
           try {
@@ -41,6 +42,7 @@ export default function UserPosts() {
       }, []);
       
   
+      // Load indicator
     if (loading) {
       return (
         <View className="flex-1 justify-center items-center">
@@ -68,11 +70,10 @@ export default function UserPosts() {
             {auth.currentUser.displayName}'s Posts
           </Text>
 
-          {/* Spacer voor het centreren van de titel */}
+          {/* Spacer  */}
           <View className="flex-2" />
           </View>
-           
-           {/* <Text className="text-md mt-2" style={{ fontFamily: 'Montserrat_500Medium_Italic' }}>Swipe on a post to edit or delete</Text> */}
+          
           </View>
 
           {/* Info-card Skin type/concern */}
@@ -100,6 +101,7 @@ export default function UserPosts() {
             </View>
         </Animated.View>
 
+          {/* Posts */}
           <View className="mb-28">
             {posts.length === 0 ? (
               <Text>No posts found.</Text>

@@ -9,9 +9,11 @@ export default function Welcome() {
   
   const navigation = useNavigation()
 
+  // Multi-step-progress
   const [step, setStep] = useState(0);
   const totalSteps = 4;
 
+  //Render progress
   const renderStepIndicator = (currentStep) => {
     const indicators = [];
     for (let i = 0; i < totalSteps; i++) {

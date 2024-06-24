@@ -9,7 +9,7 @@ export default function PostCard({ post }) {
 
   return (
     <View> 
-    {/* Post Two */}
+    {/* Post Card */}
     <Animated.View entering={FadeInDown.delay(0).duration(2000).springify()}>
         <TouchableOpacity onPress={() => navigation.navigate('PostDetail', { post: post, postId: post.id })}>
             <View className="relative rounded-xl bg-white shadow mx-7 px-4 py-4 mt-4">

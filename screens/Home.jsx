@@ -15,14 +15,16 @@ export default function Home() {
   const [posts, setPosts] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [userPreferences, setUserPreferences] = useState(null);
-  const [searchVisible, setSearchVisible] = useState(false); // State voor zichtbaarheid van de zoekmodal
+  const [searchVisible, setSearchVisible] = useState(false); 
 
+  // Function to open the Search Modal
   const openSearchModal = () => {
-    setSearchVisible(true); // Functie om de zoekmodal te openen
+    setSearchVisible(true); 
   };
 
+  // Function to close the Search Modal
   const closeSearchModal = () => {
-    setSearchVisible(false); // Functie om de zoekmodal te sluiten
+    setSearchVisible(false); 
   };
 
   // Function to fetch user preferences
@@ -108,10 +110,6 @@ export default function Home() {
               </View>
 
               <View className="flex-row">
-                {/* <TouchableOpacity onPress={() => navigation.navigate('UserCard')}>
-                  <Image className="w-6 h-6 mr-3 mt-6" 
-                                source={require('./../assets/icons/id-card.png')} />
-                </TouchableOpacity> */}
                 <Image className="w-6 h-6 mr-7 mt-6" 
                                 source={require('./../assets/icons/notification.png')} />
               </View>
@@ -179,6 +177,7 @@ export default function Home() {
             </Text>
           </View>
 
+          {/* Posts map */}
           <View className="mb-28">
             {posts.map((post) => (
               <PostCard key={post.id} post={post} />

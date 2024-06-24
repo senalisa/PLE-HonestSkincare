@@ -11,11 +11,12 @@ export default function Register() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState(''); // Voeg displayName toe
+  const [displayName, setDisplayName] = useState(''); 
   const [error, setError] = useState('');
 
+  // Function to save an user
   const handlesubmit = async () => {
-    if(email && password && displayName) { // Controleer of displayName is ingevuld
+    if(email && password && displayName) {
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;

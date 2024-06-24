@@ -7,6 +7,7 @@ export default function Leaderboard() {
   const [skinTypeModalVisible, setSkinTypeModalVisible] = useState(false);
   const [skinConcernModalVisible, setSkinConcernModalVisible] = useState(false);
 
+  //Skin types
   const skinTypes = [
     { name: 'Oily', icon: require('./../assets/images/skins/oily-skintype.png') },
     { name: 'Dry', icon: require('./../assets/images/skins/dry-skintype.png') },
@@ -14,6 +15,7 @@ export default function Leaderboard() {
     { name: 'Normal', icon: require('./../assets/images/skins/normal-skintype.png') },
   ];
 
+  //Skin concerns
   const skinConcerns = [
     { name: 'Dryness', icon: require('./../assets/images/skins/dryness.png') },
     { name: 'Acne', icon: require('./../assets/images/skins/acne.png') },

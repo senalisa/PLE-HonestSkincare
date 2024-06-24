@@ -17,6 +17,7 @@ export default function CategorySearch() {
   const [postTypeFilter, setPostTypeFilter] = useState('all'); // Filter state
   const [filteredPosts, setFilteredPosts] = useState([]); // New state to hold sorted and filtered posts
 
+  // Fetch the related posts
   useEffect(() => {
     const fetchRelatedPosts = async () => {
       try {
@@ -43,18 +44,19 @@ export default function CategorySearch() {
     fetchRelatedPosts();
   }, [topicData]);
 
+  // Filter and sort the posts
   useEffect(() => {
     const sortAndFilterPosts = () => {
       let filtered = relatedPosts;
   
-      // Filteren op basis van postType
+      // Filter
       if (postTypeFilter !== 'all') {
         console.log('Filtered posts before:', filtered);  // Toegevoegde regel voor debugging
         filtered = filtered.filter(post => post.postType === postTypeFilter);
         console.log('Filtered posts after:', filtered);  // Toegevoegde regel voor debugging
       }
   
-      // Sorteren
+      // Sort
       if (sortBy === 'newest') {
         filtered = filtered.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       } else if (sortBy === 'trending') {
@@ -86,7 +88,7 @@ export default function CategorySearch() {
           </Text>
           </View>
 
-          {/* Spacer voor het centreren van de titel */}
+          {/* Spacer*/}
           <View className="flex-2" />
         </View>
       </View>

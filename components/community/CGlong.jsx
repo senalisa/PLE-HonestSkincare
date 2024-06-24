@@ -146,13 +146,6 @@ export default function CGLong() {
         </Text>
       </View>
 
-      {/* <TouchableOpacity className="rounded-full bg-dark-pink px-20 py-3 flex-row mx-auto mt-10"
-                            onPress={() => navigation.navigate('Register')}>
-             <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
-                    className="text-white text-xl"
-             >I agree</Text>
-      </TouchableOpacity> */}
-
     </View>
     </ScrollView>
   )

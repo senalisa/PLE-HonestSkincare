@@ -14,8 +14,8 @@ export default function UserCardTwo() {
     const [userId, setUserId] = useState(null);
     const [loading, setLoading] = useState(true);
   
+    //Get Auth of users
     useEffect(() => {
-      // Haal de gebruikers-id op zodra de gebruiker is ingelogd
       const unsubscribe = auth.onAuthStateChanged((user) => {
         if (user) {
           setUserId(user.uid);
@@ -89,8 +89,10 @@ export default function UserCardTwo() {
             </Text>
         </View>
 
+        {/* User Card Component */}
         <UserCardComponent/>
 
+        {/* Button to change skin type & concerns */}
         <View className="mx-auto">
             <TouchableOpacity  onPress={() => navigation.navigate('UserSkinType')} className="mt-5 border border-gray-200 rounded-xl py-2 px-2 flex-row">
               <Text style={{ fontFamily: 'Montserrat_400Regular', fontSize: 13 }}
@@ -99,6 +101,7 @@ export default function UserCardTwo() {
             </TouchableOpacity>
         </View>
 
+        {/* Button to navigate to home */}
         <TouchableOpacity onPress={() => navigation.navigate('Home')} className="mt-10 py-2.5 bg-dark-pink rounded-full mb-5 w-60 flex mx-auto shadow-md">
               <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 17 }}
               className="text-xl font-bold text-center text-white">Start Exploring</Text>

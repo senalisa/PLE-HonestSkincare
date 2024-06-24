@@ -9,6 +9,7 @@ export default function Topics({ userPreferences }) {
   const navigation = useNavigation();
   const [topics, setTopics] = useState([]);
 
+  //Fetch the topics 
   useEffect(() => {
     const fetchTopics = async () => {
       try {
@@ -24,6 +25,7 @@ export default function Topics({ userPreferences }) {
     fetchTopics();
   }, []);
 
+  //Match the topics with user's preferences
   const matchesUserPreferences = (topic) => {
     if (!userPreferences) return false;
 

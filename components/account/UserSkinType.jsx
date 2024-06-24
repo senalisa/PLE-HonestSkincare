@@ -6,6 +6,7 @@ import { db, auth } from '../../config/firebase';
 import { useNavigation } from '@react-navigation/native';
 import { ArrowLeftIcon } from 'react-native-heroicons/solid';
 
+//Skin Concern Options
 const SkinConcernOption = ({ concern, icon, isSelected, onPress }) => {
   return (
     <TouchableOpacity
@@ -37,30 +38,37 @@ export default function UserSkinType() {
   const [selectedSkinType, setSelectedSkinType] = useState('');
   const [skinConcerns, setSkinConcerns] = useState([]);
 
+  //MULTI-STEP-PROGRESS
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     step1Data: '',
     step2Data: '',
   });
 
+  //Button for next step
   const handleNext = () => {
     setStep(step + 1);
   };
 
+  //Button for previous step
   const handlePrevious = () => {
     setStep(step - 1);
   };
 
+  //MODAL
   const [modalVisible, setModalVisible] = useState(false);
 
+  //Open the modal
   const openModal = () => {
     setModalVisible(true);
   };
 
+  //Close the modal
   const closeModal = () => {
     setModalVisible(false);
   };
 
+  //AUTH
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
@@ -73,7 +81,7 @@ export default function UserSkinType() {
     return () => unsubscribe();
   }, []);
   
-
+  //Fetch user prefrences
   useEffect(() => {
     const fetchUserPreferences = async () => {
       try {
@@ -94,7 +102,8 @@ export default function UserSkinType() {
     fetchUserPreferences();
   }, [userId]);
   
-
+  //TAGS
+  //Toggle of skin concern
   const handleToggleSkinConcern = (concern) => {
     setSkinConcerns(prevConcerns => {
       if (prevConcerns.includes(concern)) {
@@ -105,6 +114,7 @@ export default function UserSkinType() {
     });
   };
 
+  //List of skin concern
   const skinConcernList = [
     { name: 'Dryness', icon: require('../../assets/images/skins/dryness.png') },
     { name: 'Acne', icon: require('../../assets/images/skins/acne.png') },
@@ -119,6 +129,7 @@ export default function UserSkinType() {
     { name: 'Eczema', icon: require('../../assets/images/skins/eczema.png') }
   ];
 
+  //SAVE POST
   const handleSavePreferences = async () => {
     try {
       const userPrefRef = doc(db, 'userPreferences', userId);
@@ -130,31 +141,9 @@ export default function UserSkinType() {
     }
   };
 
-  const progressStepsStyle = {
-    activeStepIconBorderColor: '#63254E',
-    activeLabelColor: '#63254E',
-    activeStepNumColor: 'white',
-    activeStepIconColor: '#63254E',
-    completedStepIconColor: '#63254E',
-    completedProgressBarColor: '#63254E',
-    completedCheckColor: 'white',
-    borderWidth: 1,
-  };
-
-  const buttonNext = {
-    padding: 10,
-    color: 'white',
-    backgroundColor: '#63254E'
-  };
-
-  const buttonPrevious = {
-    color: 'white',
-    backgroundColor: '#63254E',
-    padding: 10,
-  };
-
   return (
     <View className="flex-1 pt-16 bg-white">
+      {/* Step 1 */}
       {step === 1 && (
         <View>
           <View className="flex-row justify-start">
@@ -167,13 +156,17 @@ export default function UserSkinType() {
           </View>
 
           <View className="justify-center items-center">
+            {/* Title */}
             <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 16 }}
               className="mx-24 text-center text-dark-pink mb-3">Step 1</Text>
 
+            {/* Intro */}
             <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 25 }}
               className=" text-center mb-8">Let's get to know your {"\n"} skin type!</Text>
 
+            {/* Buttons of skin type */}
             <View className="flex-row ">
+              {/* Dry */}
               <TouchableOpacity 
                 className={`bg-white justify-center border border-gray-100 shadow-md rounded-md p-3 m-2 w-40 items-center ${selectedSkinType === 'Dry' && 'border-dark-pink'}`}
                 onPress={() => setSelectedSkinType('Dry')}
@@ -189,6 +182,7 @@ export default function UserSkinType() {
                   to redness and itching.</Text>
               </TouchableOpacity>
 
+              {/* Oily */}
               <TouchableOpacity
                 className={`bg-white border border-gray-100 shadow-md rounded-md p-3 m-2 w-40 items-center ${selectedSkinType === 'Oily' && 'border-dark-pink'}`}
                 onPress={() => setSelectedSkinType('Oily')}
@@ -205,6 +199,7 @@ export default function UserSkinType() {
               </TouchableOpacity>
             </View>
 
+            {/* Combination */}
             <View className="flex-row">
               <TouchableOpacity
                 className={`bg-white border border-gray-100 shadow-md rounded-md p-3 m-2 w-40 items-center ${selectedSkinType === 'Combination' && 'border-dark-pink'}`}
@@ -222,6 +217,7 @@ export default function UserSkinType() {
                   and cheeks are drier.</Text>
               </TouchableOpacity>
 
+              {/* Normal */}
               <TouchableOpacity
                 className={`bg-white  border border-gray-100 shadow-md rounded-md p-3 m-2 w-40 items-center ${selectedSkinType === 'Normal' && 'border-dark-pink'}`}
                 onPress={() => setSelectedSkinType('Normal')}
@@ -237,6 +233,7 @@ export default function UserSkinType() {
               </TouchableOpacity>
             </View>
 
+            {/* Button if the user doesnt know their skin type */}
             <TouchableOpacity onPress={openModal} className="mt-5 border border-gray-200 rounded-xl py-2 px-2 flex-row">
               <Image className="w-3.5 h-3.5 mr-1" style={{ tintColor: "#A8A8A8"}}
                 source={require('../../assets/icons/info.png')} />
@@ -244,11 +241,13 @@ export default function UserSkinType() {
                 className="text-gray-500">I don't know my skin type</Text>
             </TouchableOpacity>
 
+            {/* Next Button */}
             <TouchableOpacity onPress={handleNext} className="mt-8 py-2.5 bg-dark-pink rounded-full mb-5 w-60 flex mx-auto shadow-md">
               <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 17 }}
                 className="text-xl font-bold text-center text-white">Next</Text>
             </TouchableOpacity>
 
+            {/* Modal with info if user doesnt know their skin type */}
             <Modal
               animationType="fade"
               transparent={true}
@@ -277,14 +276,18 @@ export default function UserSkinType() {
         </View>
       )}
 
+      {/* Step 2 */}
       {step === 2 && (
         <View className="justify-center items-center pt-4">
+          {/* Title */}
           <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 16 }}
             className="mx-24 text-center text-dark-pink mb-3">Step 2</Text>
 
+          {/* Concern */}
           <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 25 }}
             className="mx-18 text-center mb-8">What are your Skin  {"\n"} Concerns?</Text>
 
+          {/* Map of skin concerns */}
           <View className="p-5">
             <View className="flex-row flex-wrap justify-center">
               {skinConcernList.map(concern => (
@@ -299,11 +302,13 @@ export default function UserSkinType() {
             </View>
           </View>
 
+          {/* Save button */}
           <TouchableOpacity onPress={handleSavePreferences} className="mt-8 py-2.5 bg-dark-pink rounded-full mb-5 w-60 flex mx-auto shadow-md">
             <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 17 }}
               className="text-xl font-bold text-center text-white">Save</Text>
           </TouchableOpacity>
 
+          {/* Go back button */}
           <TouchableOpacity onPress={handlePrevious}>
             <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 17 }}
               className="pt-5 color-gray-500">Go back</Text>

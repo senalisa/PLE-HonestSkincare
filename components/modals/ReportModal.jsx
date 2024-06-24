@@ -12,13 +12,13 @@ const ReportModal = ({ itemId, itemType, reporterId, onClose }) => {
     try {
       await addDoc(collection(db, 'reports'), {
         itemId,
-        itemType,  // 'post' or 'comment'
+        itemType,  
         reportReason,
         reportDescription,
         reporterId,
         timestamp: serverTimestamp(),
       });
-      onClose(); // Sluit de modal na het rapporteren
+      onClose(); 
     } catch (error) {
       console.error('Error reporting item: ', error);
     }

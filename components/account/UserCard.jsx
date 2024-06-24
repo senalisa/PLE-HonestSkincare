@@ -4,7 +4,6 @@ import { useNavigation } from '@react-navigation/native'
 import { ArrowLeftIcon } from 'react-native-heroicons/solid'
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../../config/firebase'; 
-import Animated, { FlipInEasyX } from 'react-native-reanimated';
 import UserCardComponent from './UserCardComponent';
 
 export default function UserCard() {
@@ -14,8 +13,8 @@ export default function UserCard() {
     const [userId, setUserId] = useState(null);
     const [loading, setLoading] = useState(true);
   
+    //get Auth of current user
     useEffect(() => {
-      // Haal de gebruikers-id op zodra de gebruiker is ingelogd
       const unsubscribe = auth.onAuthStateChanged((user) => {
         if (user) {
           setUserId(user.uid);
@@ -27,6 +26,7 @@ export default function UserCard() {
       return () => unsubscribe();
     }, []);
   
+    //Fetch the user's preferences
     useEffect(() => {
       const fetchUserPreferences = async () => {
         if (!userId) return;
@@ -58,19 +58,6 @@ export default function UserCard() {
         );
     }
 
-    const getImageSource = (skinType) => {
-        switch (skinType) {
-          case 'Oily':
-            return require('../../assets/images/oily-skintype.png');
-          case 'Dry':
-            return require('../../assets/images/dry-skintype.png');
-          case 'Combination':
-            return require('../../assets/images/combi-skintype.png');
-          case 'Normal':
-            return require('../../assets/images/normal-skintype.png');
-        }
-      };
-
   return (
     <View className="flex-1 pt-14 bg-white">
         {/* Backbutton */}
@@ -90,6 +77,7 @@ export default function UserCard() {
             </Text>
         </View>
 
+        {/* UserCardComponent */}
         <UserCardComponent />
 
         <View className="mx-auto">

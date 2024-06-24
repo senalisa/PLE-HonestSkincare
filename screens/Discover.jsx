@@ -9,14 +9,16 @@ import Search from '../components/Search';
 
 export default function Discover() {
   const [articles, setArticles] = useState([]);
-  const [searchVisible, setSearchVisible] = useState(false); // State voor zichtbaarheid van de zoekmodal
+  const [searchVisible, setSearchVisible] = useState(false); 
 
+  // Function to open the Search Modal
   const openSearchModal = () => {
-    setSearchVisible(true); // Functie om de zoekmodal te openen
+    setSearchVisible(true); 
   };
 
+  // Function to close the Search Modal
   const closeSearchModal = () => {
-    setSearchVisible(false); // Functie om de zoekmodal te sluiten
+    setSearchVisible(false); 
   };
 
    // Function to fetch posts and filter based on user preferences
@@ -48,9 +50,6 @@ export default function Discover() {
       <ImageBackground source={require('./../assets/images/discover-bg.png')} resizeMode="cover" imageStyle= {{opacity:0.3}}>
 
         <View className="mt-20 mb-10">
-
-          {/* INTRO: Logo + Notifications */}
-          
 
           {/* INTRO: Welcome user + text */}
           <View className="-mt-3 mb-0 px-8 flex-row justify-between">
@@ -92,9 +91,8 @@ export default function Discover() {
       <View className="bg-white outline outline-offset-6 h-full py-5 -mt-5 rounded-t-[35px]">
 
       <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 22 }} className="mx-7 mt-2 text-center">Trending Articles</Text>
-      {/* <Image className="w-48 h-10 justify-center mx-auto "
-      source={require('./../assets/images/articles-text.png')} /> */}
 
+      {/* Article cards */}
       <View className="mb-20">
             <ArticleCard />
         </View>

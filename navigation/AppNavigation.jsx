@@ -46,6 +46,7 @@ const config = {
 const Stack = createStackNavigator()
 const Tab = createBottomTabNavigator();
 
+//Custom Tab Bar button 
 const CustomTabBarButton = ({children, onPress}) => (
     <TouchableOpacity
     style={{
@@ -177,6 +178,7 @@ const Tabs = () => {
     );
 };
 
+//Navigation between pages
 const AppNavigation = () => {
     const { user } = useAuth();
 
@@ -216,17 +218,5 @@ const AppNavigation = () => {
         </NavigationContainer>
     );
 };
-
-const styles = StyleSheet.create({
-    focusedCreatePostTab: {
-        backgroundColor: 'purple', // Achtergrondkleur aanpassen
-        borderRadius: 20, // Afgeronde hoeken toevoegen
-        width: 60, // Breedte aanpassen
-        height: 60, // Hoogte aanpassen
-        justifyContent: 'center', // Center de inhoud verticaal
-        alignItems: 'center', // Center de inhoud horizontaal
-        top: -20, // Positie aanpassen (om te compenseren voor de grotere hoogte)
-    }
-});
 
 export default AppNavigation;

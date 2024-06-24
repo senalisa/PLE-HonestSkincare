@@ -17,6 +17,7 @@ export default function Search({ visible, onClose }) {
     const [skinTypeModalVisible, setSkinTypeModalVisible] = useState(false);
     const [skinConcernModalVisible, setSkinConcernModalVisible] = useState(false);
 
+    //Skin types
     const skinTypes = [
         { name: 'Oily', icon: require('./../assets/images/skins/oily-skintype.png') },
         { name: 'Dry', icon: require('./../assets/images/skins/dry-skintype.png') },
@@ -24,6 +25,7 @@ export default function Search({ visible, onClose }) {
         { name: 'Normal', icon: require('./../assets/images/skins/normal-skintype.png') },
       ];
       
+      //Skin concerns
       const skinConcerns = [
         { name: 'Dryness', icon: require('./../assets/images/skins/dryness.png') },
         { name: 'Acne', icon: require('./../assets/images/skins/acne.png') },
@@ -38,7 +40,7 @@ export default function Search({ visible, onClose }) {
         { name: 'Eczema', icon: require('./../assets/images/skins/eczema.png') }
       ];
 
-      
+    //Fetching posts
     useEffect(() => {
         const fetchPosts = async () => {
             try {
@@ -54,6 +56,7 @@ export default function Search({ visible, onClose }) {
         fetchPosts();
     }, []);
 
+    //Filter the results
     useEffect(() => {
         const filteredResults = allPosts.filter(post => {
             if (postTypeFilter === 'all') {
@@ -88,7 +91,7 @@ export default function Search({ visible, onClose }) {
                         </Text>
                     </View>
 
-                    {/* Spacer voor het centreren van de titel */}
+                    {/* Spacer  */}
                     <View className="flex-2" />
                     </View>
                 </View>
@@ -117,6 +120,7 @@ export default function Search({ visible, onClose }) {
                                             source={require('./../assets/icons/down2.png')} />
                         </TouchableOpacity>
 
+                        {/* Skin Concern */}
                         <TouchableOpacity
                         className="flex-row justify-between items-center bg-white border border-gray-200 rounded-full px-4 py-2 w-[182]"
                         onPress={() => setSkinConcernModalVisible(true)}

@@ -12,6 +12,7 @@ export default function Login() {
   const [password, setPassword] = useState();
   const [error, setError] = useState('');
 
+  // Function to save an user
   const handleSubmit = async () => {
     if(email && password) { 
       try {
@@ -73,7 +74,7 @@ export default function Login() {
 
          </Animated.View>
 
-         {/* Wachtwoord input */}
+         {/* Password input */}
          <Animated.View entering={FadeInDown.delay(400).duration(3000).springify()}>
            {/* Text */}
            <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}

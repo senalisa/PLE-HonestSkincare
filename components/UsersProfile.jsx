@@ -13,6 +13,7 @@ export default function UsersProfile({ route }) {
     const [displayName, setDisplayName] = useState('');
     const [postTypeFilter, setPostTypeFilter] = useState('all'); // State for postType filter
 
+    // Fetch the user's posts
     useEffect(() => {
         const fetchUserPosts = async () => {
             try {
@@ -20,7 +21,6 @@ export default function UsersProfile({ route }) {
                 const userPostsSnapshot = await getDocs(userPostsQuery);
                 const posts = userPostsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 setUserPosts(posts);
-                // Get the displayName from the first post object
                 if (posts.length > 0) {
                     setDisplayName(posts[0].displayName);
                 }
@@ -60,7 +60,7 @@ export default function UsersProfile({ route }) {
                         </Text>
                     </View>
 
-                    {/* Spacer voor het centreren van de titel */}
+                    {/* Spacer  */}
                     <View className="flex-2" />
 
                 </View>
@@ -96,6 +96,7 @@ export default function UsersProfile({ route }) {
                         </TouchableOpacity>
                 </View>
 
+                {/* Map of filtered posts */}
                 <View className="mb-32">
                         {filteredPosts.map((post) => (
                             <PostCard key={post.id} post={post} />

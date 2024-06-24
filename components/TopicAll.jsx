@@ -6,6 +6,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
 export default function TopicAll() {
+
   const navigation = useNavigation();
   const [topics, setTopics] = useState({
     skinTypes: [],
@@ -13,6 +14,7 @@ export default function TopicAll() {
     products: []
   });
 
+  // Fetch the topics
   useEffect(() => {
     const fetchTopics = async () => {
       try {
@@ -43,6 +45,7 @@ export default function TopicAll() {
     fetchTopics();
   }, []);
 
+  //Render the topics
   const renderTopics = (topics) => {
     return topics.map((topic, index) => (
       <Animated.View key={topic.topic} entering={FadeInDown.duration(3000).springify()}>
@@ -59,6 +62,7 @@ export default function TopicAll() {
     ));
   };
 
+  //Render the skincare product topics
   const renderTopicsProducts = (topics) => {
     return topics.map((topic, index) => (
       <Animated.View key={topic.topic} entering={FadeInDown.duration(3000).springify()}>

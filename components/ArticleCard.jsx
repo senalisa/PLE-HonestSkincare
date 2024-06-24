@@ -9,7 +9,6 @@ import { db } from '../config/firebase';
 import { Dimensions } from 'react-native';
 import { StyleSheet } from 'react-native';
 
-
 const windowWidth = Dimensions.get('window').width;
 const PAGE_WIDTH = windowWidth;
 
@@ -17,6 +16,7 @@ export default function ArticleCard() {
   const navigation = useNavigation();
   const [articles, setArticles] = useState([]);
 
+  // Fetch the articles from the database
   const fetchArticles = async () => {
     try {
       const articlesCollectionRef = collection(db, 'articles');
@@ -36,6 +36,7 @@ export default function ArticleCard() {
     fetchArticles();
   }, []);
 
+  //Animation
   const animationStyle = useCallback(
     (value) => {
       "worklet";
@@ -63,7 +64,6 @@ export default function ArticleCard() {
     []
   );
   
-
   return (
     <View style={{ flex: 1, height: 240 }}>
       <Carousel

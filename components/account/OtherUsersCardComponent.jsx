@@ -1,14 +1,13 @@
 import { View, Text, TouchableOpacity, Image, ImageBackground } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { ArrowLeftIcon } from 'react-native-heroicons/solid';
 import { doc, getDoc } from 'firebase/firestore';
-import { db, auth } from '../../config/firebase'; 
+import { db } from '../../config/firebase'; 
 import Animated, { FlipInEasyX } from 'react-native-reanimated';
 
 export default function OtherUserCardComponent({ userId, displayName }) {
   const [userPreferences, setUserPreferences] = useState(null);
 
+  //Fetch user prefrences
   useEffect(() => {
     const fetchUserPreferences = async () => {
       try {
@@ -24,6 +23,7 @@ export default function OtherUserCardComponent({ userId, displayName }) {
     fetchUserPreferences();
   }, [userId]);
 
+  //Get Image Source of the skinType tag
   const getImageSource = (skinType) => {
     switch (skinType) {
       case 'Oily':
