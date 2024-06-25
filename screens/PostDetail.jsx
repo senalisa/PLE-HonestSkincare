@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, SafeAreaView, Image, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, RefreshControl, StatusBar } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, SafeAreaView, Image, ImageBackground, KeyboardAvoidingView, Platform, Modal, StatusBar } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import { doc, getDoc, collection, addDoc, query, orderBy, getDocs, serverTimestamp, updateDoc, arrayUnion, Timestamp, deleteDoc } from 'firebase/firestore';
 import { db, auth } from '../config/firebase';
@@ -7,6 +8,7 @@ import { Linking } from 'react-native';
 import { Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Swiper from 'react-native-swiper';
+
 
 const addComment = async (postId, text, authorId, authorName) => {
   try {
@@ -59,6 +61,10 @@ export default function PostDetail({ route }) {
   const [replying, setReplying] = useState(false);
   const [replyingAuthorName, setReplyingAuthorName] = useState(null);
   const [commentCount, setCommentCount] = useState(0);
+
+  const handleReportPost = () => {
+    navigation.navigate('ReportForm', { postId: post.id, title: post.title });
+  };
 
   const handleAuthorPress = () => {
     const authorId = post.userId; // Haal de gebruikers-ID van de auteur op uit de postgegevens
@@ -375,15 +381,17 @@ export default function PostDetail({ route }) {
 
             {/* Likes + Comments */}
             <View className="flex-row mt-1">
+
+            {/* Report */}
+            <TouchableOpacity onPress={handleReportPost}>
+              <Image className="w-5 h-5 mr-3" style={{ tintColor: "gray"}}
+                                        source={require('./../assets/icons/spam.png')} />
+            </TouchableOpacity>
+
                 {/* Likes */}
                 <View className="flex-row">
                     <Image className="w-5 h-5 " style={{ tintColor: "gray"}}
                                         source={require('./../assets/icons/like.png')} />
-                    {/* <Text 
-                    style={{ fontFamily: 'Montserrat_500Medium', fontSize: 15 }}
-                    className="pl-2 mt-0.5">
-                        100
-                    </Text> */}
                 </View>
             </View>
         </View>
@@ -405,6 +413,7 @@ export default function PostDetail({ route }) {
                     </View>
                 </View>
         </View>
+
     </View>
   );
 
@@ -510,13 +519,6 @@ export default function PostDetail({ route }) {
 
                     <View className="flex-end">
 
-                    {/* {reply.authorId === user.uid && (
-                    <TouchableOpacity onPress={() => handleDeleteReply(item.id, reply.timestamp)}>
-                        <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
-                        className="text-red-500 underline mt-2">Delete</Text>
-                    </TouchableOpacity>
-                    )} */}
-
                     </View>
                 </View>
             ))}
@@ -570,6 +572,7 @@ export default function PostDetail({ route }) {
   </TouchableOpacity>
 </View>
 </View>
+
 
     </View>
   </KeyboardAvoidingView>

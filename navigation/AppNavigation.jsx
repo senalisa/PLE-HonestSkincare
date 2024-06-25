@@ -28,6 +28,7 @@ import CGShort from '../components/community/CGshort.jsx';
 import CGLong from '../components/community/CGlong.jsx';
 import UserPosts from '../components/account/UserPosts.jsx';
 import UsersProfile from '../components/UsersProfile.jsx';
+import ReportForm from '../components/report/ReportForm.jsx';
 
 
 // Animation
@@ -200,6 +201,7 @@ const AppNavigation = () => {
                     <Stack.Screen name="CGLong" component={CGLong} options={{ headerShown: false }} />
                     <Stack.Screen name="UserPosts" component={UserPosts} options={{ headerShown: false }} />
                     <Stack.Screen name="UsersProfile" component={UsersProfile} options={{ headerShown: false }} />
+                    <Stack.Screen name="ReportForm" component={ReportForm} options={{ headerShown: false }} />
                 </>
                 ) : (
                 <>
