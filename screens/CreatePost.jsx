@@ -26,6 +26,7 @@ export default function CreatePost() {
   const [searchInput, setSearchInput] = useState(''); 
   const [searchResults, setSearchResults] = useState([]); 
   const [modalVisible, setModalVisible] = useState(false); 
+  const [modalAlertVisible, setModalAlertVisible] = useState(false);
 
   //MULTI-STEP-PROGRESS
   const [step, setStep] = useState(1);
@@ -261,7 +262,7 @@ export default function CreatePost() {
     console.log('Opening image picker...');
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Sorry, we hebben toestemming nodig om dit te doen!');
+      Alert.alert('Please give us permission to see your gallery.');
       return;
     }
 
@@ -345,11 +346,7 @@ const handleSavePost = async () => {
     }
 
     if (containsLink(title) || containsLink(description)) {
-      Alert.alert(
-        'Link Policy',
-        'The posting of links is not allowed to ensure the safety and integrity of our community. For more info read the Community Guidelines',
-        [{ text: 'OK' }]
-      );
+      setModalAlertVisible(true);
       return;
     }
 
@@ -795,6 +792,35 @@ const handleSavePost = async () => {
 
           </View>
         )}
+
+      {/* Modal for Alert */}
+      <Modal
+              animationType="fade"
+              transparent={true}
+              visible={modalAlertVisible}
+              onRequestClose={() => {
+                setModalVisible(!modalAlertVisible);
+              }}
+            >
+              <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+                className="flex-1 justify-center align-center">
+                <View className="bg-white p-7 mx-20 rounded-md">
+                  <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
+                    className="text-center text-lg mb-4">Link Policy</Text>
+                  
+                  <Text style={{ fontFamily: 'Montserrat_400Regular'}}
+                    className="text-center text-base">The posting of links is not allowed to ensure the safety and integrity of our community. For more info read</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('CGlong')}>
+                      <Text className="text-center mb-7 underline text-dark-pink text-base" style={{ fontFamily: 'Montserrat_400Regular' }}>the Community Guidelines.</Text>
+                    </TouchableOpacity>
+
+                  <TouchableOpacity onPress={() => setModalVisible(!modalAlertVisible)} className="bg-dark-pink py-1.5 mx-12 rounded-full"> 
+                    <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
+                      className="text-white text-center text-base">I got it!</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+      </Modal>
 
   </View>
   </ScrollView>
