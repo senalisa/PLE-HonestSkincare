@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView, StatusBar, ImageBackground, Image } from 'react-native'
+import { View, Text, Pressable, ScrollView, StatusBar, ImageBackground, Image } from 'react-native'
 import React from 'react'
 import { useNavigation } from '@react-navigation/native'
 import UserCardComponent from '../components/account/UserCardComponent'
@@ -32,14 +32,14 @@ export default function Profile() {
           <View className="-mt-3 mb-0 px-10 flex-row justify-between">
             <Text className="mb-1" style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 25 }}>Account</Text>
             
-            <TouchableOpacity onPress={handleLogout}>
+            <Pressable onPress={handleLogout}>
             <View className="flex-row mt-1.5">
               <Image className="w-4 h-4 mr-1"  style={{ tintColor: '#63254E' }}
                                   source={require('./../assets/icons/exit.png')} />
               <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
               className="text-dark-pink">Sign out</Text>
             </View>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           <View>
@@ -57,7 +57,7 @@ export default function Profile() {
         </View>
 
         {/* Button */}
-        <TouchableOpacity className="bg-white border border-gray-100 mx-8 py-4 px-5 shadow-sm rounded-xl flex-row justify-between"
+        <Pressable className="bg-white border border-gray-100 mx-8 py-4 px-5 shadow-sm rounded-xl flex-row justify-between"
         onPress={()=> navigation.navigate('UserPosts')}>
             
             <View className="flex-row">
@@ -70,19 +70,19 @@ export default function Profile() {
               </Text>
             </View>
 
-            <TouchableOpacity className="bg-dark-pink py-1 w-24 rounded-full ml-12">
+            <Pressable className="bg-dark-pink py-1 w-24 rounded-full ml-12">
                             <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
                             className="text-white text-xs text-center">Boost!</Text>
-            </TouchableOpacity>
+            </Pressable>
 
             <Image className="w-5 h-5" 
                                   source={require('./../assets/icons/next.png')} />
 
-        </TouchableOpacity>
+        </Pressable>
 
         <View>
           {/* Button */}
-          <TouchableOpacity className="bg-white border border-gray-100 mx-8 py-4 px-5 shadow-sm rounded-xl flex-row justify-between mt-5">
+          <Pressable className="bg-white border border-gray-100 mx-8 py-4 px-5 shadow-sm rounded-xl flex-row justify-between mt-5">
             
             <View className="flex-row">
               <Image className="w-5 h-5 mr-4" 
@@ -97,10 +97,10 @@ export default function Profile() {
             <Image className="w-5 h-5" 
                                   source={require('./../assets/icons/next.png')} />
 
-          </TouchableOpacity>
+          </Pressable>
 
           {/* Button */}
-          <TouchableOpacity className="bg-white border border-gray-100 mx-8 py-4 px-5 shadow-sm rounded-xl flex-row justify-between mt-5"
+          <Pressable className="bg-white border border-gray-100 mx-8 py-4 px-5 shadow-sm rounded-xl flex-row justify-between mt-5"
           onPress={()=> navigation.navigate('UserSkinType')}>
 
             <View className="flex-row">
@@ -116,10 +116,10 @@ export default function Profile() {
             <Image className="w-5 h-5" 
                                   source={require('./../assets/icons/next.png')} />
 
-          </TouchableOpacity>
+          </Pressable>
 
           {/* Button */}
-          <TouchableOpacity className="bg-white border border-gray-100 mx-8 py-4 px-5 shadow-sm rounded-xl flex-row justify-between mt-5"
+          <Pressable className="bg-white border border-gray-100 mx-8 py-4 px-5 shadow-sm rounded-xl flex-row justify-between mt-5"
           onPress={()=> navigation.navigate('CGLong')}>
             
             <View className="flex-row">
@@ -135,7 +135,7 @@ export default function Profile() {
             <Image className="w-5 h-5" 
                                   source={require('./../assets/icons/next.png')} />
 
-          </TouchableOpacity>
+          </Pressable>
 
           
         </View>

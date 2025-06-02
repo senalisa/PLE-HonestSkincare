@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, SafeAreaView, Image, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, RefreshControl, StatusBar } from 'react-native';
+import { View, Text, TextInput, Pressable, FlatList, SafeAreaView, Image, ImageBackground, KeyboardAvoidingView, Platform, Modal, StatusBar } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import { doc, getDoc, collection, addDoc, query, orderBy, getDocs, serverTimestamp, updateDoc, arrayUnion, Timestamp, deleteDoc } from 'firebase/firestore';
 import { db, auth } from '../config/firebase';
@@ -7,6 +8,15 @@ import { Linking } from 'react-native';
 import { Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Swiper from 'react-native-swiper';
+
+const skincareTerms = {
+  "vitamin C": "VitaminCInfo",
+  "retinol": "RetinolInfo",
+  "niacinamide": "NiacinamideInfo",
+   "BHA": "BHAinfo",
+  // voeg meer termen toe en verwijs naar schermnamen
+};
+
 
 const addComment = async (postId, text, authorId, authorName) => {
   try {
@@ -60,6 +70,10 @@ export default function PostDetail({ route }) {
   const [replyingAuthorName, setReplyingAuthorName] = useState(null);
   const [commentCount, setCommentCount] = useState(0);
 
+  const handleReportPost = () => {
+    navigation.navigate('ReportForm', { postId: post.id, title: post.title });
+  };
+
   const handleAuthorPress = () => {
     const authorId = post.userId; // Haal de gebruikers-ID van de auteur op uit de postgegevens
     navigation.navigate('UsersProfile', { userId: authorId });
@@ -88,6 +102,59 @@ export default function PostDetail({ route }) {
 
     fetchCommentCount();
   }, [post.id]);
+
+  const [termMap, setTermMap] = useState({});
+
+useEffect(() => {
+  const fetchTerms = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "skincareTerms"));
+      const terms = {};
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.aliases && Array.isArray(data.aliases)) {
+          data.aliases.forEach(alias => {
+            terms[alias.toLowerCase()] = data.name; // sla lowercase alias op met verwijzing naar doc id
+          });
+        }
+      });
+      setTermMap(terms);
+    } catch (error) {
+      console.error("Error fetching skincare terms:", error);
+    }
+  };
+
+  fetchTerms();
+}, []);
+
+useEffect(() => {
+  console.log("TermMap geladen:", termMap);
+}, [termMap]);
+
+
+const renderClickableDescription = (text) => {
+  const words = text.split(/(\s+)/); // behoud spaties
+  return words.map((word, index) => {
+    const cleanedWord = word.toLowerCase().replace(/[.,?!]/g, '');
+    const docId = termMap[cleanedWord];
+    
+    if (docId) {
+      return (
+        <Pressable
+          key={index}
+          onPress={() => navigation.navigate("IngredientDetail", { ingredientName: docId })}
+        >
+          <Text style={{ color: '#FB6F93', fontFamily: 'Montserrat_600SemiBold' }}>{word}</Text>
+        </Pressable>
+      );
+    }
+
+    return (
+      <Text key={index} style={{ fontFamily: 'Montserrat_500Medium' }}>{word}</Text>
+    );
+  });
+};
+
 
   // Definieer de containsLink functie
     const containsLink = (text) => {
@@ -209,10 +276,10 @@ export default function PostDetail({ route }) {
         <View
         className="flex-row justify-between px-5 pt-14 pb-10">
                 {/* Back button */}
-                <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Pressable onPress={() => navigation.goBack()}>
                     <Image className="w-5 h-5" 
                                     source={require('./../assets/icons/left-arrow.png')} />
-                </TouchableOpacity>
+                </Pressable>
 
                 {/* Question or advise tag */}
                 <View className="border border-dark-pink bg-dark-pink rounded-xl w-20 p-0.5">
@@ -239,16 +306,16 @@ export default function PostDetail({ route }) {
                 </Text>
 
                 {/* Save */}
-                <TouchableOpacity>
+                <Pressable>
                         <Image className="w-5 h-5 mt-3 ml-8" style={{ tintColor: "gray"}}
                                                 source={require('./../assets/icons/save.png')} />
-                </TouchableOpacity>
+                </Pressable>
           </View>
 
             {/* Tags */}
             <View className="flex-row flex-wrap">
                 {post.skinTypeTags.map((tag, index) => (
-                    <TouchableOpacity 
+                    <Pressable 
                     key={index}
                     className="bg-light-blue border border-blue rounded-xl px-3 py-0.5 mx-1 mb-2">
                     <Text 
@@ -256,11 +323,11 @@ export default function PostDetail({ route }) {
                         className="text-center text-blue text-xs">
                         {tag}
                     </Text>
-                    </TouchableOpacity>
+                    </Pressable>
                 ))}
 
                 {post.skinConcernTags.map((tag, index) => (
-                    <TouchableOpacity 
+                    <Pressable 
                     key={index}
                     className="bg-yellow border border-dark-yellow rounded-xl px-3 py-0.5 mx-1 mb-2">
                     <Text 
@@ -268,31 +335,27 @@ export default function PostDetail({ route }) {
                         className="text-center text-dark-yellow text-xs">
                         {tag}
                     </Text>
-                    </TouchableOpacity>
+                    </Pressable>
                 ))}
 
                 {post.skincareProductTags.map((tag, index) => (
-                    <TouchableOpacity 
+                    <Pressable 
                     key={index}
-                    className="bg-pinkie border border-pink rounded-xl px-3 py-0.5 mx-1 mb-2">
+                    className="bg-pink-light border border-pink rounded-xl px-3 py-0.5 mx-1 mb-2">
                     <Text 
                         style={{ fontFamily: 'Montserrat_600SemiBold' }}
                         className="text-center text-pink text-xs">
                         {tag}
                     </Text>
-                    </TouchableOpacity>
+                    </Pressable>
                 ))}
                 </View>
         </View>
         
-        <View>
-            {/* Description */}
-            <Text 
-                    style={{ fontFamily: 'Montserrat_500Medium' }}
-                    className="pt-2 px-2 mb-3 w-100 text-base">
-                    {post.description}
-            </Text>
+        <View className="pt-2 px-2 mb-3 w-100 flex-row flex-wrap">
+          {renderClickableDescription(post.description)}
         </View>
+
         
         {/* Post PRODUCT */}
         <View>
@@ -311,12 +374,12 @@ export default function PostDetail({ route }) {
                 <Text style={{ fontFamily: 'Montserrat_400Regular', fontSize: 15 }}>{product.brandName}</Text>
                 </View>
                 {/* Link Button */}
-                <TouchableOpacity onPress={() => openProductURL(product.productURL)} style={{ backgroundColor: '#63254E', borderRadius: 20, paddingVertical: 6, paddingHorizontal: 10 }}>
+                <Pressable onPress={() => openProductURL(product.productURL)} style={{ backgroundColor: '#FB6F93', borderRadius: 20, paddingVertical: 6, paddingHorizontal: 10 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Image style={{ width: 12, height: 12, tintColor: 'white', marginRight: 4 }} source={require('./../assets/icons/link.png')} />
                     <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12, color: 'white' }}>Link</Text>
                 </View>
-                </TouchableOpacity>
+                </Pressable>
             </View>
             ))
         )}
@@ -355,12 +418,12 @@ export default function PostDetail({ route }) {
                 </View>
 
                 <View className="flex-row pt-1.5 mx-2">
-                  <TouchableOpacity onPress={handleAuthorPress}>
+                  <Pressable onPress={handleAuthorPress}>
                     <Text style={{ fontFamily: 'Montserrat_300Light', fontSize: 12 }}
                     className="underline">
                       {post.displayName}
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
 
                     <Image className="w-1 h-1 mt-1 ml-3" style={{ tintColor: "#63254E"}}
                                             source={require('./../assets/images/user.png')} />
@@ -375,15 +438,17 @@ export default function PostDetail({ route }) {
 
             {/* Likes + Comments */}
             <View className="flex-row mt-1">
+
+            {/* Report */}
+            <Pressable onPress={handleReportPost}>
+              <Image className="w-5 h-5 mr-3" style={{ tintColor: "gray"}}
+                                        source={require('./../assets/icons/spam.png')} />
+            </Pressable>
+
                 {/* Likes */}
                 <View className="flex-row">
                     <Image className="w-5 h-5 " style={{ tintColor: "gray"}}
                                         source={require('./../assets/icons/like.png')} />
-                    {/* <Text 
-                    style={{ fontFamily: 'Montserrat_500Medium', fontSize: 15 }}
-                    className="pl-2 mt-0.5">
-                        100
-                    </Text> */}
                 </View>
             </View>
         </View>
@@ -405,6 +470,7 @@ export default function PostDetail({ route }) {
                     </View>
                 </View>
         </View>
+
     </View>
   );
 
@@ -450,7 +516,7 @@ export default function PostDetail({ route }) {
 
             <View className="flex-row">
 
-                <TouchableOpacity onPress={() => {
+                <Pressable onPress={() => {
                 toggleReply(item.id, item.authorName);
                 setReplying(true);
                 }}>
@@ -458,25 +524,25 @@ export default function PostDetail({ route }) {
                 className="text-gray-400 mt-2 mr-5">
                     Reply
                 </Text>
-                </TouchableOpacity>
+                </Pressable>
 
                 {item.replies && item.replies.length > 0 && (
-                <TouchableOpacity onPress={() => toggleComment(item.id)}>
+                <Pressable onPress={() => toggleComment(item.id)}>
                     <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
                     className="text-gray-400 mt-1.5 flex-row mr-5">
                     <Image className="w-5 h-5 -mt-2 mr-1" style={{ tintColor: "#CBCACA"}}
                                         source={require('./../assets/icons/minus.png')} />
                     {expandedComments[item.id] ? `Hide ${item.replies.length} Replies` : `Show ${item.replies.length} Replies`}
                     </Text>
-                </TouchableOpacity>
+                </Pressable>
                 )}
 
                 {item.authorId === user.uid && (
                     <View className="justify-self-end">
-                        <TouchableOpacity onPress={() => handleDeleteComment(item.id)}>
+                        <Pressable onPress={() => handleDeleteComment(item.id)}>
                         <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
                         className="text-red-500 underline mt-2">Delete</Text>
-                        </TouchableOpacity>
+                        </Pressable>
                     </View>
                   )}
 
@@ -510,13 +576,6 @@ export default function PostDetail({ route }) {
 
                     <View className="flex-end">
 
-                    {/* {reply.authorId === user.uid && (
-                    <TouchableOpacity onPress={() => handleDeleteReply(item.id, reply.timestamp)}>
-                        <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
-                        className="text-red-500 underline mt-2">Delete</Text>
-                    </TouchableOpacity>
-                    )} */}
-
                     </View>
                 </View>
             ))}
@@ -538,7 +597,7 @@ export default function PostDetail({ route }) {
 )}
   
 {replying && (
-  <TouchableOpacity onPress={() => {
+  <Pressable onPress={() => {
     setReplying(false);
     setReplyingTo(null);
   }}
@@ -549,7 +608,7 @@ export default function PostDetail({ route }) {
         Cancel Reply
       </Text>
     </View>
-  </TouchableOpacity>
+  </Pressable>
 )}
 
 </View>
@@ -565,11 +624,12 @@ export default function PostDetail({ route }) {
     value={newInput}
     onChangeText={setNewInput}
   />
-  <TouchableOpacity onPress={handleAddInput} className="bg-blue-500 text-white py-2 px-4 rounded-lg mt-2">
+  <Pressable onPress={handleAddInput} className="bg-blue-500 text-white py-2 px-4 rounded-lg mt-2">
     <Image className="w-6 h-6 -mt-2" style={{ tintColor: "#63254E"}} source={require('../assets/icons/send.png')} />
-  </TouchableOpacity>
+  </Pressable>
 </View>
 </View>
+
 
     </View>
   </KeyboardAvoidingView>

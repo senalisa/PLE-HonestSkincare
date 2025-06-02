@@ -70,7 +70,7 @@ export default function UserCardComponent() {
       };
 
   return (
-        <Animated.View entering={FlipInEasyX.delay(0).duration(500).springify()}>
+        // <Animated.View entering={FlipInEasyX.delay(0).duration(500).springify()}>
         <View className="m-8 bg-white rounded-xl shadow-xl mx-auto border border-gray-200">
             {/* Card top */}
 
@@ -145,6 +145,6 @@ export default function UserCardComponent() {
             </View>
 
         </View>
-        </Animated.View>
+        // </Animated.View>
   )
 }

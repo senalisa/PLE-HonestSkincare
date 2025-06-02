@@ -10,24 +10,24 @@ module.exports = {
   theme: {
       extend: {
       colors: {
-          "dark-pink" : "#63254E",
+          "dark-pink" : "#FB6F93",
           "light-beige" : "#F5EDE5",
           "dark-beige" : "#C8BBA8",
           "pastel-green" : "#E2E0C1",
 
         // Blue
-          "light-blue" : "#F4FBFD",
-          "blue" : "#7BB6D7",
+          "light-blue" : "#F7FDFF",
+          "blue" : "#4F9EC5",
 
         //   Pink
-          "pink" : "#AE466D",
-          "pink-light" : "#EBDBE3",
+          "pink" : "#FB6F93",
+          "pink-light" : "#FFFAFB",
           "pastel-pink": "#E7B1AF",
           "pinkie" : "#F5EBEF",
 
         //Yellow
-        "yellow" : "#F2EFD7",
-        "dark-yellow" : "#B4A18A",
+        "yellow" : "#FFFEFB",
+        "dark-yellow" : "#D59630",
       },
       width: {
         '18': '4.5rem',

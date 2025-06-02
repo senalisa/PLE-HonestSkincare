@@ -70,7 +70,7 @@ export default function PostCreated({ route }) {
                             {post.skincareProductTags.map((tag, index) => (
                                 <TouchableOpacity 
                                     key={index}
-                                    className="bg-pinkie border border-pink rounded-xl px-3 py-0.5 mx-1 my-1">
+                                    className="bg-pink-light border border-pink rounded-xl px-3 py-0.5 mx-1 my-1">
                                     <Text 
                                         style={{ fontFamily: 'Montserrat_600SemiBold' }}
                                         className="text-center text-pink text-[11px]">

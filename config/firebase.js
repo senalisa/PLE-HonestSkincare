@@ -1,10 +1,15 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { getStorage, ref } from "firebase/storage";
+import { initializeApp } from 'firebase/app';
+import {
+  getAuth,
+  initializeAuth,
+  getReactNativePersistence
+} from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
+import { getFirestore } from 'firebase/firestore';
+import { getStorage, ref } from 'firebase/storage';
 
-// Your web app's Firebase configuration
+// firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyDEtvJ9J2TRJEu3V2pCERXXyAG7912vuEg",
   authDomain: "honest-skincare.firebaseapp.com",
@@ -14,14 +19,28 @@ const firebaseConfig = {
   appId: "1:597086215518:web:824118dc857377f31843cf"
 };
 
-// Initialize Firebase
+// Initialize Firebase app
 const app = initializeApp(firebaseConfig);
 
-// Initialize Cloud Firestore and get a reference to the service
-export const db = getFirestore(app);
+// Initialize Auth met veilige fallback en platformcheck
+let auth;
+if (Platform.OS === 'web') {
+  auth = getAuth(app);
+} else {
+  try {
+    auth = initializeAuth(app, {
+      persistence: getReactNativePersistence(AsyncStorage),
+    });
+  } catch (e) {
+    console.log('Fallback to getAuth():', e.message);
+    auth = getAuth(app);
+  }
+}
 
-export const auth = getAuth(app);
+// Firestore & Storage
+const db = getFirestore(app);
+const storage = getStorage(app);
+const storageRef = ref(storage, 'images/');
 
-export const storage = getStorage(app);
-
-export const storageRef = ref(storage, 'images/');
+// Exports
+export { auth, db, storage, storageRef };
