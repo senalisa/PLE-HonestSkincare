@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image, ScrollView } from 'react-native'
+import { View, Text, Pressable, Image, ScrollView } from 'react-native'
 import Animated, { FadeIn, FadeInDown, FadeInUp, FadeOut } from 'react-native-reanimated';
 import React from 'react'
 
@@ -11,7 +11,7 @@ export default function PostCard({ post }) {
     <View> 
     {/* Post Card */}
     <Animated.View entering={FadeInDown.delay(0).duration(2000).springify()}>
-        <TouchableOpacity onPress={() => navigation.navigate('PostDetail', { post: post, postId: post.id })}>
+        <Pressable onPress={() => navigation.navigate('PostDetail', { post: post, postId: post.id })}>
             <View className="relative rounded-xl bg-white shadow mx-7 px-4 py-4 mt-4">
                 <View className="flex-row">
                     {/* Post info */}
@@ -35,7 +35,7 @@ export default function PostCard({ post }) {
                         {/* Tags */}
                         <View className="flex-row pt-1 flex-wrap">
                             {post.skinTypeTags.map((tag, index) => (
-                                <TouchableOpacity 
+                                <Pressable 
                                     key={index}
                                     className="bg-light-blue border border-blue rounded-xl px-3 py-0.5 mx-1 my-1">
                                     <Text 
@@ -43,11 +43,11 @@ export default function PostCard({ post }) {
                                         className="text-center text-blue text-[11px]">
                                         {tag}
                                     </Text>
-                                </TouchableOpacity>
+                                </Pressable>
                             ))}
 
                             {post.skinConcernTags.map((tag, index) => (
-                                <TouchableOpacity 
+                                <Pressable 
                                     key={index}
                                     className="bg-yellow border border-dark-yellow rounded-xl px-3 py-0.5 mx-1 my-1">
                                     <Text 
@@ -55,29 +55,29 @@ export default function PostCard({ post }) {
                                         className="text-center text-dark-yellow text-[11px]">
                                         {tag}
                                     </Text>
-                                </TouchableOpacity>
+                                </Pressable>
                             ))}
 
                             {post.skincareProductTags.map((tag, index) => (
-                                <TouchableOpacity 
+                                <Pressable 
                                     key={index}
-                                    className="bg-pinkie border border-pink rounded-xl px-3 py-0.5 mx-1 my-1">
+                                    className="bg-pink-light border border-pink rounded-xl px-3 py-0.5 mx-1 my-1">
                                     <Text 
                                         style={{ fontFamily: 'Montserrat_600SemiBold' }}
                                         className="text-center text-pink text-[11px]">
                                         {tag}
                                     </Text>
-                                </TouchableOpacity>
+                                </Pressable>
                             ))}
                         </View>
                     </View>
 
                     {/* Save Button */}
                     <View className="absolute top-2 right-2">
-                        <TouchableOpacity>
+                        <Pressable>
                             <Image className="w-5 h-5" style={{ tintColor: "gray" }}
                                 source={require('./../assets/icons/save.png')} />
-                        </TouchableOpacity>
+                        </Pressable>
                     </View>
                 </View>
 
@@ -134,7 +134,7 @@ export default function PostCard({ post }) {
                     </View>
                 </View>
             </View>
-        </TouchableOpacity>
+        </Pressable>
     </Animated.View>
 </View>
 

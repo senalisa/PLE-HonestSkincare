@@ -814,7 +814,7 @@ const handleSavePost = async () => {
                       <Text className="text-center mb-7 underline text-dark-pink text-base" style={{ fontFamily: 'Montserrat_400Regular' }}>the Community Guidelines.</Text>
                     </TouchableOpacity>
 
-                  <TouchableOpacity onPress={() => setModalVisible(!modalAlertVisible)} className="bg-dark-pink py-1.5 mx-12 rounded-full"> 
+                  <TouchableOpacity onPress={() => setModalAlertVisible(!modalAlertVisible)} className="bg-dark-pink py-1.5 mx-12 rounded-full"> 
                     <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
                       className="text-white text-center text-base">I got it!</Text>
                   </TouchableOpacity>

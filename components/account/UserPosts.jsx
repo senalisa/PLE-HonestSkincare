@@ -76,8 +76,8 @@ export default function UserPosts() {
           
           </View>
 
-          {/* Info-card Skin type/concern */}
-        <Animated.View entering={FlipInEasyX.delay(100).duration(2000).springify()}>
+          {/* Boost post */}
+        {/* <Animated.View entering={FlipInEasyX.delay(100).duration(2000).springify()}> */}
             <View className="shadow-md bg-white mx-7 mt-4 rounded-xl mb-5">
                 <ImageBackground source={require('../../assets/images/boost-bg2.png')} style={{ borderRadius: 20, overflow: 'hidden' }}>
                     {/* Title + Info */}
@@ -99,7 +99,7 @@ export default function UserPosts() {
                 </View>
                 </ImageBackground>
             </View>
-        </Animated.View>
+        {/* </Animated.View> */}
 
           {/* Posts */}
           <View className="mb-28">

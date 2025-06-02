@@ -38,7 +38,7 @@ export default function Home() {
         if (!querySnapshot.empty) {
           const userPreferencesData = querySnapshot.docs[0].data();
           setUserPreferences(userPreferencesData);
-          console.log('Fetched user preferences:', userPreferencesData);  // Log user preferences
+          // console.log('Fetched user preferences:', userPreferencesData);  // Log user preferences
         }
       }
     } catch (error) {
@@ -65,7 +65,7 @@ export default function Home() {
           return hasMatchingSkinType && hasMatchingSkinConcerns;
         });
         setPosts(filteredPosts);
-        console.log('Filtered posts based on user preferences:', filteredPosts);  // Log filtered posts
+        // console.log('Filtered posts based on user preferences:', filteredPosts);  // Log filtered posts
       } else {
         setPosts(fetchedPosts);
         console.log('Fetched posts without filtering:', fetchedPosts);  // Log fetched posts

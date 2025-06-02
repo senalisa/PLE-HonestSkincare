@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { Pressable, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import Carousel, { TAnimationStyle } from 'react-native-reanimated-carousel';
 import { interpolate } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
@@ -77,7 +77,7 @@ export default function ArticleCard() {
         loop
         data={articles}
         renderItem={({ item, index }) => (
-          <TouchableWithoutFeedback
+          <Pressable
             key={index}
             onPress={() => navigation.navigate('Article', { articleId: item.id })}
             containerStyle={{ flex: 1 }}
@@ -97,7 +97,7 @@ export default function ArticleCard() {
             >
               <Image source={{ uri: item.articleCover }} style={styles.image} />
             </View>
-          </TouchableWithoutFeedback>
+          </Pressable>
         )}
         customAnimation={animationStyle}
       />

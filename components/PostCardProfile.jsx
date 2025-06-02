@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, Text, Pressable, Image } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import React from 'react';
 import { Swipeable } from 'react-native-gesture-handler';
@@ -11,29 +11,29 @@ export default function PostCardProfile({ post, onDelete, onEdit }) {
     const renderRightActions = () => (
         <View className="flex-row -ml-5">
             {/* Edit */}
-             <TouchableOpacity
+             <Pressable
                 className="justify-center items-center w-20 h-full"
                 onPress={() => onEdit(post)}
             >
                 <FontAwesome name="edit" size={24} color="#63254E" />
                 <Text className="text-dark-pink">Edit</Text>
-            </TouchableOpacity>
+            </Pressable>
 
             {/* Delete */}
-            <TouchableOpacity 
+            <Pressable 
                 className="justify-center items-center w-20 h-full"
                 onPress={() => onDelete(post.id)}
             >
                 <FontAwesome name="trash" size={24} color="#790000" />
                 <Text className="text-red-800">Delete</Text>
-            </TouchableOpacity>
+            </Pressable>
         </View>
     );
 
     return (
         <Swipeable renderRightActions={renderRightActions}>
-            <Animated.View entering={FadeInDown.delay(0).duration(2000).springify()}>
-                <TouchableOpacity onPress={() => navigation.navigate('PostDetail', { post: post, postId: post.id })}>
+            {/* <Animated.View entering={FadeInDown.delay(0).duration(2000).springify()}> */}
+                <Pressable onPress={() => navigation.navigate('PostDetail', { post: post, postId: post.id })}>
                     <View className="relative rounded-xl bg-white shadow mx-7 px-4 py-4 mt-4 mb-3">
                         <View className="flex-row">
                             {/* Post info */}
@@ -59,7 +59,7 @@ export default function PostCardProfile({ post, onDelete, onEdit }) {
                                 {/* Tags */}
                                 <View className="flex-row pt-1 flex-wrap">
                                     {post.skinTypeTags.map((tag, index) => (
-                                        <TouchableOpacity
+                                        <Pressable
                                             key={index}
                                             className="bg-light-blue border border-blue rounded-xl px-3 py-0.5 mx-1 my-1"
                                         >
@@ -69,11 +69,11 @@ export default function PostCardProfile({ post, onDelete, onEdit }) {
                                             >
                                                 {tag}
                                             </Text>
-                                        </TouchableOpacity>
+                                        </Pressable>
                                     ))}
 
                                     {post.skinConcernTags.map((tag, index) => (
-                                        <TouchableOpacity
+                                        <Pressable
                                             key={index}
                                             className="bg-yellow border border-dark-yellow rounded-xl px-3 py-0.5 mx-1 my-1"
                                         >
@@ -83,13 +83,13 @@ export default function PostCardProfile({ post, onDelete, onEdit }) {
                                             >
                                                 {tag}
                                             </Text>
-                                        </TouchableOpacity>
+                                        </Pressable>
                                     ))}
 
                                     {post.skincareProductTags.map((tag, index) => (
-                                        <TouchableOpacity
+                                        <Pressable
                                             key={index}
-                                            className="bg-pinkie border border-pink rounded-xl px-3 py-0.5 mx-1 my-1"
+                                            className="bg-pink-light border border-pink rounded-xl px-3 py-0.5 mx-1 my-1"
                                         >
                                             <Text
                                                 style={{ fontFamily: 'Montserrat_600SemiBold' }}
@@ -97,20 +97,20 @@ export default function PostCardProfile({ post, onDelete, onEdit }) {
                                             >
                                                 {tag}
                                             </Text>
-                                        </TouchableOpacity>
+                                        </Pressable>
                                     ))}
                                 </View>
                             </View>
 
                             {/* Save Button */}
                             <View className="absolute top-2 right-2">
-                                <TouchableOpacity>
+                                <Pressable>
                                     <Image
                                         className="w-5 h-5"
                                         style={{ tintColor: 'gray' }}
                                         source={require('./../assets/icons/save.png')}
                                     />
-                                </TouchableOpacity>
+                                </Pressable>
                             </View>
                         </View>
 
@@ -179,8 +179,8 @@ export default function PostCardProfile({ post, onDelete, onEdit }) {
                             </View>
                         </View>
                     </View>
-                </TouchableOpacity>
-            </Animated.View>
+                </Pressable>
+            {/* </Animated.View> */}
         </Swipeable>
     );
 }

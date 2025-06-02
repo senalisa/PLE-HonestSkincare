@@ -4,7 +4,7 @@ import ArticleCard from '../components/ArticleCard'
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db, auth } from './../config/firebase';
 import TopicAll from '../components/TopicAll';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Pressable } from 'react-native-gesture-handler';
 import Search from '../components/Search';
 
 export default function Discover() {
@@ -67,7 +67,7 @@ export default function Discover() {
           {/* Search Bar */}
           <View className="px-10 flex-row justify-between mt-6">
             {/* Search Icon */}
-            <TouchableOpacity 
+            <Pressable 
                 style={{ paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between' }}
                 onPress={openSearchModal}
               >
@@ -78,7 +78,7 @@ export default function Discover() {
                     Search...
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </Pressable>
 
               {/* Search Modal */}
               <Search visible={searchVisible} onClose={closeSearchModal}/>
