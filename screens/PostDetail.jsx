@@ -9,14 +9,6 @@ import { Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Swiper from 'react-native-swiper';
 
-const skincareTerms = {
-  "vitamin C": "VitaminCInfo",
-  "retinol": "RetinolInfo",
-  "niacinamide": "NiacinamideInfo",
-   "BHA": "BHAinfo",
-  // voeg meer termen toe en verwijs naar schermnamen
-};
-
 
 const addComment = async (postId, text, authorId, authorName) => {
   try {
@@ -144,7 +136,10 @@ const renderClickableDescription = (text) => {
           key={index}
           onPress={() => navigation.navigate("IngredientDetail", { ingredientName: docId })}
         >
-          <Text style={{ color: '#FB6F93', fontFamily: 'Montserrat_600SemiBold' }}>{word}</Text>
+          <Text 
+          style={{ color: '#FB6F93', fontFamily: 'Montserrat_600SemiBold' }}
+          className="underline"
+          >{word}</Text>
         </Pressable>
       );
     }
