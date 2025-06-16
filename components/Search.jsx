@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Modal, TouchableOpacity, Text, Image, FlatList } from 'react-native';
+import { View, TextInput, Modal, TouchableOpacity, Text, Image, FlatList, Pressable } from 'react-native';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useNavigation } from '@react-navigation/native';
@@ -134,15 +134,15 @@ export default function Search({ visible, onClose }) {
 
                     <View className="flex-row mx-auto mt-3 mb-3">
                         {/* PostType filter buttons */}
-                        <TouchableOpacity className={`border ${postTypeFilter === 'all' ? 'border-dark-pink bg-dark-pink' : 'border-gray-200 bg-white'} rounded-full px-10 py-1 ml-1`} onPress={() => setPostTypeFilter('all')}>
+                        <TouchableOpacity className={`border ${postTypeFilter === 'all' ? 'border-dark-pink bg-dark-pink' : 'border-gray-200 bg-white'} rounded-full px-6 py-1 ml-1`} onPress={() => setPostTypeFilter('all')}>
                         <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15 }} className={`text-${postTypeFilter === 'all' ? 'white' : 'gray-400'} text-center`}>All</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity className={`border ${postTypeFilter === 'Advice' ? 'border-dark-pink bg-dark-pink' : 'border-gray-200 bg-white'} rounded-full px-10 py-1 ml-3`} onPress={() => setPostTypeFilter('Advice')}>
+                        <TouchableOpacity className={`border ${postTypeFilter === 'Advice' ? 'border-dark-pink bg-dark-pink' : 'border-gray-200 bg-white'} rounded-full px-6 py-1 ml-3`} onPress={() => setPostTypeFilter('Advice')}>
                         <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15 }} className={`text-${postTypeFilter === 'Advice' ? 'white' : 'gray-400'} text-center`}>Advice</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity className={`border ${postTypeFilter === 'Question' ? 'border-dark-pink bg-dark-pink' : 'border-gray-200 bg-white'} rounded-full px-9 py-1 ml-3`} onPress={() => setPostTypeFilter('Question')}>
+                        <TouchableOpacity className={`border ${postTypeFilter === 'Question' ? 'border-dark-pink bg-dark-pink' : 'border-gray-200 bg-white'} rounded-full px-6 py-1 ml-3`} onPress={() => setPostTypeFilter('Question')}>
                         <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 15 }} className={`text-${postTypeFilter === 'Question' ? 'white' : 'gray-400'} text-center`}>Question</Text>
                         </TouchableOpacity>
                     </View>
@@ -151,7 +151,12 @@ export default function Search({ visible, onClose }) {
                         data={searchResults}
                         renderItem={({ item }) => (
                             <View style={{ paddingVertical: 5 }}>
-                                <TouchableOpacity onPress={() => navigation.navigate('PostDetail', { post: item, postId: item.id })}>
+                               <Pressable onPress={() => {
+                                    onClose(); // sluit eerst de modal
+                                    setTimeout(() => {
+                                    navigation.navigate('PostDetail', { post: item, postId: item.id });
+                                    }, 300); // kleine vertraging zodat de modal eerst netjes sluit
+                                }}>
                                     <View className="relative rounded-xl bg-white shadow mx-7 px-4 py-4 mt-4">
                                         <View className="flex-row">
                                             <View className="flex-1 flex-wrap">
@@ -224,7 +229,7 @@ export default function Search({ visible, onClose }) {
                                             </View>
                                         </View>
                                     </View>
-                                </TouchableOpacity>
+                                </Pressable>
                             </View>
                         )}
                         keyExtractor={item => item.id}

@@ -30,6 +30,11 @@ import CGLong from '../components/community/CGlong.jsx';
 import UserPosts from '../components/account/UserPosts.jsx';
 import UsersProfile from '../components/UsersProfile.jsx';
 import ReportForm from '../components/report/ReportForm.jsx';
+import Glossary from '../screens/Glossary.jsx';
+import AllArticles from '../screens/AllArticles.jsx';
+import ArticlesFilter from '../components/ArticlesFilter.jsx';
+import ExpertProfile from '../components/account/ExpertProfile.jsx';
+
 
 
 // Animation
@@ -142,11 +147,11 @@ const Tabs = () => {
                 )
                 }} />
 
-            <Tab.Screen name="Leaderboard" component={Leaderboard} options={{
+            <Tab.Screen name="Glossary" component={Glossary} options={{
                 tabBarIcon: ({focused}) => (
                     <View style={{alignItems: 'center', justifyContent: 'center', top: 5}}>
                         <Image
-                        source={require('./../assets/icons/ranking-star.png')}
+                        source={require('./../assets/icons/book-bookmark.png')}
                         resizeMode="contain"
                         style={{
                             width: 25,
@@ -154,7 +159,6 @@ const Tabs = () => {
                             tintColor: focused ? '#FB6F93' : 'grey'
                         }}
                         />
-
                     </View>
                 )
             }}/>
@@ -206,6 +210,10 @@ const AppNavigation = () => {
                     <Stack.Screen name="ReportForm" component={ReportForm} options={{ headerShown: false }} />
                     <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
                     <Stack.Screen name="IngredientDetail" component={IngredientInfoScreen} options={{ headerShown: false }} />
+                    <Stack.Screen name="Glossary" component={Glossary} options={{ headerShown: false }} />
+                    <Stack.Screen name="AllArticles" component={AllArticles} options={{ headerShown: false }} />
+                    <Stack.Screen name="ArticlesFilter" component={ArticlesFilter} options={{ headerShown: false }} />
+                    <Stack.Screen name="ExpertProfile" component={ExpertProfile} options={{ headerShown: false }} />
                 </>
                 ) : (
                 <>

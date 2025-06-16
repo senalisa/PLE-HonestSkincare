@@ -98,7 +98,7 @@ export default function Home() {
       <View className="flex-[1] white">
 
         {/* INTRO */}
-        <ImageBackground source={require('./../assets/images/home-bg2.png')} resizeMode="cover" imageStyle= {{opacity:0.3}}>
+        <ImageBackground source={require('./../assets/images/home-bg5.png')} resizeMode="cover">
 
           <View className="mt-10 mb-10">
 
