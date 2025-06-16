@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, SafeAreaView, Image, ImageBackground, KeyboardAvoidingView, Platform} from 'react-native';
+import { View, Text, PixelRatio, TextInput, TouchableOpacity, FlatList, Pressable, Image, ImageBackground, KeyboardAvoidingView, Platform} from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { doc, getDoc, collection, addDoc, query, orderBy, getDocs, serverTimestamp, updateDoc, arrayUnion, Timestamp, deleteDoc} from 'firebase/firestore';
 import { db, auth } from '../config/firebase'; 
@@ -8,6 +8,8 @@ import { useNavigation } from '@react-navigation/native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { format } from 'date-fns';
+import ExpertPopUp from '../components/ExpertPopUp'
 
 //Function to add a comment
 const addComment = async (articleId, text, authorId, authorName) => {
@@ -63,6 +65,15 @@ export default function Article() {
   const [replying, setReplying] = useState(false);
   const [replyingAuthorName, setReplyingAuthorName] = useState(null);
   const [commentCount, setCommentCount] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+
+  const [showAuthor, setShowAuthor] = useState(false);
+
+   //Responsive font size
+      const fontScale = PixelRatio.getFontScale();
+      const getFontSize = size => size / fontScale;
+
 
   //Fetch the article
   useEffect(() => {
@@ -72,9 +83,13 @@ export default function Article() {
         const articleSnap = await getDoc(articleRef);
 
         if (articleSnap.exists()) {
-          setArticle(articleSnap.data());
-        } else {
-          console.log('No such document!');
+          const data = articleSnap.data();
+          setArticle(data);
+          const userId = auth.currentUser?.uid;
+          if (userId) {
+            setIsLiked(data.likedBy?.includes(userId));
+            setIsSaved(data.savedBy?.includes(userId));
+          }
         }
       } catch (error) {
         console.error('Error fetching article:', error);
@@ -89,6 +104,43 @@ export default function Article() {
     fetchArticle();
     fetchComments();
   }, [articleId]);
+
+  const toggleLike = async () => {
+  const userId = auth.currentUser?.uid;
+  if (!userId || !article) return;
+
+  const articleRef = doc(db, 'articles', articleId);
+
+  if (isLiked) {
+    await updateDoc(articleRef, {
+      likedBy: arrayRemove(userId),
+      likes: article.likes - 1
+    });
+    setIsLiked(false);
+    setArticle(prev => ({ ...prev, likes: prev.likes - 1 }));
+  } else {
+    await updateDoc(articleRef, {
+      likedBy: arrayUnion(userId),
+      likes: article.likes + 1
+    });
+    setIsLiked(true);
+    setArticle(prev => ({ ...prev, likes: prev.likes + 1 }));
+  }
+};
+
+
+  const toggleSave = async () => {
+    const userId = auth.currentUser?.uid;
+    if (!userId) return;
+    const articleRef = doc(db, 'articles', articleId);
+    if (isSaved) {
+      await updateDoc(articleRef, { savedBy: arrayRemove(userId) });
+      setIsSaved(false);
+    } else {
+      await updateDoc(articleRef, { savedBy: arrayUnion(userId) });
+      setIsSaved(true);
+    }
+  };
 
   //Fetch the comment count
   useEffect(() => {
@@ -195,16 +247,39 @@ export default function Article() {
 
   // RRender the description of an article
   const renderDescription = () => {
-    return article.articleDescription.map((desc, index) => (
-      <Text
-        key={index}
-        className="mt-5"
-        style={{ fontFamily: 'Montserrat_500Medium', fontSize: 16 }}
-      >
-        {desc}
+  if (!article.sections || !Array.isArray(article.sections)) return null;
+
+  return article.sections.map((section, index) => (
+    <View key={index} className="mt-6">
+      <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(14) }}>
+        {section.subtitle}
       </Text>
-    ));
-  };
+      <Text style={{ fontFamily: 'Montserrat_400Regular', fontSize: getFontSize(14) }} className="mt-1">
+        {section.text}
+      </Text>
+      {section.image && (
+        <Image
+          source={{ uri: section.image }}
+          className="mt-2 w-full h-48 rounded-lg"
+          resizeMode="cover"
+        />
+      )}
+    </View>
+  ));
+};
+
+const getReadTime = (sections) => {
+  const totalWords = sections.reduce((count, section) => {
+    const wordsInText = section.text?.split(/\s+/).length || 0;
+    const wordsInSubtitle = section.subtitle?.split(/\s+/).length || 0;
+    return count + wordsInText + wordsInSubtitle;
+  }, 0);
+
+  const minutes = Math.ceil(totalWords / 200); // 200 woorden per minuut lezen
+  return `${minutes} min${minutes > 1 ? 's' : ''} read`;
+};
+
+
 
   // Load indicator
   if (!article) {
@@ -216,52 +291,190 @@ export default function Article() {
   }
 
   // Head of an article
-  const renderHeader = () => (
+  const renderHeader = () => {const formattedDate = format(article.createdAt.toDate(), 'MMM d, yyyy'); 
+
+return (
+    
     <View>
       {/* Background image */}
-      <ImageBackground source={{ uri: article.articleImage }} resizeMode="cover">
-        <View className="flex-row justify-start">
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            className="bg-primary-dark px-2 rounded-tr-2xl rounded-bl-2xl ml-4 pb-40 pt-14 shadow">
-            <Image className="w-5 h-5" source={require('./../assets/icons/left-arrow.png')} />
-          </TouchableOpacity>
-        </View>
+      <ImageBackground source={{ uri: article.articleCover }} resizeMode="cover">
+         <View
+                className="flex-row justify-between bg-primary-dark px-2 rounded-tr-2xl rounded-bl-2xl mx-4 pb-40 pt-14 shadow">
+                        {/* Back button */}
+                        <Pressable onPress={() => navigation.goBack()}>
+                            <Image className="w-5 h-5" 
+                                            source={require('./../assets/icons/left-arrow.png')} />
+                        </Pressable>
+        
+                        {/* Article Tag */}
+                        <View className="flex-row flex-wrap gap-2">
+                        {article.tags.articleCategory?.map((tag, index) => (
+                          <View key={index} className="border border-dark-pink bg-dark-pink rounded-xl px-2 py-0.5">
+                            <Text
+                              style={{ fontFamily: 'Montserrat_600SemiBold' }}
+                              className="text-white text-xs">
+                              {tag}
+                            </Text>
+                          </View>
+                        ))}
+                      </View>
+                </View> 
       </ImageBackground>
 
-      {/* Title */}
-      <View className="-mt-14 bg-white rounded-t-xl pt-8 pb-5 px-6">
-        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 22 }}
+      <View className="-mt-20 bg-white rounded-t-3xl pb-5 px-6" style={{
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: -8 }, // naar boven
+            shadowOpacity: 0.08,
+            shadowRadius: 6,
+            zIndex: 5, // zodat hij boven andere elementen ligt indien nodig
+          }}>
+
+        <View className="flex-row justify-between items-center mt-7 mb-2 px-1">
+          {/* Links: datum + leestijd */}
+          <Text
+            style={{ fontFamily: 'Montserrat_400Regular', fontSize: getFontSize(11) }}
+            className="text-gray-500"
+          >
+            {formattedDate} – {getReadTime(article.sections)}
+          </Text>
+
+          {/* Rechts: Save button */}
+          <Pressable onPress={toggleSave}>
+            <Image
+              source={require('../assets/icons/save.png')}
+              className="w-5 h-5"
+              style={{ tintColor: '#888' }} // Optioneel: kleur aanpassen
+            />
+          </Pressable>
+        </View>
+
+
+        {/* Title */}
+        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(20) }}
         className="font-bold">{article.articleTitle}</Text>
+
+        {/* Intro */}
+        <Text style={{ fontFamily: 'Montserrat_400Regular', fontSize: getFontSize(14) }}
+        className="font-bold mt-3">{article.articleIntro}</Text>
+
+        {/* Tags */}
+        <View className="mt-3 space-y-2 flex-row flex-wrap items-center">
+            {/* Skin Types */}
+            {article.tags?.skinTypes?.length > 0 && (
+              <View className="flex-row flex-wrap gap-2 items-center mr-2">
+                {/* <Text className="text-gray-600" style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(12) }}>Skin Type:</Text> */}
+                {article.tags.skinTypes.map((tag, index) => (
+                  <View key={index} className="bg-light-blue px-2 py-0.5 rounded-full border border-blue">
+                    <Text className="text-blue" style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(11) }}>
+                      {tag}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {/* Skin Concerns */}
+            {article.tags?.skinConcerns?.length > 0 && (
+              <View className="flex-row flex-wrap gap-2 items-center mr-2">
+                {/* <Text className="text-xs font-semibold text-gray-600">Concerns:</Text> */}
+                {article.tags.skinConcerns.map((tag, index) => (
+                  <View key={index} className="bg-yellow px-2 py-0.5 rounded-full border border-dark-yellow">
+                    <Text className="text-xs text-dark-yellow" style={{ fontFamily: 'Montserrat_500Medium' , fontSize: getFontSize(11) }}>
+                      {tag}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {/* Ingredient Tags */}
+            {article.tags?.ingredients?.length > 0 && (
+              <View className="flex-row flex-wrap gap-2 items-center mr-2">
+                {/* <Text className="text-xs font-semibold text-gray-600">Ingredients:</Text> */}
+                {article.tags.ingredients.map((tag, index) => (
+                  <View key={index} className="bg-red-50 px-2 py-0.5 rounded-full border border-red-700">
+                    <Text className="text-xs text-red-700" style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(11) }}>
+                      {tag}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {/* Sustainability Tags */}
+            {article.tags?.sustainability?.length > 0 && (
+              <View className="flex-row flex-wrap gap-2 items-center mr-2">
+                {/* <Text className="text-xs font-semibold text-gray-600">Sustainability:</Text> */}
+                {article.tags.sustainability.map((tag, index) => (
+                  <View key={index} className="bg-green-50 border border-green-800 px-2 py-0.5 rounded-full">
+                    <Text className="text-xs text-green-800" style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(11) }}>
+                      {tag}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+
+      <Pressable className="flex-row items-center pt-3" onPress={() => setShowAuthor(true)}>
+        <Image className="w-5 h-5" source={require('./../assets/images/user.png')} />
+        <Text style={{ fontFamily: 'Montserrat_400Regular', fontSize: getFontSize(12) }} className="px-2 underline text-dark-pink">
+          {article.author}
+        </Text>
+      </Pressable>
+
+      {/* Line */}
+      <View className="border-b border-gray-300 mt-5" />
 
       {/* Description */}
       <View>
         {renderDescription()}
       </View>
 
-        {/* Finish line */}
-        <Text className="mt-5 text-dark-pink" style={{ fontFamily: 'Montserrat_500Medium_Italic', fontSize: 16 }}>
-        Share your thoughts and experiences!
-        </Text>
+      {/* Line */}
+      <View className="border-b border-gray-300 mt-8" />
 
-        {/* Author */}
-        <View className="flex-row pt-8">
-                        <Text
-                        style={{ fontFamily: 'Montserrat_300Light', fontSize: 12 }}>
-                            Honest Skincare Staff
-                        </Text>
-
-                        <Image className="w-1 h-1 mt-1 ml-3" style={{ tintColor: "#63254E"}}
-                                                source={require('./../assets/images/user.png')} />
-
-                        <Text 
-                        className="ml-3"
-                        style={{ fontFamily: 'Montserrat_300Light', fontSize: 12 }}>
-                            4 days ago
-                        </Text>
+      <View className="flex-row justify-between items-center mt-4 px-2">
+      {/* Like button */}
+      <TouchableOpacity onPress={toggleLike}>
+        <View className="flex-row items-center">
+          <Image
+            source={require('../assets/icons/like.png')}
+            className="w-6 h-6 mr-2"
+            style={{ tintColor: '#888' }}
+          />
+          <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(12) }}>
+            {article.likes ?? 0}
+          </Text>
         </View>
+      </TouchableOpacity>
 
+      {/* Comment button */}
+      <TouchableOpacity onPress={() => console.log('Comment')}>
+        <View className="flex-row items-center">
+          <Image
+            source={require('../assets/icons/speech-bubble.png')}
+            className="w-6 h-6 mr-2"
+            style={{ tintColor: '#888' }}
+          />
+          <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(12) }}>
+            {commentCount}
+          </Text>
         </View>
+      </TouchableOpacity>
+
+      {/* Info button */}
+      <TouchableOpacity onPress={() => console.log('Info')}>
+        <Image
+          source={require('../assets/icons/info.png')}
+          className="w-6 h-6"
+          style={{ tintColor: '#888' }}
+        />
+      </TouchableOpacity>
+    </View>
+
+      
+      </View>
 
         {/* Comments text */}
         <View className="mt-6 mb-2 mx-5 flex-row">
@@ -269,17 +482,29 @@ export default function Article() {
                 Comments 
                 </Text>
 
-                <View className="-mt-1">
+                {/* <View className="-mt-1">
                     <View className="bg-gray-300 px-1.5 rounded-full ml-1">
                         <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 13 }}
                         className="py-0.5 text-white">
                             {commentCount} 
                         </Text>
                     </View>
-                </View>
+                </View> */}
         </View>
+
+        <ExpertPopUp
+          visible={showAuthor}
+          onClose={() => setShowAuthor(false)}
+          onViewProfile={() => {
+            setShowAuthor(false);
+            navigation.navigate('ExpertProfile');
+          }}
+        />
+
     </View>
-  );
+    
+    );
+  };
 
   return (
     // Comments
@@ -310,16 +535,16 @@ export default function Article() {
                 <View className="bg-white p-3 rounded-xl shadow-sm">
                     <View className="flex-row">
 
-                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
+                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(12) }}
                         className="font-bold mb-1">{item.authorName} </Text>
 
                         <Text className="ml-2 mt-0.5 text-gray-400"
-                        style={{ fontFamily: 'Montserrat_500Medium', fontSize: 10 }}
+                        style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(10) }}
                         >{getTimeAgo(item.timestamp)}</Text>
 
                     </View>
                 
-                    <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 14 }} className="pr-8">{item.text}</Text>
+                    <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(12) }} className="pr-8">{item.text}</Text>
                 </View>
 
             <View className="flex-row">
@@ -328,7 +553,7 @@ export default function Article() {
                 toggleReply(item.id, item.authorName);
                 setReplying(true);
                 }}>
-                <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
+                <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(12) }}
                 className="text-gray-400 mt-2 mr-5">
                     Reply
                 </Text>
@@ -336,10 +561,8 @@ export default function Article() {
 
                 {item.replies && item.replies.length > 0 && (
                 <TouchableOpacity onPress={() => toggleComment(item.id)}>
-                    <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
-                    className="text-gray-400 mt-1.5 flex-row mr-5">
-                    <Image className="w-5 h-5 -mt-2 mr-1" style={{ tintColor: "#CBCACA"}}
-                                        source={require('./../assets/icons/minus.png')} />
+                    <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(12) }}
+                    className="text-gray-400 mt-2 mr-5">
                     {expandedComments[item.id] ? `Hide ${item.replies.length} Replies` : `Show ${item.replies.length} Replies`}
                     </Text>
                 </TouchableOpacity>
@@ -348,7 +571,7 @@ export default function Article() {
                 {item.authorId === user.uid && (
                     <View className="justify-self-end">
                         <TouchableOpacity onPress={() => handleDeleteComment(item.id)}>
-                        <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
+                        <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(12) }}
                         className="text-red-500 underline mt-2">Delete</Text>
                         </TouchableOpacity>
                     </View>
@@ -433,12 +656,12 @@ export default function Article() {
     onChangeText={setNewInput}
   />
   <TouchableOpacity onPress={handleAddInput} className="bg-blue-500 text-white py-2 px-4 rounded-lg mt-2">
-    <Image className="w-6 h-6 -mt-2" style={{ tintColor: "#63254E"}} source={require('../assets/icons/send.png')} />
+    <Image className="w-6 h-6 -mt-2" style={{ tintColor: "#FB6F93"}} source={require('../assets/icons/send.png')} />
   </TouchableOpacity>
 </View>
 </View>
 
-    </View>
+</View>
   </KeyboardAvoidingView>
   )
 };

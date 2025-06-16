@@ -25,16 +25,19 @@ export default function CategorySearch() {
         const queryBySkinType = query(postsCollectionRef, where('skinTypeTags', 'array-contains', topicData.topic));
         const queryBySkinConcerns = query(postsCollectionRef, where('skinConcernTags', 'array-contains', topicData.topic));
         const queryBySkincareProduct = query(postsCollectionRef, where('skincareProductTags', 'array-contains', topicData.topic));
+        const queryBySustainability = query(postsCollectionRef, where('sustainabilityTags', 'array-contains', topicData.topic));
 
         const querySnapshotBySkinType = await getDocs(queryBySkinType);
         const querySnapshotBySkinConcerns = await getDocs(queryBySkinConcerns);
         const querySnapshotBySkincareProduct = await getDocs(queryBySkincareProduct);
+        const querySnapshotBySustainability = await getDocs(queryBySustainability);
 
         const postsBySkinType = querySnapshotBySkinType.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         const postsBySkinConcerns = querySnapshotBySkinConcerns.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         const postsBySkincareProduct = querySnapshotBySkincareProduct.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const postsBySustainability = querySnapshotBySustainability.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        const allRelatedPosts = [...postsBySkinType, ...postsBySkinConcerns, ...postsBySkincareProduct];
+        const allRelatedPosts = [...postsBySkinType, ...postsBySkinConcerns, ...postsBySkincareProduct, ...postsBySustainability];
         setRelatedPosts(allRelatedPosts);
       } catch (error) {
         console.error('Error fetching related posts:', error);
@@ -96,7 +99,7 @@ export default function CategorySearch() {
       {/* Info-card Skin type/concern */}
       <Animated.View entering={FlipInEasyX.delay(100).duration(2000).springify()}>
         <View className="flex-row shadow-md mx-7 rounded-xl mb-8 items-center">
-          <ImageBackground source={require('./../assets/images/topic-bg.png')} imageStyle={{ opacity: 0.1 }} className="flex-row items-center rounded-xl border-gray-100" style={{ borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: '#E5E5E5' }}>
+          <ImageBackground source={require('./../assets/images/category-bg.png')} className="flex-row items-center rounded-xl border-gray-100" style={{ borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: '#E5E5E5' }}>
             {/* Title + Info */}
             <View className="w-40 ml-5 py-5 mr-9">
               <Text style={{ fontFamily: 'Montserrat_600SemiBold' }} className="mb-2 text-lg">

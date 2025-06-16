@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
-import { Pressable, TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { View, Text, TouchableOpacity, Image, PixelRatio } from 'react-native';
+import { Pressable } from 'react-native-gesture-handler';
 import Carousel, { TAnimationStyle } from 'react-native-reanimated-carousel';
 import { interpolate } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
@@ -13,6 +13,10 @@ const windowWidth = Dimensions.get('window').width;
 const PAGE_WIDTH = windowWidth;
 
 export default function ArticleCard() {
+  //Responsive font size
+      const fontScale = PixelRatio.getFontScale();
+      const getFontSize = size => size / fontScale;
+
   const navigation = useNavigation();
   const [articles, setArticles] = useState([]);
 
@@ -89,13 +93,17 @@ export default function ArticleCard() {
                 backgroundColor: "white",
                 flex: 1,
                 borderRadius: 10,
-                justifyContent: "center",
                 overflow: "hidden",
-                alignItems: "center",
                 borderWidth: 1, borderColor: '#EFEFEF' 
               }}
             >
               <Image source={{ uri: item.articleCover }} style={styles.image} />
+              <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(14) }} className="px-4 mt-4">{ item.articleTitle }</Text>
+              <View className="flex-row items-center px-4 pt-4">
+                  <Image className="w-4 h-4" 
+                                  source={require('./../assets/images/user.png')} />
+                  <Text style={{ fontFamily: 'Montserrat_400Regular', fontSize: getFontSize(9) }} className="px-2">{ item.author }</Text>
+              </View>
             </View>
           </Pressable>
         )}
@@ -107,8 +115,9 @@ export default function ArticleCard() {
 
 const styles = StyleSheet.create({
   image: {
-    width: 170,
-    height: 230,
-    borderRadius: 10,
+    width: '100%',
+    height: 100,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   }
 });

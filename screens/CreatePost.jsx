@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, Modal, TextInput, FlatList, Text, ImageBackground, Image, ScrollView, Alert } from 'react-native';
+import { View, TouchableOpacity, Modal, TextInput, FlatList, Text, ImageBackground, Image, ScrollView, Alert, Pressable, PixelRatio } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
 import { query, where, getDocs, collection, addDoc } from 'firebase/firestore';
@@ -13,12 +13,17 @@ import { useNavigation } from '@react-navigation/native';
 export default function CreatePost() {
   const navigation = useNavigation();
 
+    //Responsive font size
+          const fontScale = PixelRatio.getFontScale();
+          const getFontSize = size => size / fontScale;
+
   const [postType, setPostType] = useState(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [selectedSkinTypeTags, setSelectedSkinTypeTags] = useState([]);
   const [selectedSkinConcernTags, setSelectedSkinConcernTags] = useState([]);
   const [selectedSkincareProductTags, setSelectedSkincareProductTags] = useState([]);
+  const [selectedSustainabilityTags, setSelectedSustainabilityTags] = useState([]);
   const [userId, setUserId] = useState(null);
   const [displayName, setDisplayName] = useState('');
 
@@ -95,13 +100,15 @@ export default function CreatePost() {
     skinType: true,
     skinConcern: false,
     skincareProduct: false,
+    sustainability: false, 
   });
 
   // Styles of the tags
   const tagStyles = {
-    skinType: 'bg-light-blue border-2 border-blue',
-    skinConcern: 'bg-yellow border-2 border-dark-yellow',
-    skincareProduct: 'bg-pinkie border-2 border-pink',
+    skinType: 'bg-light-blue border-1 border-blue',
+    skinConcern: 'bg-yellow border-1 border-dark-yellow',
+    skincareProduct: 'bg-light-pink border-1 border-dark-pink',
+    sustainability: 'bg-green-50 border-1 border-green-600',
   };
 
   //Toggle section of tags
@@ -130,6 +137,12 @@ export default function CreatePost() {
           prevTags.includes(tag) ? prevTags.filter(item => item !== tag) : [...prevTags, tag]
         );
         break;
+      case 'sustainability':
+        setSelectedSustainabilityTags(prevTags =>
+          prevTags.includes(tag) ? prevTags.filter(item => item !== tag) : [...prevTags, tag]
+        );
+        break;
+
       default:
         break;
     }
@@ -142,26 +155,29 @@ export default function CreatePost() {
         {visibleSections[type] && ( // Controleer of de sectie zichtbaar is
           <View className="flex-row flex-wrap w-full">
             {tags.map(tag => (
-              <TouchableOpacity
+              <Pressable
                 key={tag}
-                className={`border border-gray-100 px-5 py-1.5 rounded-full mr-2 mb-2 bg-white ${
+                className={`border border-gray-100 px-5 py-1.5 rounded-full mr-2 mb-3 bg-white ${
                   selectedSkinTypeTags.includes(tag) ? tagStyles.skinType : ''
                 } ${
                   selectedSkinConcernTags.includes(tag) ? tagStyles.skinConcern : ''
                 } ${
                   selectedSkincareProductTags.includes(tag) ? tagStyles.skincareProduct : ''
+                } ${
+                  selectedSustainabilityTags.includes(tag) ? tagStyles.sustainability : ''
                 }`}
                 onPress={() => toggleTag(tag, type)}>
                 <Text 
-                  style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 13 }}
+                  style={{ fontFamily: 'Montserrat_500Medium', fontSize: 12 }}
                   className={`text-center ${
                     selectedSkinTypeTags.includes(tag) ? 'text-blue' : 
                     selectedSkinConcernTags.includes(tag) ? 'text-dark-yellow' :
-                    selectedSkincareProductTags.includes(tag) ? 'text-pink' : ''
+                    selectedSkincareProductTags.includes(tag) ? 'text-pink' :
+                    selectedSustainabilityTags.includes(tag) ? 'text-green-600' : ''
                   }`}>
                   {tag}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </View>
         )}
@@ -363,6 +379,7 @@ const handleSavePost = async () => {
       skinTypeTags: selectedSkinTypeTags,
       skinConcernTags: selectedSkinConcernTags,
       skincareProductTags: selectedSkincareProductTags,
+      sustainabilityTags: selectedSustainabilityTags,
       products: products,
       imageUrls: imageUrls,
     });
@@ -376,6 +393,7 @@ const handleSavePost = async () => {
       skinTypeTags: selectedSkinTypeTags,
       skinConcernTags: selectedSkinConcernTags,
       skincareProductTags: selectedSkincareProductTags,
+      sustainabilityTags: selectedSustainabilityTags,
       products: products,
       imageUrls: imageUrls,
     };
@@ -385,6 +403,7 @@ const handleSavePost = async () => {
     setSelectedSkinTypeTags([]);
     setSelectedSkinConcernTags([]);
     setSelectedSkincareProductTags([]);
+    setSelectedSustainabilityTags([]);
     setProducts([]);
     setImages([]);
 
@@ -407,12 +426,12 @@ const handleSavePost = async () => {
       <View className="pt-12 pb-10">
   
         {/* Title */}
-        <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
-        className="text-center mt-8 shadow-md text-base">Create a post</Text>
+        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(16)}}
+        className="text-center mt-8 shadow-md">Create a post</Text>
 
         {/* Title of the step */}
-        <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
-        className="text-center mt-0 color-dark-pink shadow-md text-xl">{getStepText(step)}</Text>
+        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(20) }}
+        className="text-center mt-1 color-dark-pink shadow-md">{getStepText(step)}</Text>
 
         {/* Progress Bar */}
         <View className="flex-row items-center justify-center my-5 w-20 mx-auto">
@@ -433,8 +452,8 @@ const handleSavePost = async () => {
                   onPress={handleNext} 
                   className="py-1 bg-dark-pink rounded-full w-16">
                   <Text 
-                    style={{ fontFamily: 'Montserrat_600SemiBold'}} 
-                    className="text-sm font-bold text-center text-white">
+                    style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(14)}} 
+                    className="font-bold text-center text-white">
                     Next
                   </Text>
                 </TouchableOpacity>
@@ -442,16 +461,16 @@ const handleSavePost = async () => {
 
               {/* Post Type */}
                 <View className="mb-6">
-                  <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
-                  className="text-lg font-bold mb-2">Post Type</Text>
+                  <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(16)}}
+                  className="font-bold mb-2">Post Type</Text>
 
                   <View className="flex-row">
                     <TouchableOpacity
                       className={`mt-2 py-2 px-5 rounded-full shadow-sm mr-5 ${postType === 'Question' ? 'bg-dark-pink' : 'bg-white'}`}
                       onPress={() => handlePostTypeSelection('Question')}>
 
-                      <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
-                      className={`text-[14px] ${postType === 'Question' ? 'text-white' : 'text-black'}`}>Question</Text>
+                      <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(14) }}
+                      className={`${postType === 'Question' ? 'text-white' : 'text-black'}`}>Question</Text>
 
                     </TouchableOpacity>
 
@@ -459,8 +478,8 @@ const handleSavePost = async () => {
                       className={`mt-2 py-2 px-5 rounded-full shadow-sm ${postType === 'Advice' ? 'bg-dark-pink' : 'bg-white'}`}
                       onPress={() => handlePostTypeSelection('Advice')}>
 
-                      <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
-                      className={`text-[14px] ${postType === 'Advice' ? 'text-white' : 'text-black'}`}>Advice</Text>
+                      <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(14)}}
+                      className={`${postType === 'Advice' ? 'text-white' : 'text-black'}`}>Advice</Text>
                     </TouchableOpacity>
                   </View>
 
@@ -468,26 +487,28 @@ const handleSavePost = async () => {
 
               {/* Post Title */}
                 <View className="mb-6">
-                <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
-                  className="text-lg font-bold mb-2">Title</Text>
+                <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(16)}}
+                  className= "mb-3">Title</Text>
                   <TextInput
-                    className="border border-gray-200 rounded-full p-3.5 shadow-sm bg-white"
+                    className="border border-gray-200 rounded-full py-3 px-6 shadow-sm bg-white"
                     placeholder="Enter Title"
                     value={title}
                     onChangeText={setTitle}
+                    style={{ fontFamily: 'Montserrat_400Regular', fontSize: getFontSize(14)}}
                   />
                 </View>
 
               {/* Post Description */}
               <View className="mb-6">
-                <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
-                className="text-lg font-bold mb-2">Description</Text>
+                <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(16)}}
+                className="mb-3">Description</Text>
                 <TextInput
-                  className="border border-gray-200 rounded-xl shadow-sm p-3.5 h-48 bg-white"
+                  className="border border-gray-200 rounded-xl shadow-sm py-3 px-6 h-48 bg-white"
                   placeholder="Enter Description"
                   multiline
                   value={description}
                   onChangeText={setDescription}
+                  style={{ fontFamily: 'Montserrat_400Regular', fontSize: getFontSize(14)}}
                 />
               </View>
           </View>
@@ -502,8 +523,8 @@ const handleSavePost = async () => {
                   onPress={handlePrevious} 
                   className="py-1 bg-white border border-gray-400 rounded-full w-16 ">
                   <Text 
-                    style={{ fontFamily: 'Montserrat_600SemiBold'}} 
-                    className="text-sm font-bold text-center text-gray-400">
+                    style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(14)}} 
+                    className="text-center text-gray-400">
                     Back
                   </Text>
                 </TouchableOpacity>
@@ -513,8 +534,8 @@ const handleSavePost = async () => {
                   onPress={handleNext} 
                   className="py-1 bg-dark-pink rounded-full w-16">
                   <Text 
-                    style={{ fontFamily: 'Montserrat_600SemiBold'}} 
-                    className="text-sm font-bold text-center text-white">
+                    style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(14)}} 
+                    className="text-center text-white">
                     Next
                   </Text>
                 </TouchableOpacity>
@@ -528,11 +549,11 @@ const handleSavePost = async () => {
                     <Image className="w-8 h-10" source={require('../assets/images/oily-skintype.png')} />
 
                     <View className="ml-3 mt-1">
-                      <Text style={{ fontFamily: 'Montserrat_400Regular'}}
-                      className="text-xs font-bold -mb-1 ">Choose a tag for the</Text>
+                      <Text style={{ fontFamily: 'Montserrat_400Regular', fontSize: getFontSize(12)}}
+                      className="-mb-1 ">Choose a tag for the</Text>
 
-                      <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
-                      className="text-base font-bold ">Skin Type</Text>
+                      <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(16)}}
+                      className="mt-1">Skin Type</Text>
                     </View>
                 </View>
             
@@ -555,11 +576,11 @@ const handleSavePost = async () => {
                     <Image className="w-8 h-10" source={require('../assets/images/acne.png')} />
 
                     <View className="ml-3 mt-1">
-                      <Text style={{ fontFamily: 'Montserrat_400Regular'}}
-                      className="text-xs font-bold -mb-1 ">Choose a tag for the</Text>
+                     <Text style={{ fontFamily: 'Montserrat_400Regular', fontSize: getFontSize(12)}}
+                      className="-mb-1 ">Choose a tag for the</Text>
 
-                      <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
-                      className="text-base font-bold ">Skin Concern</Text>
+                      <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(16)}}
+                      className="mt-1">Skin Concern</Text>
                     </View>
                 </View>
                 
@@ -582,11 +603,11 @@ const handleSavePost = async () => {
                     <Image className="w-6 h-9" source={require('../assets/images/serum-2.png')} />
 
                     <View className="ml-3 mt-1">
-                      <Text style={{ fontFamily: 'Montserrat_400Regular'}}
-                      className="text-xs font-bold -mb-1 ">Choose a tag for the</Text>
+                      <Text style={{ fontFamily: 'Montserrat_400Regular', fontSize: getFontSize(12)}}
+                      className="-mb-1 ">Choose a tag for the</Text>
 
-                      <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
-                      className="text-base font-bold ">Skincare Product</Text>
+                     <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(16)}}
+                      className="mt-1">Skincare Product</Text>
                     </View>
                 </View>
 
@@ -598,6 +619,32 @@ const handleSavePost = async () => {
 
               <View className="px-5">
                 {renderTags(['Cleanser', 'Moisturizer', 'Serum', 'Sunscreen', 'Toner', 'Eye cream', 'Lip balm',], 'skincareProduct')}
+              </View>
+
+              {/* Line */}
+              <View className="border-b border-gray-100 mt-5" />
+
+              {/* Tags for sustainability */}
+              <TouchableOpacity onPress={() => toggleSection('sustainability')} className="flex-row justify-between items-center my-5 mx-8">
+                <View className="flex-row mb-1">
+                  <Image className="w-9 h-9" source={require('../assets/images/eco.png')} />
+
+                  <View className="ml-3 mt-1">
+                    <Text style={{ fontFamily: 'Montserrat_400Regular', fontSize: getFontSize(12)}}
+                      className="-mb-1 ">Choose a tag for</Text>
+                    <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(16)}}
+                      className="mt-1">Sustainability</Text>
+                  </View>
+                </View>
+
+                <Image
+                  source={visibleSections.sustainability ? require('../assets/icons/up2.png') : require('../assets/icons/down2.png')}
+                  style={{ width: 13, height: 13 }} 
+                />
+              </TouchableOpacity>
+
+              <View className="px-5">
+                {renderTags(['Vegan', 'Cruelty-Free', 'Plastic-Free', 'Refillable', 'Recyclable'], 'sustainability')}
               </View>
 
             </View>
@@ -615,8 +662,8 @@ const handleSavePost = async () => {
                   onPress={handlePrevious} 
                   className="py-1 bg-white border border-gray-400 rounded-full w-16 ">
                   <Text 
-                    style={{ fontFamily: 'Montserrat_600SemiBold'}} 
-                    className="text-sm font-bold text-center text-gray-400">
+                    style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(14)}} 
+                    className="text-center text-gray-400">
                     Back
                   </Text>
                 </TouchableOpacity>
@@ -626,8 +673,8 @@ const handleSavePost = async () => {
                   onPress={handleSavePost} 
                   className="py-1 bg-dark-pink rounded-full w-16">
                   <Text 
-                    style={{ fontFamily: 'Montserrat_600SemiBold'}} 
-                    className="text-sm font-bold text-center text-white">
+                    style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(14)}} 
+                    className="text-center text-white">
                     Save
                   </Text>
                 </TouchableOpacity>
@@ -637,19 +684,19 @@ const handleSavePost = async () => {
               <View className="flex-row justify-between mb-3">
 
                 <View className="flex">
-                  <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
-                      className="text-lg font-bold">Products</Text>
+                  <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(16)}}
+                      className="mb-1">Products</Text>
 
-                  <Text style={{ fontFamily: 'Montserrat_400Regular'}}
-                      className="text-xs text-gray-400">Optional</Text>
+                  <Text style={{ fontFamily: 'Montserrat_400Regular', fontSize: getFontSize(12)}}
+                      className="text-gray-400">Optional</Text>
                 </View>
 
                 {/* Button to open the Modal of products */}
                 <TouchableOpacity onPress={() => setModalVisible(true)} className="border border-gray-200 py-0 px-5 rounded-full bg-white flex-row shadow-sm justify-center items-center">
                   <Image className="w-2 h-2 mr-1 mt-1" 
                                               source={require('./../assets/icons/plus.png')} />
-                  <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
-                  className="text-xs text-center mt-0.5"
+                  <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(12) }}
+                  className="text-center mt-1"
                   >Add a product</Text>
                 </TouchableOpacity>
 
@@ -665,23 +712,23 @@ const handleSavePost = async () => {
                                 source={{ uri: product.productImage }} />
 
                       <View className="flex pl-3">
-                        <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
-                        className="text-black pr-12 mr-12 text-base">{product.productName}</Text>
+                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(14)}}
+                        className="text-black pr-12 mr-12">{product.productName}</Text>
 
-                        <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
-                        className="text-black pt-0.5 text-dark-pink text-sm">{product.brandName}</Text>
+                        <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(12) }}
+                        className="text-black pt-0.5 text-dark-pink">{product.brandName}</Text>
                       </View>
                   </View>
 
                   <View className="flex-row justify-between mt-2">
                     <TouchableOpacity onPress={() => openProductURL(product.productURL)}>
-                      <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 13 }}
+                      <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(12) }}
                       className="color-dark-pink">URL to product</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={() => removeProductFromList(index)}>
-                      <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: 13 }}
-                      className="color-red-800">Delete Product</Text>
+                      <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(12) }}
+                      className="color-black">Delete Product</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -696,7 +743,7 @@ const handleSavePost = async () => {
             >
               <View className="flex-1 justify-center items-center mb-20 mt-20">
 
-                <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 22 }}
+                <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(18) }}
                 className="mb-5">Add a product</Text>
 
                 {/* Textinput with search */}
@@ -727,9 +774,9 @@ const handleSavePost = async () => {
                                 source={{ uri: item.productImage }} />
 
                       <View className="flex pl-3">
-                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 16 }}
+                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(14) }}
                         className="text-black pr-12">{item.productName}</Text>
-                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 14 }}
+                        <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(12) }}
                         className="text-black pt-1 text-dark-pink">{item.brandName}</Text>
                       </View>
 
@@ -752,19 +799,19 @@ const handleSavePost = async () => {
             <View className="flex-row justify-between mb-3">
 
               <View className="flex">
-                <Text style={{ fontFamily: 'Montserrat_600SemiBold'}}
-                    className="text-lg font-bold">Image(s)</Text>
+                <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(16)}}
+                    className="mb-1">Image(s)</Text>
 
-                <Text style={{ fontFamily: 'Montserrat_400Regular'}}
-                    className="text-xs text-gray-400">Optional</Text>
+                <Text style={{ fontFamily: 'Montserrat_400Regular', fontSize: getFontSize(12)}}
+                    className="text-gray-400">Optional</Text>
               </View>
 
               {/* Button to open phone gallery and add one or multiple images */}
               <TouchableOpacity onPress={pickImages} className="border border-gray-200 py-2 px-5 rounded-full bg-white flex-row shadow-sm justify-center items-center">
                 <Image className="w-2 h-2 mr-1 mt-1" 
                                             source={require('./../assets/icons/plus.png')} />
-                <Text style={{ fontFamily: 'Montserrat_600SemiBold' }}
-                className="text-xs text-center mt-0.5"
+                <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(12) }}
+                className="text-center mt-1"
                 >Add Image(s)</Text>
               </TouchableOpacity>
 

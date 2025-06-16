@@ -8,15 +8,7 @@ import { Linking } from 'react-native';
 import { Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Swiper from 'react-native-swiper';
-
-const skincareTerms = {
-  "vitamin C": "VitaminCInfo",
-  "retinol": "RetinolInfo",
-  "niacinamide": "NiacinamideInfo",
-   "BHA": "BHAinfo",
-  // voeg meer termen toe en verwijs naar schermnamen
-};
-
+import IngredientPopUp from './../components/IngredientPopUp';
 
 const addComment = async (postId, text, authorId, authorName) => {
   try {
@@ -70,6 +62,10 @@ export default function PostDetail({ route }) {
   const [replyingAuthorName, setReplyingAuthorName] = useState(null);
   const [commentCount, setCommentCount] = useState(0);
 
+  const [selectedIngredient, setSelectedIngredient] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+
   const handleReportPost = () => {
     navigation.navigate('ReportForm', { postId: post.id, title: post.title });
   };
@@ -114,7 +110,7 @@ useEffect(() => {
         const data = doc.data();
         if (data.aliases && Array.isArray(data.aliases)) {
           data.aliases.forEach(alias => {
-            terms[alias.toLowerCase()] = data.name; // sla lowercase alias op met verwijzing naar doc id
+            terms[alias.toLowerCase()] = data.name;
           });
         }
       });
@@ -142,9 +138,26 @@ const renderClickableDescription = (text) => {
       return (
         <Pressable
           key={index}
-          onPress={() => navigation.navigate("IngredientDetail", { ingredientName: docId })}
+          onPress={async () => {
+            try {
+              const snapshot = await getDocs(collection(db, "skincareTerms"));
+              snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.name.toLowerCase() === docId.toLowerCase()) {
+                 setSelectedIngredient({ id: doc.id, ...data });
+                  setModalVisible(true);
+                }
+              });
+            } catch (err) {
+              console.error("Fout bij ophalen ingrediënt:", err);
+            }
+          }}
+
         >
-          <Text style={{ color: '#FB6F93', fontFamily: 'Montserrat_600SemiBold' }}>{word}</Text>
+          <Text 
+          style={{ color: '#FB6F93', fontFamily: 'Montserrat_600SemiBold' }}
+          className="underline"
+          >{word}</Text>
         </Pressable>
       );
     }
@@ -272,7 +285,7 @@ const renderClickableDescription = (text) => {
     <View>
         <View className="shadow-sm">
 
-        <ImageBackground source={require('./../assets/images/bg7.png')} resizeMode="cover" imageStyle= {{opacity:0.2}}>
+        <ImageBackground source={require('./../assets/images/home-bg3.png')} resizeMode="cover">
         <View
         className="flex-row justify-between px-5 pt-14 pb-10">
                 {/* Back button */}
@@ -349,6 +362,19 @@ const renderClickableDescription = (text) => {
                     </Text>
                     </Pressable>
                 ))}
+            
+              {post.sustainabilityTags.map((tag, index) => (
+                    <Pressable 
+                    key={index}
+                    className="bg-green-50 border border-green-800 rounded-xl px-3 py-0.5 mx-1 mb-2">
+                    <Text 
+                        style={{ fontFamily: 'Montserrat_600SemiBold' }}
+                        className="text-center text-green-800 text-xs">
+                        {tag}
+                    </Text>
+                    </Pressable>
+                ))}
+
                 </View>
         </View>
         
@@ -356,7 +382,15 @@ const renderClickableDescription = (text) => {
           {renderClickableDescription(post.description)}
         </View>
 
-        
+        <IngredientPopUp
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          ingredient={selectedIngredient}
+          onNavigate={(name) =>
+            navigation.navigate('IngredientDetail', { ingredientName: name, ingredientId: selectedIngredient?.id })
+          }
+        />
+
         {/* Post PRODUCT */}
         <View>
         {post.products.length > 0 && (

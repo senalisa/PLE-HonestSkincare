@@ -1,4 +1,4 @@
-import { View, Text, ImageBackground, Image, TextInput, ScrollView, StatusBar } from 'react-native'
+import { View, Text, ImageBackground, Image, TextInput, ScrollView, StatusBar, PixelRatio } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import ArticleCard from '../components/ArticleCard'
 import { collection, getDocs, query, where } from 'firebase/firestore';
@@ -6,8 +6,15 @@ import { db, auth } from './../config/firebase';
 import TopicAll from '../components/TopicAll';
 import { Pressable } from 'react-native-gesture-handler';
 import Search from '../components/Search';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Discover() {
+  const navigation = useNavigation();
+
+   //Responsive font size
+    const fontScale = PixelRatio.getFontScale();
+    const getFontSize = size => size / fontScale;
+
   const [articles, setArticles] = useState([]);
   const [searchVisible, setSearchVisible] = useState(false); 
 
@@ -47,21 +54,16 @@ export default function Discover() {
     <View className="flex-[1] white">
 
       {/* INTRO */}
-      <ImageBackground source={require('./../assets/images/discover-bg.png')} resizeMode="cover" imageStyle= {{opacity:0.3}}>
+      <ImageBackground source={require('./../assets/images/discover-bg-2.png')} resizeMode="cover" imageStyle= {{}}>
 
         <View className="mt-20 mb-10">
 
           {/* INTRO: Welcome user + text */}
           <View className="-mt-3 mb-0 px-8 flex-row justify-between">
             <View>
-              <Text className="mb-1" style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 25 }}>Discover</Text>
-              <Text className="" style={{ fontFamily: 'Montserrat_400Regular', fontSize: 16 }}>Read articles and scroll trough topics</Text>
+              <Text className="mb-1" style={{ fontFamily: 'Montserrat_600SemiBold',  fontSize: getFontSize(25) }}>Discover</Text>
+              <Text className="" style={{ fontFamily: 'Montserrat_500Medium',  fontSize: getFontSize(13) }}>Read articles and scroll trough topics</Text>
             </View>
-            
-              <View className="flex mt-1 ml-4">
-                <Image className="w-16 h-6 ml-2" 
-                                source={require('./../assets/images/logo-plain-nobg.png')} />
-              </View>
           </View>
 
           {/* Search Bar */}
@@ -71,10 +73,10 @@ export default function Discover() {
                 style={{ paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between' }}
                 onPress={openSearchModal}
               >
-                <View className="shadow-md bg-white rounded-xl w-full mb-5 flex-row items-center">
-                  <Image style={{ width: 20, height: 20, margin: 10, tintColor: '#CBCACA' }} className="ml-5 mr-3" source={require('./../assets/icons/search.png')} />
-                  <Text style={{ fontFamily: 'Montserrat_500Medium_Italic' }}
-                  className="text-gray-300">
+                <View className="shadow-md bg-white rounded-3xl w-full mb-5 py-0.5 flex-row items-center">
+                  <Image style={{ width: 15, height: 15, margin: 10, tintColor: '#888' }} className="ml-5 mr-3" source={require('./../assets/icons/search.png')} />
+                  <Text style={{ fontFamily: 'Montserrat_400Regular' }}
+                  className="text-gray-500">
                     Search...
                   </Text>
                 </View>
@@ -88,9 +90,26 @@ export default function Discover() {
 
       </ImageBackground>
 
-      <View className="bg-white outline outline-offset-6 h-full py-5 -mt-5 rounded-t-[35px]">
+      <View className="bg-white outline outline-offset-6 h-full py-5 -mt-5 rounded-t-[35px] shadow-xl">
 
-      <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 22 }} className="mx-7 mt-2 text-center">Trending Articles</Text>
+   <View className="flex-row justify-between items-center px-7 mt-2"> 
+      {/* Title */}
+      <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(18) }}>
+        Trending Articles
+      </Text>
+
+      {/* All Articles Button */}
+      <Pressable className="flex-row items-center border border-dark-pink bg-dark-pink rounded-full px-3 py-1" onPress={() => navigation.navigate('AllArticles')}>
+        <Text style={{ fontFamily: 'Montserrat_500Medium' }} className="text-white text-xs">
+          All articles
+        </Text>
+        <Image
+          style={{ width: 10, height: 10, marginLeft: 6, tintColor: '#FFF' }}
+          source={require('./../assets/icons/right-arrow.png')}
+        />
+      </Pressable>
+    </View>
+
 
       {/* Article cards */}
       <View className="mb-20">
