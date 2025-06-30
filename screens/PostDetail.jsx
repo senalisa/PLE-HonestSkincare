@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, FlatList, SafeAreaView, Image, ImageBackground, KeyboardAvoidingView, Platform, Modal, StatusBar } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
-import { doc, getDoc, collection, addDoc, query, orderBy, getDocs, serverTimestamp, updateDoc, arrayUnion, Timestamp, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, limit, where, addDoc, query, orderBy, getDocs, serverTimestamp, updateDoc, arrayUnion, Timestamp, deleteDoc } from 'firebase/firestore';
 import { db, auth } from '../config/firebase';
 import { Linking } from 'react-native';
 import { Alert } from 'react-native';
@@ -39,13 +39,39 @@ const addReply = async (postId, commentId, text, authorId, authorName) => {
 
 const getComments = async (postId) => {
   try {
-    const commentsQuery = query(collection(db, 'posts', postId, 'comments'), orderBy('timestamp', 'asc'));
+    const commentsQuery = query(
+      collection(db, 'posts', postId, 'comments'),
+      orderBy('timestamp', 'asc')
+    );
     const commentsSnapshot = await getDocs(commentsQuery);
-    return commentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    const comments = await Promise.all(
+      commentsSnapshot.docs.map(async (docSnap) => {
+        const data = docSnap.data();
+        let badge = null;
+        try {
+          const badgeQuery = query(
+            collection(db, 'userBadges'),
+            where('userId', '==', data.authorId),
+            limit(1)
+          );
+          const badgeSnap = await getDocs(badgeQuery);
+          const badgeDoc = badgeSnap.docs[0];
+          badge = badgeDoc ? badgeDoc.data().badge : null;
+        } catch (err) {
+          console.error('Error fetching badge:', err);
+        }
+        return { id: docSnap.id, ...data, authorBadge: badge };
+      })
+    );
+
+    return comments;
   } catch (error) {
     console.error('Error getting comments: ', error);
+    return [];
   }
 };
+
 
 export default function PostDetail({ route }) {
   console.disableYellowBox = true;
@@ -129,7 +155,7 @@ useEffect(() => {
 
 
 const renderClickableDescription = (text) => {
-  const words = text.split(/(\s+)/); // behoud spaties
+  const words = text.split(/(\s+)/); 
   return words.map((word, index) => {
     const cleanedWord = word.toLowerCase().replace(/[.,?!]/g, '');
     const docId = termMap[cleanedWord];
@@ -536,8 +562,22 @@ const renderClickableDescription = (text) => {
                 <View className="bg-white p-3 rounded-xl shadow-sm">
                     <View className="flex-row">
 
-                        <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
-                        className="font-bold mb-1">{item.authorName} </Text>
+                       <View className="flex-row items-center">
+                          <Text
+                            style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 12 }}
+                            className="font-bold mb-1"
+                          >
+                            {item.authorName}
+                          </Text>
+                          {item.authorBadge && (
+                            <Text
+                              className="ml-2 mb-1 text-dark-pink text-xs"
+                              style={{ fontFamily: 'Montserrat_500Medium' }}
+                            >
+                              {item.authorBadge}
+                            </Text>
+                          )}
+                        </View>
 
                         <Text className="ml-2 mt-0.5 text-gray-400"
                         style={{ fontFamily: 'Montserrat_500Medium', fontSize: 10 }}

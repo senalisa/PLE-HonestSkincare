@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Pressable, Image, ScrollView, ImageBackground, TextInput } from 'react-native';
+import { View, Text, Pressable, Image, ScrollView, ImageBackground, TextInput, PixelRatio } from 'react-native';
 import { auth, db } from '../config/firebase';
 import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
 import { StatusBar } from 'expo-status-bar';
@@ -9,6 +9,10 @@ import ForYourSkinList from '../components/ForYourSkinList';
 
 export default function Glossary() {
   const navigation = useNavigation();
+
+   //Responsive font size
+        const fontScale = PixelRatio.getFontScale();
+        const getFontSize = size => size / fontScale;
 
   const [userPrefs, setUserPrefs] = useState(null);
   const [recommendedTerms, setRecommendedTerms] = useState([]);
@@ -125,7 +129,7 @@ export default function Glossary() {
 
           {todaysSpot && (
   <View className="mb-6 pr-8">
-    <Text className="text-lg font-bold mb-2 px-1" style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+    <Text className="text-lg font-bold mb-2 px-1" style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(18) }}>
       Today’s Spot
     </Text>
 
@@ -143,23 +147,23 @@ export default function Glossary() {
       />
 
       <View className="flex-1 p-4">
-        <Text className="text-md font-semibold mb-1" style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+        <Text className="font-semibold mb-1" style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(14) }}>
           {todaysSpot.name}
         </Text>
 
         <Text
           numberOfLines={2}
           ellipsizeMode="tail"
-          className="text-xs text-gray-600 mb-2"
-          style={{ fontFamily: 'Montserrat_500Medium' }}
+          className="text-black mb-2"
+          style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(12) }}
         >
           {todaysSpot.description}
         </Text>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {todaysSpot.tags?.map((tag, i) => (
-            <View key={i} className="bg-red-20 px-2 m-auto py-1 rounded-full mr-2 border border-red-700">
-              <Text className="text-xs text-red-700" style={{ fontFamily: 'Montserrat_600SemiBold' }}>{tag}</Text>
+            <View key={i} className="bg-red-20 px-3 m-auto py-1 rounded-full mr-2 border border-red-700">
+              <Text className="text-red-700" style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(10) }}>{tag}</Text>
             </View>
           ))}
         </ScrollView>
@@ -175,11 +179,11 @@ export default function Glossary() {
           {/* All Ingredients */}
           <View className="mt-10 pr-8 pb-36">
             <View className="flex-row justify-between items-center">
-              <Text className="text-lg font-bold mb-4" style={{ fontFamily: 'Montserrat_600SemiBold' }}>All Ingredients</Text>
+              <Text className="mb-4" style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(18) }}>All Ingredients</Text>
 
               <Pressable onPress={() => setFilterModalVisible(true)} className="flex-row items-center -mt-3">
                 <Image source={require('../assets/icons/filter.png')} className="w-4 h-4 mr-2" style={{ tintColor: '#808080' }} />
-                <Text style={{ fontFamily: 'Montserrat_500Medium' }} className="text-gray-500">Filter</Text>
+                <Text style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(14) }} className="text-gray-500">Filter</Text>
               </Pressable>
             </View>
 
@@ -189,7 +193,7 @@ export default function Glossary() {
                 placeholder="Search for an ingredient..."
                 placeholderTextColor="#CCC"
                 className="flex-1 text-sm text-gray-800"
-                style={{ fontFamily: 'Montserrat_500Medium' }}
+                style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(14) }}
                 value={searchTerm}
                 onChangeText={setSearchTerm}
               />
@@ -198,10 +202,10 @@ export default function Glossary() {
             {/* A-Z / Trending Toggle */}
             <View className="flex-row mb-4 space-x-4">
               <Pressable onPress={() => setSortMode('A-Z')} className={`px-8 py-2 rounded-full border ${sortMode === 'A-Z' ? 'border-dark-pink bg-dark-pink' : 'border-gray-300'}`}>
-                <Text className={`${sortMode === 'A-Z' ? 'text-white' : 'text-black'}`} style={{ fontFamily: 'Montserrat_500Medium' }}>A-Z</Text>
+                <Text className={`${sortMode === 'A-Z' ? 'text-white' : 'text-black'}`} style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(14) }}>A-Z</Text>
               </Pressable>
               <Pressable onPress={() => setSortMode('Trending')} className={`px-4 py-2 rounded-full border ${sortMode === 'Trending' ? 'border-dark-pink bg-dark-pink' : 'border-gray-300'}`}>
-                <Text className={`${sortMode === 'Trending' ? 'text-white' : 'text-black'}`} style={{ fontFamily: 'Montserrat_500Medium' }}>Trending</Text>
+                <Text className={`${sortMode === 'Trending' ? 'text-white' : 'text-black'}`} style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(14) }}>Trending</Text>
               </Pressable>
             </View>
 
@@ -223,7 +227,7 @@ export default function Glossary() {
                 .filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
                 .map((item, index) => (
                 <Pressable key={index} className="w-[100%] bg-white border border-gray-100 shadow-sm rounded-xl p-4 mb-4" onPress={() => navigation.navigate('IngredientDetail', { ingredientName: item.name, ingredientId: item.id })}>
-                  <Text className="text-base font-semibold" style={{ fontFamily: 'Montserrat_500Medium' }}>{item.name}</Text>
+                  <Text className="text-base font-semibold" style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(15) }}>{item.name}</Text>
                 </Pressable>
               ))}
             </View>

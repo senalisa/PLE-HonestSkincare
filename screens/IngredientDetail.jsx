@@ -12,6 +12,7 @@ export default function IngredientInfoScreen({ route }) {
   // Navigation
   const navigation = useNavigation();
 
+  const [modalVisible, setModalVisible] = useState(false);
   const [data, setData] = useState(null);
 
   const ingredientName = route?.params?.ingredientName;
@@ -66,6 +67,7 @@ export default function IngredientInfoScreen({ route }) {
   if (!data) return <Text style={{ padding: 20 }}>Loading...</Text>;
 
   return (
+    <>
     <ScrollView showsVerticalScrollIndicator={false}>
       <ImageBackground source={{ uri: data.imageUrl}} resizeMode="cover">
               <View
@@ -80,8 +82,18 @@ export default function IngredientInfoScreen({ route }) {
       </ImageBackground>
 
       <View className="p-6 bg-white rounded-3xl -mt-5 shadow-xl">
-        {/* Title skinterm */}
-        <Text style={{ fontSize: getFontSize(24), fontFamily: 'Montserrat_600SemiBold', marginBottom: 5 }}>{data.name}</Text>
+        <View className="flex-row justify-between items-center">
+          {/* Title skinterm */}
+          <Text style={{ fontSize: getFontSize(24), fontFamily: 'Montserrat_600SemiBold', marginBottom: 5 }}>{data.name}</Text>
+           {/* Verification button */}
+          <Pressable
+              onPress={() => setModalVisible(true)}
+              // className="self-start mt-2 px-4 py-1 border border-green-700 rounded-full"
+            >
+               <Image className="w-6 h-6" style={{ tintColor: "#FB6F93"}}
+                                              source={require('./../assets/icons/verified.png')} />
+          </Pressable>
+        </View>
 
         {/* Tags */}
         <View className="flex-row flex-wrap mt-2">
@@ -208,5 +220,33 @@ export default function IngredientInfoScreen({ route }) {
         ))}
       </View>
     </ScrollView>
+
+    {modalVisible && (
+      <View className="absolute top-0 left-0 right-0 bottom-0 z-50 justify-center items-center bg-black/40">
+        <View className="bg-white rounded-2xl p-6 w-[85%] max-w-[380px]">
+          <Text className="text-lg font-semibold text-center mb-3">Verified Information</Text>
+          <Text className="text-sm text-gray-700 text-center mb-5">
+            This ingredient description was reviewed by{' '}
+            <Text
+              className="text-dark-pink underline"
+              onPress={() => {
+                setModalVisible(false);
+                navigation.navigate('ExpertProfile');
+              }}
+            >
+              Dr. Amira El-Khatib
+            </Text>
+          </Text>
+
+          <Pressable
+            onPress={() => setModalVisible(false)}
+            className="bg-dark-pink py-2 px-5 rounded-full self-center"
+          >
+            <Text className="text-white font-semibold text-sm">Close</Text>
+          </Pressable>
+        </View>
+      </View>
+    )}
+    </>
   );
 }
