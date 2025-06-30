@@ -34,6 +34,9 @@ import Glossary from '../screens/Glossary.jsx';
 import AllArticles from '../screens/AllArticles.jsx';
 import ArticlesFilter from '../components/ArticlesFilter.jsx';
 import ExpertProfile from '../components/account/ExpertProfile.jsx';
+import RequestArticle from '../screens/RequestArticle.jsx';
+import RequestArticleFilter from '../components/RequestArticleFilter.jsx';
+import LiveEventModal from '../components/LiveEventModal.jsx';
 
 
 
@@ -214,6 +217,9 @@ const AppNavigation = () => {
                     <Stack.Screen name="AllArticles" component={AllArticles} options={{ headerShown: false }} />
                     <Stack.Screen name="ArticlesFilter" component={ArticlesFilter} options={{ headerShown: false }} />
                     <Stack.Screen name="ExpertProfile" component={ExpertProfile} options={{ headerShown: false }} />
+                    <Stack.Screen name="RequestArticle" component={RequestArticle} options={{ headerShown: false }} />
+                    <Stack.Screen name="RequestArticleFilter" component={RequestArticleFilter} options={{ headerShown: false }} />
+                    <Stack.Screen name="LiveEventModal" component={LiveEventModal} options={{ headerShown: false }} />
                 </>
                 ) : (
                 <>

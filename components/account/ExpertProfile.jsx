@@ -1,6 +1,10 @@
 import React from 'react';
-import { View, Text, ScrollView, Image, Pressable, PixelRatio } from 'react-native';
+import { View, Text, ScrollView, Image, Pressable, PixelRatio, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { collection, getDocs, query, limit, where } from 'firebase/firestore';
+import { db } from '../.././config/firebase';
+import { useEffect, useState } from 'react';
+
 
 export default function ExpertProfile() {
   const navigation = useNavigation();
@@ -8,6 +12,9 @@ export default function ExpertProfile() {
    //Responsive font size
       const fontScale = PixelRatio.getFontScale();
       const getFontSize = size => size / fontScale;
+
+      const [articles, setArticles] = useState([]);
+
 
   // Hardcoded expert info
   const expert = {
@@ -22,28 +29,33 @@ export default function ExpertProfile() {
     memberSince: '10/12/2024'
   };
 
-  // Hardcoded artikelen
-  const articles = [
-    {
-      id: '1',
-      articleTitle: 'The Power of Niacinamide in Skincare',
-      articleCover: 'https://via.placeholder.com/150',
-      author: 'Dr. Leyla Taner',
-      tags: { articleCategory: ['Routine Helper'] },
-    },
-    {
-      id: '2',
-      articleTitle: 'Understanding Retinol: A Beginner’s Guide',
-      articleCover: 'https://via.placeholder.com/150',
-      author: 'Dr. Leyla Taner',
-      tags: { articleCategory: ['Product Insight'] },
-    },
-  ];
+  useEffect(() => {
+  const fetchArticles = async () => {
+    try {
+      const q = query(
+        collection(db, 'articles'),
+        where('author', '==', expert.name),
+        limit(2)
+      );
+      const snapshot = await getDocs(q);
+      const result = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setArticles(result);
+    } catch (error) {
+      console.error('Error fetching expert articles:', error);
+    }
+  };
+
+  fetchArticles();
+}, []);
+
 
   const renderArticleCard = ({ item }) => (
     <Pressable
       onPress={() => navigation.navigate('Article', { articleId: item.id })}
-      className="bg-white rounded-2xl flex-row items-center mx-6 my-2"
+      className="bg-white rounded-2xl flex-row items-center mx-2 my-2"
       style={{
         shadowColor: '#000',
         shadowOpacity: 0.08,
@@ -99,8 +111,9 @@ export default function ExpertProfile() {
   );
 
   return (
-    <ScrollView className="bg-white pt-10">
-      <View className="mt-10 mb-6 px-6">
+    <ScrollView className="bg-white pt-20 px-6">
+      <ImageBackground source={require('../.././assets/images/expert-bg.png')} resizeMode="cover">
+      {/* <View className="mt-10 mb-6 px-6"> */}
             {/* Back button */}
             <Pressable onPress={() => navigation.goBack()}>
                     <Image className="w-5 h-5" 
@@ -111,8 +124,9 @@ export default function ExpertProfile() {
             <Image source={expert.image} className="w-28 h-28 rounded-full mb-4 " />
             <Text className="text-center mb-2" style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(20) }}>{expert.name}</Text>
             <Text className="text-center text-dark-pink mb-4" style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(16) }}>{expert.title}</Text>
-            <Text className="text-gray-700 text-center" style={{ fontFamily: 'Montserrat_400Regular', fontSize: getFontSize(13) }}>{expert.bio}</Text>
+            <Text className="text-black text-center" style={{ fontFamily: 'Montserrat_400Regular', fontSize: getFontSize(13) }}>{expert.bio}</Text>
         </View>
+        </ImageBackground>
 
         {/* Contactinformatie stijlvol */}
         <View className="flex-row justify-between px-6 mt-4 mb-4">
@@ -128,10 +142,13 @@ export default function ExpertProfile() {
             <Text className="text-dark-pink font-semibold mb-1" style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(12) }}>CLINIC</Text>
             <Text className="text-gray-700 text-center mx-2" style={{ fontFamily: 'Montserrat_500Medium', fontSize: getFontSize(13) }}>{expert.clinic}</Text>
           </View>
-        </View>
+        {/* </View> */}
       </View>
 
-      <Text className="px-6 mt-2 text-base mb-3" style={{ fontFamily: 'Montserrat_600SemiBold' }}>Articles by {expert.name}</Text>
+       {/* Line */}
+                          <View className="border-b border-gray-100 mb-5 mt-5" />
+
+      <Text className="px-2 mt-2 text-base mb-3" style={{ fontFamily: 'Montserrat_600SemiBold' }}>Articles by {expert.name}</Text>
 
       {articles.map(article => renderArticleCard({ item: article }))}
     </ScrollView>

@@ -87,6 +87,23 @@ export default function TopicAll() {
     ));
   };
 
+  //Render the skincare product topics
+  const renderTopicsSustainability = (topics) => {
+    return topics.map((topic, index) => (
+      <Animated.View key={topic.topic} entering={FadeInDown.duration(3000).springify()}>
+        <TouchableOpacity onPress={() => navigation.navigate('CategorySearch', { topicData: topic })}>
+          <View className="bg-white border border-gray-200 mr-3 px-4 rounded-xl items-center shadow-sm py-3">
+            <Image source={{ uri: topic.topicImage }} className="w-12 h-[45] -mt-6 mb-1.5" />
+            <View className="flex-wrap">
+              <Text style={{ fontFamily: 'Montserrat_300Light'}} className="w-20 pb-0 mt-2 text-center text-[10px]">Explore</Text>
+              <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(13)}} className="pb-1 text-center w-[85]">{topic.topicName}</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Animated.View>
+    ));
+  };
+
   return (
     <View>
       {/* Skin Type Topics */}
@@ -110,7 +127,7 @@ export default function TopicAll() {
       {/* Sustainability Topics */}
       <Text style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 18 }} className="mx-7 mb-2">Sustainability</Text>
       <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} className="py-5 ml-6">
-        {renderTopics(topics.sustainability)}
+        {renderTopicsSustainability(topics.sustainability)}
       </ScrollView>
     </View>
   );

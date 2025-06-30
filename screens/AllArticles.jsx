@@ -215,6 +215,12 @@ export default function AllArticles() {
 
       <View className="bg-white outline outline-offset-6 h-full py-5 -mt-5 rounded-t-[35px] shadow-xl">
 
+         <Pressable onPress={() => navigation.navigate('RequestArticle')}
+            className="flex-row justify-between bg-white py-3 px-3 rounded-xl shadow-xs border border-gray-100 mx-auto mt-3 w-100 mx-6 mb-3">
+              <Text className="text-black" style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: getFontSize(14) }}>Request an Article</Text>
+              <Image className="w-4 h-4 mr-3" style={{ tintColor: "#FB6F93" }} source={require('./../assets/icons/right-arrow.png')} />
+          </Pressable>
+
         {recommendedArticles.length > 0 && (
           <View className="mb-6 pl-6">
             <View className="flex-row justify-between items-center">
